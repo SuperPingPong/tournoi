@@ -1,0 +1,20 @@
+version: '2'
+services:
+  db:
+    build: db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  frontend:
+    build: frontend
+    depends_on:
+      - api
+    restart: always
+    ports:
+      - "0.0.0.0:40080:80"
+  api:
+    build: backend
+    depends_on:
+      - db
+    restart: always

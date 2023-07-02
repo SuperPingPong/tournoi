@@ -37,15 +37,15 @@ func (api *API) setupRouter() {
 	}
 
 	api.router.Use(middlewares.ErrorHandler())
-	api.router.POST("/otp", api.SendOTP)
-	api.router.POST("/login", api.authMiddleware.LoginHandler)
-	api.router.GET("/logout", api.authMiddleware.LogoutHandler)
+	api.router.POST("/api/otp", api.SendOTP)
+	api.router.POST("/api/login", api.authMiddleware.LoginHandler)
+	api.router.GET("/api/logout", api.authMiddleware.LogoutHandler)
 
 	authenticated := api.router.Group("/")
 	authenticated.Use(api.authMiddleware.MiddlewareFunc())
 	{
-		authenticated.GET("/members", api.ListMembers)
-		authenticated.POST("/members", api.CreateMember)
-		authenticated.PATCH("/members/:id", api.UpdateMember)
+		authenticated.GET("/api/members", api.ListMembers)
+		authenticated.POST("/api/members", api.CreateMember)
+		authenticated.PATCH("/api/members/:id", api.UpdateMember)
 	}
 }

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="tournoi de tennis de table national b" />
+    <title>Tournoi de Lognes 🏓</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="stylesheet" href="css/custom.css" />
+    <script src="js/he.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" id="theme-styles">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/custom.js"></script>
+    <link rel="icon" type="image/png" href="favicon.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="favicon.png" sizes="16x16" />
+  </head>
+  <body>
+    <header class="header">
+      <h1 id="title" class="header__title">🏓 TOURNOI NATIONAL B DE L’E.P. LOGNES 🏓</h1>
+      <h2 id="subtitle" class="header__title">28 octobre et 29 octobre 2023</h2>
+      <p id="description" class="header__description">
+        Règlement du tournoi: <a href="/files/reglement.pdf" target="_blank">reglement.pdf</a>
+        <!--
+        <br><br>
+        <button style="" class="button" type="reset" name="reset" onclick="logout()">Réinitialiser</button>
+        -->
+      </p>
+      <img src="/img/illustration.png" alt="" aria-hidden="true" class="illustration" />
+    </header>
+    <main>
+      <a href="https://github.com/SuperPingPong/tournoi" target="_blank" class="github-corner" aria-label="View source on GitHub">
+        <svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg>
+      </a>
+      <form action="#" method="GET" id="survey-form" class="survey" novalidate>
+        <div
+          class="progressbar"
+          tabindex="0"
+          role="progressbar"
+          aria-valuemin="1"
+          aria-valuemax="3"
+          aria-valuenow="1"
+          aria-valuetext="Question 1 sur 3: Validation de votre adresse email"
+        >
+          <span class="progressbar__step active" aria-hidden="true"></span>
+          <span class="progressbar__step" aria-hidden="true"></span>
+          <span class="progressbar__step" aria-hidden="true"></span>
+        </div>
+
+        <section
+          class="survey__panel survey__panel--current"
+          aria-hidden="false"
+          data-index="1"
+          data-panel="firstPanel"
+          data-requirement="email"
+        >
+          <h2 class="survey__panel__question">
+            <span class="visuallyhidden">Question 1 sur 3 </span>Validation de votre adresse email
+          </h2>
+          <div class="survey__panel__period">
+            <div class="form-group">
+              <input class="field" type="text" id="email" name="email" required placeholder="Votre adresse email" />
+              <p class="error-message"></p>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="survey__panel"
+          aria-hidden="true"
+          data-index="2"
+          data-panel="secondPanel"
+          data-requirement="option"
+        >
+          <h2 class="survey__panel__question">
+            <span class="visuallyhidden">Question 2 sur 3 </span>Sélection du numéro de licence de l'inscrit
+          </h2>
+          <div class="survey__panel__satisfaction">
+            <p>
+            Vous êtes déjà inscrit ? Vous voulez modifier votre inscription ou consulter votre rang dans les listes d'attentes ? <a href="/app">Cliquez ici</a><br>
+            </p>
+            <div class="form-group">
+              <input class="field" type="text" id="license" name="license" onkeyup="search()" required placeholder="Entrer le nom de famille du joueur" />
+              <div class="suggestions" id="suggestions"></div>
+              <p class="error-message"></p>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="survey__panel"
+          aria-hidden="true"
+          data-index="3"
+          data-panel="thirdPanel"
+          data-requirement="option"
+        >
+          <h2 class="survey__panel__question">
+            <span class="visuallyhidden">Question 3 of 3 </span>Choix des tableaux
+          </h2>
+          <div class="survey__panel__hearabout">
+            <img style="margin-top: 2rem" src="img/table-day-1.png" alt="" aria-hidden="true" class="illustration" />
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-A" name="question_3" value="A" />
+              <label for="tableau-A">Tableau A (72 places restantes)</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-B" name="question_3" value="A" />
+              <label for="tableau-B">Tableau B (72 places restantes)</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-C" name="question_3" value="A" />
+              <label for="tableau-C">Tableau C (72 places restantes)</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-D" name="question_3" value="A" />
+              <label for="tableau-D">Tableau D (72 places restantes)</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-E" name="question_3" value="A" />
+              <label for="tableau-E">Tableau E (72 places restantes)</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-F" name="question_3" value="A" />
+              <label for="tableau-F">Tableau F (72 places restantes)</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-G" name="question_3" value="A" />
+              <label for="tableau-G">Tableau G (72 places restantes)</label>
+            </div>
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-H" name="question_3" value="A" />
+              <label for="tableau-H">Tableau H (72 places restantes)</label>
+            </div>
+
+            <img style="margin-top: 2rem" src="img/table-day-2.png" alt="" aria-hidden="true" class="illustration" />
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-1" name="question_3" value="A" />
+              <label for="tableau-1">Tableau 1 (72 places restantes)</label>
+            </div>
+
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-2" name="question_3" value="A" />
+              <label for="tableau-2">Tableau 2 (72 places restantes)</label>
+            </div>
+
+            <!-- Repeat the pattern for 'tableau-3' to 'tableau-7' -->
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-3" name="question_3" value="A" />
+              <label for="tableau-3">Tableau 3 (72 places restantes)</label>
+            </div>
+
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-4" name="question_3" value="A" />
+              <label for="tableau-4">Tableau 4 (72 places restantes)</label>
+            </div>
+
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-5" name="question_3" value="A" />
+              <label for="tableau-5">Tableau 5 (72 places restantes)</label>
+            </div>
+
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-6" name="question_3" value="A" />
+              <label for="tableau-6">Tableau 6 (72 places restantes)</label>
+            </div>
+
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" id="tableau-7" name="question_3" value="A" />
+              <label for="tableau-7">Tableau 7 (72 places restantes)</label>
+            </div>
+
+          </div>
+          <p class="error-message"></p>
+        </section>
+
+        <div class="form-buttons">
+          <button class="button" type="button" name="prev" disabled="disabled" aria-label="Précédent" aria-hidden="true">
+            Précédent
+          </button>
+          <button class="button" type="button" name="next" aria-label="Suivant" aria-hidden="false">Suivant</button>
+          <button class="button" type="submit" id="submit" name="submit" disabled="disabled" aria-hidden="true">
+            Valider
+          </button>
+        </div>
+      </form>
+    </main>
+    <!-- <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script> -->
+    <script src="js/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,30 @@
+version: '2'
+services:
+  db:
+    build: db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - $PWD/database:/var/lib/postgresql
+  frontend:
+    build: frontend
+    depends_on:
+      - api
+    restart: always
+    ports:
+      - "0.0.0.0:40080:80"
+    volumes:
+      - $PWD/frontend/html:/usr/share/nginx/html
+  api:
+    build:
+      context: backend
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - db
+    restart: always
+    volumes:
+      - $PWD/backend:/app

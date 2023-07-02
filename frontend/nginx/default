@@ -1,0 +1,21 @@
+server {
+        listen 80 default_server;
+        server_name  localhost;
+        server_tokens off;
+
+        root /usr/share/nginx/html;
+        index index.html;
+
+        location /api  {
+           proxy_pass  http://api:8080;
+        }
+
+        location /app {
+            try_files $uri $uri/ /app.html;
+        }
+
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+
+}
