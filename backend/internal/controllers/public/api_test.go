@@ -57,7 +57,7 @@ func getTestEnv(t *testing.T) testEnv {
 	if err != nil {
 		panic(err)
 	}
-	req, err := http.NewRequestWithContext(ctx, "POST", "/login", bytes.NewBuffer(body))
+	req, err := http.NewRequestWithContext(ctx, "POST", "/api/login", bytes.NewBuffer(body))
 	if err != nil {
 		panic(err)
 	}

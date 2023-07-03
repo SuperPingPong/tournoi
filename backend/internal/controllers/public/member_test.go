@@ -54,7 +54,7 @@ func TestListMembers(t *testing.T) {
 		}
 		env.db.Create(&members)
 
-		res := performRequest("GET", "/members", nil, map[string]string{
+		res := performRequest("GET", "/api/members", nil, map[string]string{
 			"Authorization": "Bearer " + env.jwt,
 		}, env.api.router)
 
@@ -83,7 +83,7 @@ func TestListMembers(t *testing.T) {
 		}
 		env.db.Create(user)
 
-		res := performRequest("GET", "/members", nil, map[string]string{
+		res := performRequest("GET", "/api/members", nil, map[string]string{
 			"Authorization": "Bearer " + env.jwt,
 		}, env.api.router)
 
@@ -117,7 +117,7 @@ func TestCreateMember(t *testing.T) {
 			Body:       r,
 		}, nil)
 
-		res := performRequest("POST", "/members", bytes.NewBuffer(body), map[string]string{
+		res := performRequest("POST", "/api/members", bytes.NewBuffer(body), map[string]string{
 			"Authorization": "Bearer " + env.jwt,
 		}, env.api.router)
 
@@ -144,7 +144,7 @@ func TestCreateMember(t *testing.T) {
 		body, err := json.Marshal(data)
 		require.NoError(t, err)
 
-		res := performRequest("POST", "/members", bytes.NewBuffer(body), map[string]string{
+		res := performRequest("POST", "/api/members", bytes.NewBuffer(body), map[string]string{
 			"Authorization": "Bearer " + env.jwt,
 		}, env.api.router)
 
@@ -158,7 +158,7 @@ func TestCreateMember(t *testing.T) {
 		env := getTestEnv(t)
 		defer env.teardown()
 
-		res := performRequest("POST", "/members", nil, map[string]string{
+		res := performRequest("POST", "/api/members", nil, map[string]string{
 			"Authorization": "Bearer " + env.jwt,
 		}, env.api.router)
 
@@ -198,7 +198,7 @@ func TestUpdateMember(t *testing.T) {
 			Body:       r,
 		}, nil)
 
-		url := fmt.Sprintf("/members/%s", created.ID)
+		url := fmt.Sprintf("/api/members/%s", created.ID)
 		data := map[string]string{
 			"PermitID": permitID,
 		}
@@ -226,7 +226,7 @@ func TestUpdateMember(t *testing.T) {
 		env := getTestEnv(t)
 		defer env.teardown()
 
-		url := "/members/000001"
+		url := "/api/members/000001"
 		data := map[string]string{}
 		body, err := json.Marshal(data)
 		require.NoError(t, err)
@@ -251,7 +251,7 @@ func TestUpdateMember(t *testing.T) {
 		}
 		env.db.Create(created)
 
-		url := fmt.Sprintf("/members/%s", created.ID)
+		url := fmt.Sprintf("/api/members/%s", created.ID)
 		res := performRequest("PATCH", url, nil, map[string]string{
 			"Authorization": "Bearer " + env.jwt,
 		}, env.api.router)
@@ -266,7 +266,7 @@ func TestUpdateMember(t *testing.T) {
 		env := getTestEnv(t)
 		defer env.teardown()
 
-		url := "/members/foo"
+		url := "/api/members/foo"
 		res := performRequest("PATCH", url, nil, map[string]string{
 			"Authorization": "Bearer " + env.jwt,
 		}, env.api.router)
@@ -294,7 +294,7 @@ func TestUpdateMember(t *testing.T) {
 		}
 		env.db.Create(user)
 
-		url := "/members/" + user.Members[0].ID.String()
+		url := "/api/members/" + user.Members[0].ID.String()
 		data := map[string]string{"PermitID": "000000"}
 		body, err := json.Marshal(data)
 		require.NoError(t, err)
@@ -313,7 +313,7 @@ func TestUpdateMember(t *testing.T) {
 		defer env.teardown()
 
 		memberID := uuid.NewString()
-		url := "/members/" + memberID
+		url := "/api/members/" + memberID
 		data := map[string]string{"PermitID": "000000"}
 		body, err := json.Marshal(data)
 		require.NoError(t, err)

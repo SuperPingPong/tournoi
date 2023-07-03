@@ -43,9 +43,10 @@ func (a *AuthBusiness) AuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
-			return &models.User{
-				ID: uuid.MustParse(claims[IdentityKey].(string)),
-			}
+
+			var user models.User
+			a.db.First(&user, uuid.MustParse(claims[IdentityKey].(string)))
+			return &user
 		},
 		Authorizator: func(data interface{}, ctx *gin.Context) bool {
 			if _, ok := data.(*models.User); ok {

@@ -41,11 +41,12 @@ func (api *API) setupRouter() {
 	api.router.POST("/api/login", api.authMiddleware.LoginHandler)
 	api.router.GET("/api/logout", api.authMiddleware.LogoutHandler)
 
-	authenticated := api.router.Group("/")
+	authenticated := api.router.Group("/api")
 	authenticated.Use(api.authMiddleware.MiddlewareFunc())
 	{
-		authenticated.GET("/api/members", api.ListMembers)
-		authenticated.POST("/api/members", api.CreateMember)
-		authenticated.PATCH("/api/members/:id", api.UpdateMember)
+		authenticated.GET("/members", api.ListMembers)
+		authenticated.POST("/members", api.CreateMember)
+		authenticated.PATCH("/members/:id", api.UpdateMember)
+		authenticated.POST("/check-auth", api.CheckAuth)
 	}
 }
