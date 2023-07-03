@@ -73,7 +73,7 @@ type PlayerXML struct {
 	LastName  string  `xml:"nom"`
 	FirstName string  `xml:"prenom"`
 	ClubName  string  `xml:"nclub"`
-	Points    float64 `xml:"score"`
+	Points    float64 `xml:"points"`
 	PermitID  string  `xml:"licence"`
 	Sex       string  `xml:"sexe"`
 }

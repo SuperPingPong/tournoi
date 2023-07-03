@@ -6,18 +6,19 @@ function search() {
     var surname = value;
     var name = "";
     $.ajax({
-      url: "/api/search",
-      data: {
+      url: "/api/players",
+      type: "POST",
+      data: JSON.stringify({
         surname: surname,
         name: name
-      },
-      type: "GET",
+      }),
+      contentType: 'application/json',
       success: function(players) {
         const suggestions = $('#suggestions');
         const result = $('#result');
         suggestions.html("");
-        for (const player of players) {
-          const div = $('<div>').html(player.surname + ' ' + player.name + ' - ' + player.nclub + ' - ' + player.score);
+        for (const player of players.players) {
+          const div = $('<div>').html(player.nom + ' ' + player.prenom + ' - ' + player.nomclub + ' - ' + player.point);
           div.click(function() {
             input.val("");
             suggestions.hide();

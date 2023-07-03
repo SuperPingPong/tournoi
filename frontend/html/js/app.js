@@ -329,7 +329,7 @@ function Survey(survey) {
     if (index === "2") {
       var licenseNumber = $('input[name="license"]').val();
       $.ajax({
-        url: '/api/player',
+        url: '/api/players/' + licenseNumber,
         type: 'GET',
         data: {
           license_number: licenseNumber
