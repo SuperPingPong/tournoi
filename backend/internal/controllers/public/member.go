@@ -43,19 +43,22 @@ func (api *API) CreateMember(ctx *gin.Context) {
 		return
 	}
 
-	data, err := api.GetFFTTMemberData(input.PermitID)
+	data, err := api.GetFFTTPlayerData(input.PermitID)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get member data from FFTT: %w", err))
 		return
 	}
 
 	member := models.Member{
-		UserID:    userID,
-		PermitID:  data.Licence,
-		FirstName: data.Prenom,
-		LastName:  data.Nom,
-		Sex:       data.Sexe,
-		Points:    data.Point,
+		UserID:     userID,
+		PermitID:   data.PermitID,
+		FirstName:  data.FirstName,
+		LastName:   data.LastName,
+		Sex:        data.Sex,
+		Points:     data.Points,
+		Category:   data.Category,
+		ClubName:   data.ClubName,
+		PermitType: data.PermitType,
 	}
 	err = api.db.Create(&member).Error
 	if err != nil {
@@ -109,17 +112,20 @@ func (api *API) UpdateMember(ctx *gin.Context) {
 	}
 
 	if input.PermitID != "" {
-		data, err := api.GetFFTTMemberData(input.PermitID)
+		data, err := api.GetFFTTPlayerData(input.PermitID)
 		if err != nil {
 			ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get member data from FFTT: %w", err))
 			return
 		}
 
-		member.PermitID = data.Licence
-		member.FirstName = data.Prenom
-		member.LastName = data.Nom
-		member.Sex = data.Sexe
-		member.Points = data.Point
+		member.PermitID = data.PermitID
+		member.FirstName = data.FirstName
+		member.LastName = data.LastName
+		member.Sex = data.Sex
+		member.Points = data.Points
+		member.Category = data.Category
+		member.ClubName = data.ClubName
+		member.PermitType = data.PermitType
 	}
 
 	err = api.db.Save(&member).Error

@@ -8,12 +8,15 @@ import (
 )
 
 type Member struct {
-	ID        uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid();->"`
-	PermitID  string    `gorm:"not null;unique;index"`
-	FirstName string    `gorm:"not null"`
-	LastName  string    `gorm:"not null"`
-	Sex       string    `gorm:"not null"`
-	Points    float64   `gorm:"not null"`
+	ID         uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid();->"`
+	PermitID   string    `gorm:"not null;unique;index"`
+	FirstName  string    `gorm:"not null"`
+	LastName   string    `gorm:"not null"`
+	Sex        string    `gorm:"not null"`
+	Points     float64   `gorm:"not null"`
+	Category   string
+	ClubName   string
+	PermitType string
 
 	CreatedAt time.Time      `gorm:"<-:create;not null"`
 	UpdatedAt time.Time      `gorm:"not null"`

@@ -105,17 +105,21 @@ func TestCreateMember(t *testing.T) {
 		permitID := "123456"
 		sex := "M"
 		point := 801.0
-		data := map[string]string{"permitID": permitID}
-		body, err := json.Marshal(data)
-		require.NoError(t, err)
+		category := "S"
+		clubName := "Caillouville"
+		permitType := "T"
 
 		expectedFFTTReq, err := http.NewRequest(http.MethodGet, "https://fftt.dafunker.com/v1/joueur/"+permitID, nil)
-		mockFFTTRes := fmt.Sprintf(`{"nom":"%s","prenom":"%s","licence":"%s","sexe":"%s","point":%f}`, lastName, firstName, permitID, sex, point)
+		mockFFTTRes := fmt.Sprintf(`{"nom":"%s","prenom":"%s","licence":"%s","sexe":"%s","point":%f,"cat":"%s","nomclub":"%s","type":"%s"}`, lastName, firstName, permitID, sex, point, category, clubName, permitType)
 		r := io.NopCloser(bytes.NewReader([]byte(mockFFTTRes)))
 		env.api.httpClient.(*MockHTTPClient).EXPECT().Do(expectedFFTTReq).Return(&http.Response{
 			StatusCode: http.StatusOK,
 			Body:       r,
 		}, nil)
+
+		data := map[string]string{"permitID": permitID}
+		body, err := json.Marshal(data)
+		require.NoError(t, err)
 
 		res := performRequest("POST", "/api/members", bytes.NewBuffer(body), map[string]string{
 			"Authorization": "Bearer " + env.jwt,
@@ -131,6 +135,9 @@ func TestCreateMember(t *testing.T) {
 		require.Equal(t, permitID, created.PermitID)
 		require.Equal(t, sex, created.Sex)
 		require.Equal(t, point, created.Points)
+		require.Equal(t, category, created.Category)
+		require.Equal(t, clubName, created.ClubName)
+		require.Equal(t, permitType, created.PermitType)
 		require.Equal(t, env.user.ID, created.UserID)
 		require.True(t, created.CreatedAt.After(time.Time{}))
 		require.Equal(t, created.CreatedAt, created.UpdatedAt)
@@ -188,10 +195,13 @@ func TestUpdateMember(t *testing.T) {
 		lastName := "Pierre"
 		permitID := "123456"
 		sex := "M"
-		point := 801
+		point := 801.0
+		category := "S"
+		clubName := "Caillouville"
+		permitType := "T"
 
 		expectedFFTTReq, err := http.NewRequest(http.MethodGet, "https://fftt.dafunker.com/v1/joueur/"+permitID, nil)
-		mockFFTTRes := fmt.Sprintf(`{"nom":"%s","prenom":"%s","licence":"%s","sexe":"%s","point":%d}`, lastName, firstName, permitID, sex, point)
+		mockFFTTRes := fmt.Sprintf(`{"nom":"%s","prenom":"%s","licence":"%s","sexe":"%s","point":%f,"cat":"%s","nomclub":"%s","type":"%s"}`, lastName, firstName, permitID, sex, point, category, clubName, permitType)
 		r := io.NopCloser(bytes.NewReader([]byte(mockFFTTRes)))
 		env.api.httpClient.(*MockHTTPClient).EXPECT().Do(expectedFFTTReq).Return(&http.Response{
 			StatusCode: http.StatusOK,
@@ -220,6 +230,9 @@ func TestUpdateMember(t *testing.T) {
 		require.Equal(t, lastName, updated.LastName)
 		require.Equal(t, permitID, updated.PermitID)
 		require.Equal(t, sex, updated.Sex)
+		require.Equal(t, category, updated.Category)
+		require.Equal(t, clubName, updated.ClubName)
+		require.Equal(t, permitType, updated.PermitType)
 		require.Equal(t, env.user.ID, updated.UserID)
 	})
 	t.Run("EmptyInput", func(t *testing.T) {

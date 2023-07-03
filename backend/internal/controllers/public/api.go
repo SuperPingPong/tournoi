@@ -40,6 +40,8 @@ func (api *API) setupRouter() {
 	api.router.POST("/api/otp", api.SendOTP)
 	api.router.POST("/api/login", api.authMiddleware.LoginHandler)
 	api.router.GET("/api/logout", api.authMiddleware.LogoutHandler)
+	api.router.GET("/api/players/:id", api.GetFFTTPlayer)
+	api.router.POST("/api/players", api.SearchFFTTPlayers)
 
 	authenticated := api.router.Group("/api")
 	authenticated.Use(api.authMiddleware.MiddlewareFunc())
