@@ -22,9 +22,7 @@ function search() {
           div.click(function() {
             input.val("");
             suggestions.hide();
-            const license = player.license
-            // window.location = '/?license=' + license;
-            input.val(player.license);
+            input.val(player.licence);
           });
           suggestions.append(div);
         }
