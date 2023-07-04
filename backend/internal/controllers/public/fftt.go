@@ -1,7 +1,6 @@
 package public
 
 import (
-	"bytes"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -10,8 +9,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/net/html/charset"
-	"golang.org/x/text/encoding/charmap"
 )
 
 //go:generate mockery --name HTTPClient
@@ -129,10 +126,9 @@ func (api *API) SearchFFTTPlayers(ctx *gin.Context) {
 	}
 
 	var data PlayersXML
-	reader := bytes.NewReader(body)
-	decoder := xml.NewDecoder(reader)
-	decoder.CharsetReader = charset.NewReaderLabel
-	err = decoder.Decode(&data)
+	xmlString := strings.Replace(string(body), "encoding=\"ISO-8859-1\"", "encoding=\"UTF-8\"", 1)
+	xmlBytes := []byte(xmlString)
+	err = xml.Unmarshal(xmlBytes, &data)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to unmarshal search response from FFTT: %w", err))
 		return
@@ -148,8 +144,8 @@ func (api *API) SearchFFTTPlayers(ctx *gin.Context) {
 		}
 
 		ffttPlayers = append(ffttPlayers, FFTTPlayer{
-			LastName:  fromISO88591(strings.ReplaceAll(player.LastName, "’", "'")),
-			FirstName: fromISO88591(strings.ReplaceAll(player.FirstName, "’", "'")),
+			LastName:  player.LastName,
+			FirstName: player.FirstName,
 			PermitID:  player.PermitID,
 			Points:    player.Points,
 			ClubName:  player.ClubName,
@@ -158,13 +154,4 @@ func (api *API) SearchFFTTPlayers(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"players": ffttPlayers})
-}
-
-func fromISO88591(iso88591 string) string {
-	encoder := charmap.ISO8859_1.NewEncoder()
-	out, err := encoder.Bytes([]byte(iso88591))
-	if err != nil {
-		panic(err)
-	}
-	return string(out)
 }
