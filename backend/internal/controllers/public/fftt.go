@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/html/charset"
+	"golang.org/x/text/encoding/charmap"
 )
 
 //go:generate mockery --name HTTPClient
@@ -136,7 +137,6 @@ func (api *API) SearchFFTTPlayers(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to unmarshal search response from FFTT: %w", err))
 		return
 	}
-	fmt.Println(data)
 
 	var ffttPlayers []FFTTPlayer
 	for _, player := range data.Players {
@@ -148,8 +148,8 @@ func (api *API) SearchFFTTPlayers(ctx *gin.Context) {
 		}
 
 		ffttPlayers = append(ffttPlayers, FFTTPlayer{
-			LastName:  strings.ReplaceAll(player.LastName, "’", "'"),
-			FirstName: strings.ReplaceAll(player.FirstName, "’", "'"),
+			LastName:  fromISO88591(strings.ReplaceAll(player.LastName, "’", "'")),
+			FirstName: fromISO88591(strings.ReplaceAll(player.FirstName, "’", "'")),
 			PermitID:  player.PermitID,
 			Points:    player.Points,
 			ClubName:  player.ClubName,
@@ -158,4 +158,13 @@ func (api *API) SearchFFTTPlayers(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"players": ffttPlayers})
+}
+
+func fromISO88591(iso88591 string) string {
+	encoder := charmap.ISO8859_1.NewEncoder()
+	out, err := encoder.Bytes([]byte(iso88591))
+	if err != nil {
+		panic(err)
+	}
+	return string(out)
 }
