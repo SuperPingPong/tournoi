@@ -25,9 +25,9 @@ type FFTTPlayer struct {
 	PermitID   string  `json:"licence"`
 	Sex        string  `json:"sexe"`
 	Points     float64 `json:"point"`
-	Category   string  `json:"cat"`
+	Category   string  `json:"cat,omitempty"`
 	ClubName   string  `json:"nomclub"`
-	PermitType string  `json:"type"`
+	PermitType string  `json:"type,omitempty"`
 }
 
 func (api *API) GetFFTTPlayerData(permitID string) (*FFTTPlayer, error) {
