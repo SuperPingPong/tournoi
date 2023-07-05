@@ -22,6 +22,6 @@ type Member struct {
 	UpdatedAt time.Time      `gorm:"not null"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 
-	Bands  []*Band `gorm:"many2many:bands__members"`
+	Bands  []*Band `gorm:"many2many:bands__members;joinForeignKey:MemberID"`
 	UserID uuid.UUID
 }

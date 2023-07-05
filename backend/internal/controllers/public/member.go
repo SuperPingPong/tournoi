@@ -19,9 +19,9 @@ func (api *API) ListMembers(ctx *gin.Context) {
 	userID := uuid.MustParse(claims[auth.IdentityKey].(string))
 
 	var members []models.Member
-	err := api.db.Where("user_id = ?", userID).Find(&members).Error
+	err := api.db.Preload("Bands").Where("user_id = ?", userID).Find(&members).Error
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get member: %w", err))
+		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list members: %w", err))
 		return
 	}
 

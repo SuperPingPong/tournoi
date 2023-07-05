@@ -159,7 +159,7 @@ func TestCreateMember(t *testing.T) {
 		require.Equal(t, http.StatusBadRequest, res.Code)
 		err = json.NewDecoder(res.Body).Decode(&actual)
 		require.NoError(t, err)
-		require.Equal(t, "invalid input: Key: 'CreateMemberInput.PermitID' Error:Field validation for 'PermitID' failed on the 'required' tag", actual["error"])
+		require.Equal(t, "invalid input: Key: 'CreateMemberInput.MemberID' Error:Field validation for 'MemberID' failed on the 'required' tag", actual["error"])
 	})
 	t.Run("MissingInput", func(t *testing.T) {
 		env := getTestEnv(t)
@@ -308,7 +308,7 @@ func TestUpdateMember(t *testing.T) {
 		env.db.Create(user)
 
 		url := "/api/members/" + user.Members[0].ID.String()
-		data := map[string]string{"PermitID": "000000"}
+		data := map[string]string{"MemberID": "000000"}
 		body, err := json.Marshal(data)
 		require.NoError(t, err)
 		res := performRequest("PATCH", url, bytes.NewBuffer(body), map[string]string{
@@ -327,7 +327,7 @@ func TestUpdateMember(t *testing.T) {
 
 		memberID := uuid.NewString()
 		url := "/api/members/" + memberID
-		data := map[string]string{"PermitID": "000000"}
+		data := map[string]string{"MemberID": "000000"}
 		body, err := json.Marshal(data)
 		require.NoError(t, err)
 

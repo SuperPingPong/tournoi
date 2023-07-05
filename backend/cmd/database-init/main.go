@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/SuperPingPong/tournoi/internal/models"
 
 	"gorm.io/driver/postgres"
@@ -14,7 +16,9 @@ func main() {
 		panic(err)
 	}
 
-	db.Exec("CREATE DATABASE database")
+	if db.Exec("CREATE DATABASE database").Error != nil {
+		fmt.Println("skipping database creation...")
+	}
 
 	db, err = models.ConnectDatabase()
 	if err != nil {
