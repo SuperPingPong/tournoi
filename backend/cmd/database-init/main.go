@@ -25,17 +25,4 @@ func main() {
 		panic(err)
 	}
 
-	bandNames := []string{
-		"A",
-		"B",
-		"C",
-	}
-	for _, bandName := range bandNames {
-		err := db.Create(&models.Band{
-			Name: bandName,
-		}).Error
-		if err != nil {
-			panic(err)
-		}
-	}
 }

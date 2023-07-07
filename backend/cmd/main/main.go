@@ -24,6 +24,31 @@ func main() {
 		},
 	})
 
+	bands := []models.Band{
+		{
+			Name: "A",
+			Day:  1,
+		},
+		{
+			Name: "B",
+			Day:  1,
+		},
+		{
+			Name: "1",
+			Day:  2,
+		},
+		{
+			Name: "2",
+			Day:  2,
+		},
+	}
+	for _, band := range bands {
+		err := db.Create(&band).Error
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	err = r.Run("0.0.0.0:8080")
 	if err != nil {
 		panic(err)
