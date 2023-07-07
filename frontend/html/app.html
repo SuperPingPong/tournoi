@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="description" content="Survey form code challenge" />
     <title>Tournoi de Lognes 🏓</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet" />
@@ -13,6 +13,7 @@
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" id="theme-styles">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://kit.fontawesome.com/62577a5158.js" crossorigin="anonymous"></script>
     <script src="js/app.js"></script>
 
     <link rel="stylesheet" href="//cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
@@ -27,12 +28,9 @@
       <h2 id="subtitle" class="header__title">28 octobre et 29 octobre 2023</h2>
       <p id="description" class="header__description">
         Règlement du tournoi: <a href="/files/reglement.pdf" target="_blank">reglement.pdf</a>
-        <!--
-        <br><br>
-        <button style="" class="button" type="reset" name="reset" onclick="logout()">Réinitialiser</button>
-        -->
       </p>
-      <img src="/img/illustration.png" alt="" aria-hidden="true" class="illustration" />
+      <img src="img/table-day-1.png" class="illustration" />
+      <img src="img/table-day-2.png" class="illustration" />
     </header>
     <main>
       <a href="https://github.com/SuperPingPong/tournoi" target="_blank" class="github-corner" aria-label="View source on GitHub">
@@ -55,19 +53,18 @@
             Vous souhaitez ajouter une nouvelle inscription ? <a href="/">Cliquez ici</a><br>
           </p>
 
-          <table class="table table-bordered" id="dataTable" style="display: none">
+          <table class="table table-bordered" id="dataTable">
             <thead>
             <tr>
               <th style="width: 15%">Joueur</th>
-              <th style="width: 70%">Tableaux</th>
-              <th style="width: 15%"></th>
+              <th style="width: 15%">Club</th>
+              <th style="width: 15%">Points</th>
+              <th style="width: 45%">Tableaux</th>
+              <th style="width: 10%">Modifier</th>
             </tr>
             </thead>
             <tbody id="list-list"></tbody>
           </table>
-
-          <img style="margin-top: 2rem" src="img/table-day-1.png" alt="" aria-hidden="true" class="illustration" />
-          <img style="margin-top: 2rem" src="img/table-day-2.png" alt="" aria-hidden="true" class="illustration" />
 
 
         </section>

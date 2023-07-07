@@ -3,8 +3,7 @@ function init() {
     url: '/api/members',
     type: 'GET',
     success: function(response) {
-      // TODO: update to === 0
-      if (response.members.length < 0) {
+      if (response.members.length === 0) {
         Swal.fire({
           icon: 'error',
           title: "Modification des tableaux",
@@ -17,8 +16,45 @@ function init() {
         });
       }
       console.log(response.members);
+      response.members.forEach(member => {
+        console.log(member);
+      });
       let dataTable = document.getElementById("dataTable");
       dataTable.style.display = "block";
+      dataTable = $('#dataTable').DataTable({
+        "lengthMenu": [10, 25, 50, 100],
+        "pageLength": 10,
+        "data": response.members,
+        "order": [], // Remove default sorting
+        "columns": [
+          {
+            data: null,
+            render: function(data, type, row) {
+              return `👤 ${row.FirstName} ${row.LastName}`;
+            }
+          },
+          {
+            data: null,
+            render: function(data, type, row) {
+              return `🏓 ${row.ClubName}`;
+            }
+          },
+          {
+            data: null,
+            render: function(data, type, row) {
+              return `🎯 ${row.Points}`;
+            }
+          },
+          {
+            data: null,
+            render: function(data, type, row) {
+              const bandNames = 'Tableaux ' + row.Bands.map(band => band.Name).join(' / ');
+              return bandNames;
+            }
+          },
+          { "defaultContent": "<div class=\"field\"><button type=\"submit\"><i class=\"fa-solid fa-pencil\"></i></button></div>" },
+        ],
+      });
     },
     error: function(xhr, textStatus, error) {
       // console.log(error);
