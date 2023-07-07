@@ -178,6 +178,44 @@ function Survey(survey) {
       submitButton.disabled = false;
       submitButton.setAttribute("aria-hidden", false);
     }
+    if (+currentPanel.dataset.index === 3) {
+      // Dynamically field form for set-bands endpoint
+      $.ajax({
+        url: '/api/bands',
+        type: 'GET',
+        contentType: 'application/json',
+        success: function(response) {
+          [1, 2].forEach(day => {
+            let bandsDay = response.bands.filter(band => band.Day === day);
+            let bandDayContainer = document.getElementById(`form-group-day-${day}`);
+            bandDayContainer.innerHTML = '';
+            bandsDay.forEach(band => {
+                const div = document.createElement('div');
+                div.classList.add('form-group');
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.classList.add('checkbox');
+                input.id = `tableau-${band.Name}`;
+                input.name = 'question_3';
+                input.value = band.ID;
+                const label = document.createElement('label');
+                label.htmlFor = `tableau-${band.Name}`;
+                label.textContent = `Tableau ${band.Name} (72 places restantes)`;
+                div.appendChild(input);
+                div.appendChild(label);
+                bandDayContainer.appendChild(div);
+            });
+          })
+        },
+        error: function(xhr, textStatus, error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Une erreur est survenue',
+            text: ''
+          });
+        }
+      });
+    }
   }
 
   function displayPrevPanel() {
@@ -345,7 +383,7 @@ function Survey(survey) {
           license_number: licenseNumber
         },
         success: function(response) {
-          console.log(response);
+          // console.log(response);
           // Generate HTML content based on the AJAX response
           const htmlContent = '<p>' + response.content + '</p>';
           // Show SweetAlert2 with HTML content
@@ -364,20 +402,71 @@ function Survey(survey) {
             cancelButtonText: 'Annuler',
             allowOutsideClick: false
           }).then(function(result) {
-            // Handle success after OTP code is verified
-            if (result.isConfirmed) {
-              noErrors();
-              displayNextPanel();
+            if (!result.isConfirmed) {
+              return
             }
-          });
-        },
-        error: function(xhr, textStatus, error) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Une erreur est survenue',
-            text: ''
-          });
-        }
+            // Create member if not exists or pass if exists but no set-bands done yet
+            $.ajax({
+              url: '/api/members',
+              type: 'GET',
+              contentType: 'application/json',
+              success: function(response) {
+                let members = response.members;
+                let filteredMembers = members.filter(member => member.PermitID === licenseNumber);
+                if (filteredMembers.length === 0) {
+                  $.ajax({
+                    url: '/api/members',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ permitid: licenseNumber }),
+                    success: function(response) {
+                      let memberId = response.ID
+                      localStorage.setItem('memberId', memberId);
+                      noErrors();
+                      displayNextPanel();
+                    },
+                    error: function(xhr, textStatus, error) {
+                      Swal.fire({
+                        icon: 'error',
+                        title: 'Une erreur est survenue',
+                        text: ''
+                      });
+                    }
+                  });
+                } else {
+                  let memberBands = filteredMembers[0].Bands;
+                  if (memberBands.length === 0) {
+                    let memberId = filteredMembers[0].ID
+                    localStorage.setItem('memberId', memberId);
+                    noErrors();
+                    displayNextPanel();
+                  } else {
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'Licencié déjà inscrit au tournoi',
+                      html: 'Le joueur est déjà inscrit. Vous pouvez modifier votre inscription ou consulter votre rang dans les listes d\'attentes: ' +
+                      '<a href="/app">Cliquez ici</a>',
+                    });
+                  }
+                }
+              },
+              error: function(xhr, textStatus, error) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Une erreur est survenue',
+                  text: ''
+                });
+              }
+            });
+         });
+         },
+         error: function(xhr, textStatus, error) {
+           Swal.fire({
+             icon: 'error',
+             title: 'Une erreur est survenue',
+             text: ''
+           });
+         }
       });
     }
 
@@ -397,6 +486,29 @@ function Survey(survey) {
     if (!dontSubmit && false) {
       e.preventDefault();
     } else {
+      // const index = currentPanel.dataset.index;
+      const memberId = localStorage.getItem('memberId');
+      const bandIDs = [];
+      $('input[type="checkbox"]:checked').each(function() {
+        bandIDs.push($(this).val());
+      });
+      $.ajax({
+        url: `/api/members/${memberId}/set-bands`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ bandids: bandIDs }),
+        success: function(response) {
+          console.log(response);
+        },
+        error: function(xhr, textStatus, error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Une erreur est survenue',
+            text: ''
+          });
+        }
+      });
+
       mainElement.classList.add("submission");
       mainElement.setAttribute("role", "alert");
       mainElement.innerHTML = `<svg width="126" height="118" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126 118" aria-hidden="true" style="transform: translateX(50%)"><path d="M52.5 118c28.995 0 52.5-23.729 52.5-53S81.495 12 52.5 12 0 35.729 0 65s23.505 53 52.5 53z" fill="#B9CCED"/><path d="M45.726 87L23 56.877l8.186-6.105 15.647 20.74L118.766 0 126 7.192 45.726 87z" fill="#A7E9AF"/></svg>

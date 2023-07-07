@@ -9,7 +9,7 @@ import (
 
 type Band struct {
 	ID   uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid();->"`
-	Name string    `gorm:"not null"`
+	Name string    `gorm:"not null;unique"`
 	Day  int       `gorm:"not null"`
 
 	Members []*Member `gorm:"many2many:bands__members;joinForeignKey:BandID"`

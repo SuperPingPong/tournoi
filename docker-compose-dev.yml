@@ -9,7 +9,7 @@ services:
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
-      - $PWD/database:/var/lib/postgresql
+      - $PWD/database/data:/var/lib/postgresql/data
   frontend:
     build: frontend
     depends_on:

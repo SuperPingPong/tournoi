@@ -2,7 +2,9 @@ package main
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/SuperPingPong/tournoi/internal/controllers/public"
 	"github.com/SuperPingPong/tournoi/internal/models"
@@ -34,6 +36,30 @@ func main() {
 			Day:  1,
 		},
 		{
+			Name: "C",
+			Day:  1,
+		},
+		{
+			Name: "D",
+			Day:  1,
+		},
+		{
+			Name: "E",
+			Day:  1,
+		},
+		{
+			Name: "F",
+			Day:  1,
+		},
+		{
+			Name: "G",
+			Day:  1,
+		},
+		{
+			Name: "H",
+			Day:  1,
+		},
+		{
 			Name: "1",
 			Day:  2,
 		},
@@ -41,11 +67,35 @@ func main() {
 			Name: "2",
 			Day:  2,
 		},
+		{
+			Name: "3",
+			Day:  2,
+		},
+		{
+			Name: "4",
+			Day:  2,
+		},
+		{
+			Name: "5",
+			Day:  2,
+		},
+		{
+			Name: "6",
+			Day:  2,
+		},
+		{
+			Name: "7",
+			Day:  2,
+		},
 	}
 	for _, band := range bands {
 		err := db.Create(&band).Error
 		if err != nil {
-			panic(err)
+			if strings.Contains(err.Error(), "duplicated key not allowed") {
+				fmt.Printf("skipping insertion of band %s because of duplicate key\n", band.Name)
+			} else {
+				panic(err)
+			}
 		}
 	}
 

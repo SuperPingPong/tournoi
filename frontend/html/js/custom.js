@@ -5,6 +5,14 @@ function search() {
     // var name = value.split(" ")[1] || "";
     var surname = value;
     var name = "";
+
+    // Regular expression to match only numbers
+    const numberRegex = /^[0-9]+$/;
+    if (numberRegex.test(value)) {
+      // Do not make query on /api/players if license number is copy/pasted
+      return
+    }
+
     $.ajax({
       url: "/api/players",
       type: "POST",
