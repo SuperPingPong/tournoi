@@ -22,10 +22,16 @@ type ListMembersEntry struct {
 }
 
 type ListMembersMember struct {
-	ID        uuid.UUID
-	FirstName string
-	LastName  string
-	Entries   []ListMembersEntry
+	ID         uuid.UUID
+	PermitID   string
+	FirstName  string
+	LastName   string
+	Sex        string
+	Points     float64
+	Category   string
+	ClubName   string
+	PermitType string
+	Entries    []ListMembersEntry
 }
 
 type ListMembersMembers struct {
@@ -74,10 +80,16 @@ func (api *API) ListMembers(ctx *gin.Context) {
 			return
 		}
 		result.Members = append(result.Members, ListMembersMember{
-			ID:        member.ID,
-			FirstName: member.FirstName,
-			LastName:  member.LastName,
-			Entries:   memberEntries,
+			ID:         member.ID,
+			PermitID:   member.PermitID,
+			FirstName:  member.FirstName,
+			LastName:   member.LastName,
+			Sex:        member.Sex,
+			Points:     member.Points,
+			Category:   member.Category,
+			ClubName:   member.ClubName,
+			PermitType: member.PermitType,
+			Entries:    memberEntries,
 		})
 	}
 

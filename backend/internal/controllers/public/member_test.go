@@ -35,18 +35,26 @@ func TestListMembers(t *testing.T) {
 
 		members := []models.Member{
 			{
-				FirstName: "John",
-				LastName:  "Doe",
-				Sex:       "M",
-				PermitID:  "000000",
-				UserID:    env.user.ID,
+				FirstName:  "John",
+				LastName:   "Doe",
+				Sex:        "M",
+				PermitID:   "000000",
+				Points:     100.0,
+				Category:   "V2",
+				ClubName:   "Jane Club",
+				PermitType: "T",
+				UserID:     env.user.ID,
 			},
 			{
-				FirstName: "Jane",
-				LastName:  "Doe",
-				Sex:       "F",
-				PermitID:  "000001",
-				UserID:    env.user.ID,
+				FirstName:  "Jane",
+				LastName:   "Doe",
+				Sex:        "F",
+				PermitID:   "000001",
+				Points:     130.0,
+				Category:   "B1",
+				ClubName:   "Jane Club",
+				PermitType: "P",
+				UserID:     env.user.ID,
 			},
 		}
 		env.db.Create(&members)
@@ -89,6 +97,13 @@ func TestListMembers(t *testing.T) {
 		require.Equal(t, members[0].ID, got.Members[0].ID)
 		require.Equal(t, members[0].FirstName, got.Members[0].FirstName)
 		require.Equal(t, members[0].LastName, got.Members[0].LastName)
+		require.Equal(t, members[0].PermitID, got.Members[0].PermitID)
+		require.Equal(t, members[0].Sex, got.Members[0].Sex)
+		require.Equal(t, members[0].Points, got.Members[0].Points)
+		require.Equal(t, members[0].Category, got.Members[0].Category)
+		require.Equal(t, members[0].ClubName, got.Members[0].ClubName)
+		require.Equal(t, members[0].PermitType, got.Members[0].PermitType)
+
 		require.Len(t, got.Members[0].Entries, 2)
 		require.Equal(t, bands[0].ID, got.Members[0].Entries[0].BandID)
 		require.Equal(t, bands[0].Name, got.Members[0].Entries[0].BandName)
@@ -100,6 +115,12 @@ func TestListMembers(t *testing.T) {
 		require.Equal(t, members[1].ID, got.Members[1].ID)
 		require.Equal(t, members[1].FirstName, got.Members[1].FirstName)
 		require.Equal(t, members[1].LastName, got.Members[1].LastName)
+		require.Equal(t, members[1].PermitID, got.Members[1].PermitID)
+		require.Equal(t, members[1].Sex, got.Members[1].Sex)
+		require.Equal(t, members[1].Points, got.Members[1].Points)
+		require.Equal(t, members[1].Category, got.Members[1].Category)
+		require.Equal(t, members[1].ClubName, got.Members[1].ClubName)
+		require.Equal(t, members[1].PermitType, got.Members[1].PermitType)
 	})
 	t.Run("NoMemberForCurrentUser", func(t *testing.T) {
 		env := getTestEnv(t)

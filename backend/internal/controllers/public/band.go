@@ -1,7 +1,6 @@
 package public
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
