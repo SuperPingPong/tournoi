@@ -495,12 +495,88 @@ function Survey(survey) {
       bandIDs.push($(this).val());
     });
     $.ajax({
-      url: `/api/members/${memberId}/set-entries`,
-      type: 'POST',
+      url: '/api/bands',
+      type: 'GET',
       contentType: 'application/json',
-      data: JSON.stringify({ bandids: bandIDs }),
       success: function(response) {
-        console.log(response);
+        let checkboxStringTitles = [
+          '<p>Samedi 28 Octobre 2023</p>', '<p>Dimanche 29 Octobre 2023</p>'
+        ]
+        const bands = response.bands.filter(band => bandIDs.includes(band.ID));
+        let confirmText = '';
+        [1, 2].forEach(day => {
+          let bandsDayCreatedItems = [];
+          let bandsDayCreated = bands.filter(band => band.Day === day);
+          bandsDayCreated.forEach(band => {
+            bandsDayCreatedItems.push(`<p style="text-align: left; margin: 0">✅ Ajout du tableau ${band.Name}</p>`)
+          })
+          if (bandsDayCreatedItems.length > 0) {
+            confirmText += checkboxStringTitles[day-1] + bandsDayCreatedItems.join('')
+          }
+        })
+        $.ajax({
+          url: `/api/members/${memberId}`,
+          type: 'GET',
+          contentType: 'application/json',
+          success: function(member) {
+            // console.log(member);
+            Swal.fire({
+              title: 'Confirmer la mise a jour',
+              html:
+                '👤 Nom: ' + member.LastName + ' | ' +
+                '👤 Prénom: ' + member.FirstName + ' | ' +
+                '🧾 N° License: ' + member.PermitID + ' | ' +
+                '🗂️ Catégorie: ' + member.Category + ' | ' +
+                '🏓 Club: ' + member.ClubName.replace(' ', ' ') + ' | ' +
+                '⚧ Sexe: ' + member.Sex + ' | ' +
+                '🎯Officiels: ' + member.Points + '<br><br>' +
+                confirmText,
+              // input: 'text',
+              inputAttributes: {
+                  autocapitalize: 'off'
+              },
+              showLoaderOnConfirm: true,
+              showCancelButton: true,
+              confirmButtonText: 'Confirmer',
+              cancelButtonText: 'Annuler',
+              confirmButtonColor: '#5468D4',
+              cancelButtonColor: '#dc3741',
+              preConfirm: () => {
+                return bands
+              }
+            }).then((result) => {
+              $.ajax({
+                url: `/api/members/${memberId}/set-entries`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ bandids: bandIDs }),
+                success: function(response) {
+                  // console.log(response);
+                  mainElement.classList.add("submission");
+                  mainElement.setAttribute("role", "alert");
+                  mainElement.innerHTML = `<svg width="126" height="118" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126 118" aria-hidden="true" style="transform: translateX(50%)"><path d="M52.5 118c28.995 0 52.5-23.729 52.5-53S81.495 12 52.5 12 0 35.729 0 65s23.505 53 52.5 53z" fill="#B9CCED"/><path d="M45.726 87L23 56.877l8.186-6.105 15.647 20.74L118.766 0 126 7.192 45.726 87z" fill="#A7E9AF"/></svg>
+                  <h2 class="submission">Merci pour votre inscription</h2>
+                  <p style="text-align: center">Surveillez vos emails, une confirmation vous a été envoyé.<br>Pour revenir au menu principal: <a href="/">Cliquez ici</a><br>Pour modifier vos inscriptions: <a href="/app">Cliquez ici</a>`;
+                  return false;
+                },
+                error: function(xhr, textStatus, error) {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Une erreur est survenue',
+                    text: ''
+                  });
+                }
+              });
+            });
+          },
+          error: function(xhr, textStatus, error) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Une erreur est survenue',
+              text: ''
+            });
+          }
+        });
       },
       error: function(xhr, textStatus, error) {
         Swal.fire({
@@ -510,13 +586,6 @@ function Survey(survey) {
         });
       }
     });
-
-    mainElement.classList.add("submission");
-    mainElement.setAttribute("role", "alert");
-    mainElement.innerHTML = `<svg width="126" height="118" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126 118" aria-hidden="true" style="transform: translateX(50%)"><path d="M52.5 118c28.995 0 52.5-23.729 52.5-53S81.495 12 52.5 12 0 35.729 0 65s23.505 53 52.5 53z" fill="#B9CCED"/><path d="M45.726 87L23 56.877l8.186-6.105 15.647 20.74L118.766 0 126 7.192 45.726 87z" fill="#A7E9AF"/></svg>
-    <h2 class="submission">Merci pour votre inscription</h2>
-    <p style="text-align: center">Surveillez vos emails, une confirmation vous a été envoyé.<br>Pour revenir au menu principal: <a href="/">Cliquez ici</a><br>Pour modifier vos inscriptions: <a href="/app">Cliquez ici</a>`;
-    return false;
   }
 
   storeInitialData();
