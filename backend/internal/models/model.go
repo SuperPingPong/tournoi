@@ -7,6 +7,5 @@ func ListModels() []interface{} {
 		&Band{},
 		&OTP{},
 		&Entry{},
-		&EntryLock{},
 	}
 }

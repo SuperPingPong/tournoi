@@ -2,12 +2,13 @@ package main
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/SuperPingPong/tournoi/internal/controllers/public"
 	"github.com/SuperPingPong/tournoi/internal/models"
+	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
 )
@@ -91,11 +92,10 @@ func main() {
 	for _, band := range bands {
 		err := db.Create(&band).Error
 		if err != nil {
-			if strings.Contains(err.Error(), "duplicated key not allowed") {
-				fmt.Printf("skipping insertion of band %s because of duplicate key\n", band.Name)
-			} else {
+			if !errors.Is(err, gorm.ErrDuplicatedKey) {
 				panic(err)
 			}
+			fmt.Printf("skipping insertion of band %s because of duplicate key\n", band.Name)
 		}
 	}
 
