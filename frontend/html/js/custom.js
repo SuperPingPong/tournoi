@@ -25,6 +25,11 @@ function search() {
         const suggestions = $('#suggestions');
         const result = $('#result');
         suggestions.html("");
+        if (players.players === null) {
+          suggestions.hide();
+          return
+        }
+
         for (const player of players.players) {
           const div = $('<div>').html(player.nom + ' ' + player.prenom + ' - ' + player.nomclub + ' - ' + player.point);
           div.click(function() {

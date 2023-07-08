@@ -7,7 +7,7 @@ function Survey(survey) {
   const progressbar = survey.querySelector(".progressbar");
   const surveyPanels = survey.querySelectorAll(".survey__panel");
   const question1Email = survey.querySelector("[name='email']");
-  const question2License = survey.querySelectorAll("[name='license']");
+  const question2License = survey.querySelector("[name='license']");
   const question3CheckBoxes = survey.querySelectorAll("[name='question_3']");
   const allPanels = Array.from(survey.querySelectorAll(".survey__panel"));
   let progressbarStep = Array.from(progressbar.querySelectorAll(".progressbar__step "));
@@ -48,21 +48,6 @@ function Survey(survey) {
     const index = +currentPanel.dataset.index;
     const { name, type, value } = target;
     checkRequirements();
-    if (type === "checkbox") {
-      if (formData[index].answer === undefined) {
-        formData[index].answer = {
-          [name]: [value]
-        };
-        return;
-      }
-      if (formData[index]["answer"][`${name}`].includes(value)) {
-        const position = formData[index]["answer"][`${name}`].findIndex(elem => elem === value);
-        formData[index]["answer"][`${name}`].splice(position, 1);
-      } else {
-        formData[index]["answer"][`${name}`].push(value);
-      }
-      return;
-    }
 
     formData[index].answer = {
       [name]: value
@@ -92,12 +77,6 @@ function Survey(survey) {
     errorElement.removeAttribute("role");
   }
 
-  function getName(input) {
-    if (input.name === "age") return "Age";
-    if (input.name === "country") return "Country";
-    return `${input.id.charAt(0).toUpperCase()}${input.id.slice(1)}`;
-  }
-
   function checkEmail(input) {
     if (input.value.trim() === "") {
       showError(input, `Le champ email est obligatoire`);
@@ -111,31 +90,39 @@ function Survey(survey) {
     }
   }
 
-  function checkRequired(input) {
+  function checkLicense(input) {
     if (input.value.trim() === "") {
-      showError(input, `${getName(input)} is required`);
+      showError(input, `Le champ licence est obligatoire`);
     } else {
-      noErrors(input);
+      const suggestions = $('#suggestions');
+      if (!suggestions.is(':visible')) {
+        const numberRegex = /^[A-Z0-9]+$/;
+        if (numberRegex.test(input.value.trim())) {
+          noErrors(input);
+        } else {
+          showError(input, "Le format du numéro de licence n'est pas valide.");
+        }
+      }
     }
   }
 
-  function checkSelection(input) {
-    if (input.selectedIndex === 0) {
-      showError(input, `${getName(input)} is required`);
+  function checkMemberBands(checkboxes) {
+    let isAtLeastOneChecked = false;
+    for (let i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i].checked) {
+        isAtLeastOneChecked = true;
+        break;
+      }
+    }
+    if (isAtLeastOneChecked) {
+      noErrors(survey.querySelector('.survey__panel__hearabout'));
     } else {
-      noErrors(input);
+      showError(
+        survey.querySelector('.survey__panel__hearabout'),
+        "Au moins un tableau doit être sélectionné"
+      );
     }
-  }
-
-  function checkAge(age) {
-    if (age.value === "") {
-      showError(age, `${getName(age)} is required`);
-      return;
-    }
-    if (+age.value > 0) {
-      noErrors(age);
-    }
-  }
+ }
 
   function checkRequirements() {
     const requirement = currentPanel.dataset.requirement;
@@ -145,8 +132,15 @@ function Survey(survey) {
     if (index === "1") {
       checkEmail(question1Email);
     }
+    if (index === "2") {
+      checkLicense(question2License);
+    }
+    if (index === "3") {
+      const question3CheckBoxes = survey.querySelectorAll("[name='question_3']");
+      checkMemberBands(question3CheckBoxes);
+    }
     if (survey.classList.contains("form-error")) {
-      errorElement.textContent = `Veuillez sélectionner un(e) ${requirement} valide pour continuer.`;
+      // errorElement.textContent = `Le champ ${requirement} est invalide.`;
       errorElement.setAttribute("role", "alert");
       survey.classList.add("form-error");
     }
@@ -252,11 +246,13 @@ function Survey(survey) {
         // Show SweetAlert2 popup to ask for OTP code
         Swal.fire({
           title: 'Entrer le dernier code OTP reçu',
-          html: '<span>Code OTP envoyé sur: ' + email + '</span>',
+          html: '<span>Code OTP envoyé sur: ' + email + '<br><span style="font-size: 75%">(<i>N\'oubliez pas de vérifier vos spams</i><span>)</span>',
           input: 'text',
           showCancelButton: true,
           confirmButtonText: 'Confirmer',
           cancelButtonText: 'Annuler',
+          confirmButtonColor: '#5468D4',
+          cancelButtonColor: '#dc3741',
           showLoaderOnConfirm: true,
           preConfirm: function(code) {
             // Verify OTP code
@@ -400,6 +396,8 @@ function Survey(survey) {
             showCancelButton: true,
             confirmButtonText: 'Confirmer',
             cancelButtonText: 'Annuler',
+            confirmButtonColor: '#5468D4',
+            cancelButtonColor: '#dc3741',
             allowOutsideClick: false
           }).then(function(result) {
             if (!result.isConfirmed) {
@@ -411,7 +409,7 @@ function Survey(survey) {
               type: 'GET',
               contentType: 'application/json',
               success: function(response) {
-                let members = response.members;
+                let members = response.Members;
                 let filteredMembers = members.filter(member => member.PermitID === licenseNumber);
                 if (filteredMembers.length === 0) {
                   $.ajax({
@@ -434,8 +432,8 @@ function Survey(survey) {
                     }
                   });
                 } else {
-                  let memberBands = filteredMembers[0].Bands;
-                  if (memberBands.length === 0) {
+                  let memberBands = filteredMembers[0].Entries;
+                  if (memberBands === null || memberBands.length === 0) {
                     let memberId = filteredMembers[0].ID
                     localStorage.setItem('memberId', memberId);
                     noErrors();
@@ -482,47 +480,51 @@ function Survey(survey) {
 
   // submitting the form
   function handleFormSubmit(e) {
+    e.preventDefault();
+    survey.classList.remove("form-error");
+    const index = currentPanel.dataset.index;
+    console.log(formData[index]);
     checkRequirements();
-    if (!dontSubmit && false) {
-      e.preventDefault();
-    } else {
-      // const index = currentPanel.dataset.index;
-      const memberId = localStorage.getItem('memberId');
-      const bandIDs = [];
-      $('input[type="checkbox"]:checked').each(function() {
-        bandIDs.push($(this).val());
-      });
-      $.ajax({
-        url: `/api/members/${memberId}/set-bands`,
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ bandids: bandIDs }),
-        success: function(response) {
-          console.log(response);
-        },
-        error: function(xhr, textStatus, error) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Une erreur est survenue',
-            text: ''
-          });
-        }
-      });
-
-      mainElement.classList.add("submission");
-      mainElement.setAttribute("role", "alert");
-      mainElement.innerHTML = `<svg width="126" height="118" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126 118" aria-hidden="true" style="transform: translateX(50%)"><path d="M52.5 118c28.995 0 52.5-23.729 52.5-53S81.495 12 52.5 12 0 35.729 0 65s23.505 53 52.5 53z" fill="#B9CCED"/><path d="M45.726 87L23 56.877l8.186-6.105 15.647 20.74L118.766 0 126 7.192 45.726 87z" fill="#A7E9AF"/></svg>
-      <h2 class="submission">Merci pour votre inscription</h2>
-      <p>Surveillez vos emails, une confirmation vous a été envoyé.<br>Pour revenir au menu principal: <a href="/">Cliquez ici</a>`;
-      return false;
+    if (survey.classList.contains("form-error")) {
+      return;
     }
+    // const index = currentPanel.dataset.index;
+    const memberId = localStorage.getItem('memberId');
+    const bandIDs = [];
+    $('input[type="checkbox"]:checked').each(function() {
+      bandIDs.push($(this).val());
+    });
+    $.ajax({
+      url: `/api/members/${memberId}/set-entries`,
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ bandids: bandIDs }),
+      success: function(response) {
+        console.log(response);
+      },
+      error: function(xhr, textStatus, error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Une erreur est survenue',
+          text: ''
+        });
+      }
+    });
+
+    mainElement.classList.add("submission");
+    mainElement.setAttribute("role", "alert");
+    mainElement.innerHTML = `<svg width="126" height="118" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126 118" aria-hidden="true" style="transform: translateX(50%)"><path d="M52.5 118c28.995 0 52.5-23.729 52.5-53S81.495 12 52.5 12 0 35.729 0 65s23.505 53 52.5 53z" fill="#B9CCED"/><path d="M45.726 87L23 56.877l8.186-6.105 15.647 20.74L118.766 0 126 7.192 45.726 87z" fill="#A7E9AF"/></svg>
+    <h2 class="submission">Merci pour votre inscription</h2>
+    <p style="text-align: center">Surveillez vos emails, une confirmation vous a été envoyé.<br>Pour revenir au menu principal: <a href="/">Cliquez ici</a><br>Pour modifier vos inscriptions: <a href="/app">Cliquez ici</a>`;
+    return false;
   }
 
   storeInitialData();
 
   // Add event listeners
-  function addListenersTo({ question1Email, question2License, question3CheckBoxes, question4Radios, ...inputs }) {
+  function addListenersTo({ question1Email, question2License, question3CheckBoxes}) {
     question1Email.addEventListener("change", updateFormData);
+    question2License.addEventListener("change", updateFormData);
     question3CheckBoxes.forEach(elem => elem.addEventListener("change", updateFormData));
   }
   nextButton.addEventListener("click", handleNextButton);
