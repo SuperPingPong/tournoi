@@ -147,7 +147,10 @@ func TestListMembers(t *testing.T) {
 		var got ListMembersMembers
 		err := json.NewDecoder(res.Body).Decode(&got)
 		require.NoError(t, err)
-		require.Len(t, got.Members, 0)
+		require.Equal(t, ListMembersMembers{
+			Members: []ListMembersMember{},
+			Total:   0,
+		}, got)
 	})
 }
 

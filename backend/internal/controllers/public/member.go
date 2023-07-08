@@ -67,7 +67,8 @@ func (api *API) ListMembers(ctx *gin.Context) {
 	}
 
 	result := ListMembersMembers{
-		Total: int(totalCount),
+		Members: []ListMembersMember{},
+		Total:   int(totalCount),
 	}
 	for _, member := range members {
 		var memberEntries []ListMembersEntry
