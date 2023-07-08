@@ -47,6 +47,7 @@ func (api *API) setupRouter() {
 	authenticated.Use(api.authMiddleware.MiddlewareFunc())
 	{
 		authenticated.GET("/members", api.ListMembers)
+		authenticated.GET("/members/:id", api.GetMember)
 		authenticated.POST("/members", api.CreateMember)
 		authenticated.PATCH("/members/:id", api.UpdateMember)
 		authenticated.POST("/members/:id/set-entries", api.SetMemberEntries)

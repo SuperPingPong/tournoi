@@ -97,6 +97,36 @@ func (api *API) ListMembers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &result)
 }
 
+func (api *API) GetMember(ctx *gin.Context) {
+	claims := jwt.ExtractClaims(ctx)
+	userID := uuid.MustParse(claims[auth.IdentityKey].(string))
+
+	id, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid member id: %s", ctx.Param("id")))
+		return
+	}
+
+	member := models.Member{}
+	err = api.db.First(&member, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("member %s not found", id))
+			return
+		}
+
+		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get member: %w", err))
+		return
+	}
+
+	if member.UserID != userID {
+		ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("member %s not found", id))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &member)
+}
+
 type CreateMemberInput struct {
 	PermitID string `binding:"required,min=2"`
 }
