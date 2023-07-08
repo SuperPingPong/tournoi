@@ -16,9 +16,6 @@ import (
 )
 
 func TestListMembers(t *testing.T) {
-	type listMembersResponse struct {
-		Members []models.Member
-	}
 	t.Run("Success", func(t *testing.T) {
 		env := getTestEnv(t)
 		defer env.teardown()
@@ -43,7 +40,6 @@ func TestListMembers(t *testing.T) {
 				Sex:       "M",
 				PermitID:  "000000",
 				UserID:    env.user.ID,
-				Bands:     []*models.Band{},
 			},
 			{
 				FirstName: "Jane",
@@ -51,22 +47,59 @@ func TestListMembers(t *testing.T) {
 				Sex:       "F",
 				PermitID:  "000001",
 				UserID:    env.user.ID,
-				Bands:     []*models.Band{},
 			},
 		}
 		env.db.Create(&members)
+
+		bands := []models.Band{
+			{
+				Name: "A",
+				Day:  1,
+			},
+			{
+				Name: "B",
+				Day:  2,
+			},
+		}
+		env.db.Create(&bands)
+
+		entries := []models.Entry{
+			{
+				MemberID: members[0].ID,
+				BandID:   bands[0].ID,
+			},
+			{
+				MemberID: members[0].ID,
+				BandID:   bands[1].ID,
+			},
+		}
+		env.db.Create(&entries)
 
 		res := performRequest("GET", "/api/members", nil, map[string]string{
 			"Authorization": "Bearer " + env.jwt,
 		}, env.api.router)
 
 		require.Equal(t, http.StatusOK, res.Code)
-		var got listMembersResponse
+		var got ListMembersMembers
 		err := json.NewDecoder(res.Body).Decode(&got)
 		require.NoError(t, err)
 		require.Len(t, got.Members, 2)
-		require.Equal(t, members[0], got.Members[0])
-		require.Equal(t, members[1], got.Members[1])
+		require.Equal(t, 2, got.Total)
+
+		require.Equal(t, members[0].ID, got.Members[0].ID)
+		require.Equal(t, members[0].FirstName, got.Members[0].FirstName)
+		require.Equal(t, members[0].LastName, got.Members[0].LastName)
+		require.Len(t, got.Members[0].Entries, 2)
+		require.Equal(t, bands[0].ID, got.Members[0].Entries[0].BandID)
+		require.Equal(t, bands[0].Name, got.Members[0].Entries[0].BandName)
+		require.Equal(t, entries[0].CreatedAt, got.Members[0].Entries[0].CreatedAt)
+		require.Equal(t, bands[1].ID, got.Members[0].Entries[1].BandID)
+		require.Equal(t, bands[1].Name, got.Members[0].Entries[1].BandName)
+		require.Equal(t, entries[1].CreatedAt, got.Members[0].Entries[1].CreatedAt)
+
+		require.Equal(t, members[1].ID, got.Members[1].ID)
+		require.Equal(t, members[1].FirstName, got.Members[1].FirstName)
+		require.Equal(t, members[1].LastName, got.Members[1].LastName)
 	})
 	t.Run("NoMemberForCurrentUser", func(t *testing.T) {
 		env := getTestEnv(t)
@@ -90,7 +123,7 @@ func TestListMembers(t *testing.T) {
 		}, env.api.router)
 
 		require.Equal(t, http.StatusOK, res.Code)
-		var got listMembersResponse
+		var got ListMembersMembers
 		err := json.NewDecoder(res.Body).Decode(&got)
 		require.NoError(t, err)
 		require.Len(t, got.Members, 0)

@@ -4,28 +4,84 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/SuperPingPong/tournoi/internal/auth"
 	"github.com/SuperPingPong/tournoi/internal/models"
-
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
+type ListMembersEntry struct {
+	BandID    uuid.UUID
+	BandName  string
+	CreatedAt time.Time
+}
+
+type ListMembersMember struct {
+	ID        uuid.UUID
+	FirstName string
+	LastName  string
+	Entries   []ListMembersEntry
+}
+
+type ListMembersMembers struct {
+	Members []ListMembersMember
+	Total   int
+}
+
 func (api *API) ListMembers(ctx *gin.Context) {
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid page: %s", ctx.Query("page")))
+		return
+	}
+	pageSize, err := strconv.Atoi(ctx.DefaultQuery("page_size", "10"))
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid page size: %s", ctx.Query("page_size")))
+		return
+	}
+
 	claims := jwt.ExtractClaims(ctx)
 	userID := uuid.MustParse(claims[auth.IdentityKey].(string))
 
 	var members []models.Member
-	err := api.db.Preload("Bands").Where("user_id = ?", userID).Find(&members).Error
-	if err != nil {
+	var totalCount int64
+	if err := api.db.
+		Scopes(Paginate(page, pageSize)).
+		Where(&models.Member{UserID: userID}).
+		Select("*, COUNT(*) OVER () AS total_count").
+		Find(&members).
+		Count(&totalCount).Error; err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list members: %w", err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"members": members})
+	result := ListMembersMembers{
+		Total: int(totalCount),
+	}
+	for _, member := range members {
+		var memberEntries []ListMembersEntry
+		if err := api.db.Model(&models.Entry{}).
+			Select("entries.band_id, bands.name AS band_name, entries.created_at").
+			Joins("JOIN bands ON bands.id::uuid = entries.band_id::uuid").
+			Where("entries.member_id::uuid = ?::uuid", member.ID.String()).
+			Scan(&memberEntries).Error; err != nil {
+			ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list members: %w", err))
+			return
+		}
+		result.Members = append(result.Members, ListMembersMember{
+			ID:        member.ID,
+			FirstName: member.FirstName,
+			LastName:  member.LastName,
+			Entries:   memberEntries,
+		})
+	}
+
+	ctx.JSON(http.StatusOK, &result)
 }
 
 type CreateMemberInput struct {

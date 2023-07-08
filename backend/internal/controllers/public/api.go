@@ -49,7 +49,7 @@ func (api *API) setupRouter() {
 		authenticated.GET("/members", api.ListMembers)
 		authenticated.POST("/members", api.CreateMember)
 		authenticated.PATCH("/members/:id", api.UpdateMember)
-		authenticated.POST("/members/:id/set-bands", api.SetMemberBands)
+		authenticated.POST("/members/:id/set-entries", api.SetMemberEntries)
 		authenticated.GET("/bands", api.ListBands)
 		authenticated.POST("/check-auth", api.CheckAuth)
 	}
