@@ -144,8 +144,8 @@ func (api *API) SearchFFTTPlayers(ctx *gin.Context) {
 		}
 
 		ffttPlayers = append(ffttPlayers, FFTTPlayer{
-			LastName:  player.LastName,
-			FirstName: player.FirstName,
+			LastName:  strings.TrimSpace(player.LastName),
+			FirstName: strings.TrimSpace(player.FirstName),
 			PermitID:  player.PermitID,
 			Points:    player.Points,
 			ClubName:  player.ClubName,
