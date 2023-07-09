@@ -8,6 +8,14 @@ function initDataTable(data) {
     "pageLength": 15,
     "data": data,
     "order": [], // Remove default sorting
+    /*
+    "oLanguage": {
+        "sSearch": "Filtrer les résultats:"
+    },
+    */
+    "language": {
+        "url": '//cdn.datatables.net/plug-ins/1.13.5/i18n/fr-FR.json',
+    },
     "columns": [
       {
         data: null,
@@ -108,10 +116,11 @@ function editMemberBands(memberString) {
     '<p>Samedi 28 Octobre 2023</p>', '<p>Dimanche 29 Octobre 2023</p>'
   ]
   $.ajax({
-    url: '/api/bands',
+    url: `/api/members/${member.ID}/band-availabilities`,
     type: 'GET',
     contentType: 'application/json',
     success: function(response) {
+      const sessionId = response.session_id;
       [1, 2].forEach(day => {
         let bandsDay = response.bands.filter(band => band.Day === day);
         bandsDay.forEach(band => {
@@ -210,7 +219,10 @@ function editMemberBands(memberString) {
                 url: `/api/members/${member.ID}/set-entries`,
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ bandids: result.value }),
+                data: JSON.stringify({
+                  bandids: result.value,
+                  sessionid: sessionId,
+                }),
                 success: function(response) {
                   Swal.fire({
                     icon: 'success',
@@ -225,9 +237,9 @@ function editMemberBands(memberString) {
                       type: 'GET',
                       success: function(response) {
                         const members = response.Members;
-                        // dataTable.destroy();
-                        // initDataTable(members);
-                        dataTable.clear().rows.add(members).draw();
+                        dataTable.destroy();
+                        initDataTable(members);
+                        // dataTable.clear().rows.add(members).draw();
                       },
                       error: function(xhr, textStatus, error) {
                         Swal.fire({

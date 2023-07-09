@@ -175,33 +175,43 @@ function Survey(survey) {
       submitButton.setAttribute("aria-hidden", false);
     }
     if (+currentPanel.dataset.index === 3) {
-      // Dynamically field form for set-bands endpoint
+      // Dynamically field form for set-entries endpoint
+      const memberId = localStorage.getItem('memberId');
       $.ajax({
-        url: '/api/bands',
+        url: `/api/members/${memberId}/band-availabilities`,
         type: 'GET',
         contentType: 'application/json',
         success: function(response) {
+          const sessionId = response.session_id;
           [1, 2].forEach(day => {
             let bandsDay = response.bands.filter(band => band.Day === day);
             let bandDayContainer = document.getElementById(`form-group-day-${day}`);
             bandDayContainer.innerHTML = '';
             bandsDay.forEach(band => {
-                const div = document.createElement('div');
-                div.classList.add('form-group');
-                const input = document.createElement('input');
-                input.type = 'checkbox';
-                input.classList.add('checkbox');
-                input.id = `tableau-${band.Name}`;
-                input.name = 'question_3';
-                input.value = band.ID;
-                const label = document.createElement('label');
-                label.htmlFor = `tableau-${band.Name}`;
-                label.textContent = `Tableau ${band.Name} (72 places restantes)`;
-                div.appendChild(input);
-                div.appendChild(label);
-                bandDayContainer.appendChild(div);
+              const div = document.createElement('div');
+              div.classList.add('form-group');
+              const input = document.createElement('input');
+              input.type = 'checkbox';
+              input.classList.add('checkbox');
+              input.id = `tableau-${band.Name}`;
+              input.name = 'question_3';
+              input.value = band.ID;
+              const label = document.createElement('label');
+              label.htmlFor = `tableau-${band.Name}`;
+              label.textContent = `Tableau ${band.Name} (≤ ${band.MaxPoints} pts) - ` +
+                `${band.Available > 0 ? band.Available + " place(s) restante(s)" : ""}` +
+                `${band.Available === 0 ? "Inscription en liste d'attente" : ""}`;
+              div.appendChild(input);
+              div.appendChild(label);
+              bandDayContainer.appendChild(div);
             });
-          })
+            // Create hidden input for sessionId
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'sessionId';
+            hiddenInput.value = sessionId;
+            bandDayContainer.appendChild(hiddenInput);
+          });
         },
         error: function(xhr, textStatus, error) {
           Swal.fire({
@@ -323,6 +333,7 @@ function Survey(survey) {
     const index = currentPanel.dataset.index;
     console.log(formData[index]);
 
+    // ignore step 1 and step 2
     /*
     if (index === "1" || index === "2") {
       noErrors();
@@ -405,15 +416,17 @@ function Survey(survey) {
             if (!result.isConfirmed) {
               return
             }
-            // Create member if not exists or pass if exists but no set-bands done yet
+            // Create member if not exists or pass if exists but no set-entries done yet
             $.ajax({
               url: '/api/members',
               type: 'GET',
+              data: {
+                permit_id: licenseNumber
+              },
               contentType: 'application/json',
               success: function(response) {
                 let members = response.Members;
-                let filteredMembers = members.filter(member => member.PermitID === licenseNumber);
-                if (filteredMembers.length === 0) {
+                if (members.length === 0) {
                   $.ajax({
                     url: '/api/members',
                     type: 'POST',
@@ -434,9 +447,10 @@ function Survey(survey) {
                     }
                   });
                 } else {
-                  let memberBands = filteredMembers[0].Entries;
+                  let selectedMember = members[0];
+                  let memberBands = selectedMember.Entries;
                   if (memberBands === null || memberBands.length === 0) {
-                    let memberId = filteredMembers[0].ID
+                    let memberId = selectedMember.ID
                     localStorage.setItem('memberId', memberId);
                     noErrors();
                     displayNextPanel();
@@ -496,6 +510,7 @@ function Survey(survey) {
     $('input[type="checkbox"]:checked').each(function() {
       bandIDs.push($(this).val());
     });
+    const sessionId = $('input[name="sessionId"]').val();
     $.ajax({
       url: '/api/bands',
       type: 'GET',
@@ -551,7 +566,10 @@ function Survey(survey) {
                 url: `/api/members/${memberId}/set-entries`,
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ bandids: bandIDs }),
+                data: JSON.stringify({
+                  bandids: bandIDs,
+                  sessionid: sessionId,
+                }),
                 success: function(response) {
                   // console.log(response);
                   if (result.isConfirmed) {
