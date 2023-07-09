@@ -1,12 +1,29 @@
-var dataTable = null;
+let dataTable;
 
-function initDataTable(data) {
+function initDataTable() {
   let dataTableHTML = document.getElementById("dataTable");
   dataTableHTML.style.display = "block";
   dataTable = $('#dataTable').DataTable({
     "lengthMenu": [15, 30, 60, 100],
     "pageLength": 15,
-    "data": data,
+    // "searchDelay": 350,
+    // "searching": false,
+    "serverSide": true,
+    "ajax": {
+      "url": "/api/members",
+      "dataSrc": function (data) {
+        return data.Members;
+      },
+      "data": function (params) {
+        params.search = $('input[aria-controls="dataTable"]').val();
+        // params.page = 1;
+        params.page = (params.start / params.length) + 1;
+        params.page_size = params.length;
+        // params.page_size = dataTable.page.len();
+        // params.page_size = dataTable.page.len();
+        return params
+      },
+    },
     "order": [], // Remove default sorting
     /*
     "oLanguage": {
@@ -14,7 +31,7 @@ function initDataTable(data) {
     },
     */
     "language": {
-        "url": '//cdn.datatables.net/plug-ins/1.13.5/i18n/fr-FR.json',
+        "url": '/locales/datatable/fr-FR.json',
     },
     "columns": [
       {
@@ -53,6 +70,10 @@ function initDataTable(data) {
       }
     ],
     "initComplete": function() {
+      let searchInput = $('input[aria-controls="dataTable"]');
+      searchInput.on('keyup', function () {
+        dataTable.search(this.value).draw();
+      });
       // Attach click event listener to buttons
       $('button[data-action="edit"]').on('click', function(event) {
         event.preventDefault();
@@ -90,7 +111,7 @@ function init() {
           window.location.href = '/';
         });
       }
-      initDataTable(members);
+      initDataTable();
     },
     error: function(xhr, textStatus, error) {
       // console.log(error);
@@ -238,7 +259,7 @@ function editMemberBands(memberString) {
                       success: function(response) {
                         const members = response.Members;
                         dataTable.destroy();
-                        initDataTable(members);
+                        initDataTable();
                         // dataTable.clear().rows.add(members).draw();
                       },
                       error: function(xhr, textStatus, error) {
