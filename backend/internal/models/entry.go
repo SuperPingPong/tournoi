@@ -20,4 +20,8 @@ type Entry struct {
 
 	Confirmed bool      `gorm:"not null;default:false"`
 	SessionID uuid.UUID `gorm:"not null"`
+
+	CreatedBy   uuid.NullUUID `gorm:"type:uuid"`
+	ConfirmedBy uuid.NullUUID `gorm:"type:uuid"`
+	DeletedBy   uuid.NullUUID `gorm:"type:uuid"`
 }
