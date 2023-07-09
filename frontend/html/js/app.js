@@ -4,8 +4,8 @@ function initDataTable(data) {
   let dataTableHTML = document.getElementById("dataTable");
   dataTableHTML.style.display = "block";
   dataTable = $('#dataTable').DataTable({
-    "lengthMenu": [10, 25, 50, 100],
-    "pageLength": 25,
+    "lengthMenu": [15, 30, 60, 100],
+    "pageLength": 15,
     "data": data,
     "order": [], // Remove default sorting
     "columns": [
@@ -30,7 +30,7 @@ function initDataTable(data) {
       {
         data: null,
         render: function(data, type, row) {
-          const bandNames = 'Tableaux ' + row.Entries.map(entry => entry.BandName).join(' / ');
+          const bandNames = row.Entries === null ? '' : row.Entries.map(entry => entry.BandName).join(' / ');
           return bandNames;
         }
       },
@@ -66,11 +66,11 @@ function init() {
     type: 'GET',
     data: {
       page: 1,
-      page_size: 25,
+      page_size: 15,
     },
     success: function(response) {
-      let filteredMembers = response.Members.filter(member => member.Entries !== null);
-      if (response.Members.length === 0) {
+      const members = response.Members;
+      if (members.length === 0) {
         Swal.fire({
           icon: 'error',
           title: "Modification des tableaux",
@@ -82,7 +82,7 @@ function init() {
           window.location.href = '/';
         });
       }
-      initDataTable(filteredMembers);
+      initDataTable(members);
     },
     error: function(xhr, textStatus, error) {
       // console.log(error);
@@ -102,7 +102,7 @@ function init() {
 
 function editMemberBands(memberString) {
   const member = JSON.parse(memberString);
-  const bandIDs = member.Entries.map(obj => obj.BandID);
+  const bandIDs = member.Entries === null ? [] : member.Entries.map(obj => obj.BandID);
   var checkboxStrings = ['', '']
   let checkboxStringTitles = [
     '<p>Samedi 28 Octobre 2023</p>', '<p>Dimanche 29 Octobre 2023</p>'
@@ -224,9 +224,10 @@ function editMemberBands(memberString) {
                       url: '/api/members',
                       type: 'GET',
                       success: function(response) {
-                        let filteredMembers = response.Members.filter(member => member.Entries !== null);
-                        dataTable.destroy();
-                        initDataTable(filteredMembers);
+                        const members = response.Members;
+                        // dataTable.destroy();
+                        // initDataTable(members);
+                        dataTable.clear().rows.add(members).draw();
                       },
                       error: function(xhr, textStatus, error) {
                         Swal.fire({
