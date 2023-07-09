@@ -68,9 +68,11 @@ func (api *API) ListMembers(ctx *gin.Context) {
 	var members []models.Member
 	var totalCount int64
 	if err := api.db.
+		Scopes(searchMembersScope(ctx.Query("search"))).
 		Scopes(Paginate(page, pageSize)).
+		Joins("JOIN users ON users.id = members.user_id").
 		Where(&models.Member{UserID: userID}).
-		Select("*, COUNT(*) OVER () AS total_count").
+		Select("members.*, COUNT(*) OVER () AS total_count").
 		Find(&members).
 		Count(&totalCount).
 		Order(orderBy).Error; err != nil {
@@ -107,6 +109,18 @@ func (api *API) ListMembers(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, &result)
+}
+
+func searchMembersScope(search string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if search == "" {
+			return db
+		}
+		return db.Where(
+			"members.last_name ILIKE ? OR members.first_name ILIKE ? OR members.club_name ILIKE ? OR users.email ILIKE ?",
+			"%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%",
+		)
+	}
 }
 
 func (api *API) GetMember(ctx *gin.Context) {

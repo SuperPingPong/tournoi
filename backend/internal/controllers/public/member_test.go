@@ -122,6 +122,98 @@ func TestListMembers(t *testing.T) {
 		require.Equal(t, members[1].ClubName, got.Members[1].ClubName)
 		require.Equal(t, members[1].PermitType, got.Members[1].PermitType)
 	})
+	t.Run("SuccessSearch", func(t *testing.T) {
+		env := getTestEnv(t)
+		defer env.teardown()
+
+		members := []models.Member{
+			{
+				FirstName:  "John",
+				LastName:   "Doe",
+				Sex:        "M",
+				PermitID:   "000000",
+				Points:     600.0,
+				Category:   "V2",
+				ClubName:   "Jane Club",
+				PermitType: "T",
+				UserID:     env.user.ID,
+			},
+			{
+				FirstName:  "Jane",
+				LastName:   "Doe",
+				Sex:        "F",
+				PermitID:   "000001",
+				Points:     700.0,
+				Category:   "B1",
+				ClubName:   "Jane Club",
+				PermitType: "P",
+				UserID:     env.user.ID,
+			},
+			{
+				FirstName:  "Hervé",
+				LastName:   "Dupont",
+				Sex:        "M",
+				PermitID:   "000003",
+				ClubName:   "Club du Pont Hervé",
+				Points:     505.0,
+				Category:   "V3",
+				PermitType: "P",
+				UserID:     env.user.ID,
+			},
+		}
+		env.db.Create(&members)
+
+		url := "/api/members?search=%s"
+
+		// search=doe should return John and Jane
+		res := performRequest("GET", fmt.Sprintf(url, "doe"), nil, map[string]string{
+			"Authorization": "Bearer " + env.jwt,
+		}, env.api.router)
+
+		var got ListMembersMembers
+		require.Equal(t, http.StatusOK, res.Code)
+		require.NoError(t, json.NewDecoder(res.Body).Decode(&got))
+		require.Len(t, got.Members, 2)
+		require.Equal(t, 2, got.Total)
+		require.Equal(t, members[0].ID, got.Members[0].ID)
+		require.Equal(t, members[1].ID, got.Members[1].ID)
+
+		// search=CLUB should return all of them
+		res = performRequest("GET", fmt.Sprintf(url, "CLUB"), nil, map[string]string{
+			"Authorization": "Bearer " + env.jwt,
+		}, env.api.router)
+
+		require.Equal(t, http.StatusOK, res.Code)
+		require.NoError(t, json.NewDecoder(res.Body).Decode(&got))
+		require.Len(t, got.Members, 3)
+		require.Equal(t, 3, got.Total)
+		require.Equal(t, members[0].ID, got.Members[0].ID)
+		require.Equal(t, members[1].ID, got.Members[1].ID)
+		require.Equal(t, members[2].ID, got.Members[2].ID)
+
+		// search=Test should return all of them since they all belong to the user test@example.com
+		res = performRequest("GET", fmt.Sprintf(url, "Test"), nil, map[string]string{
+			"Authorization": "Bearer " + env.jwt,
+		}, env.api.router)
+
+		require.Equal(t, http.StatusOK, res.Code)
+		require.NoError(t, json.NewDecoder(res.Body).Decode(&got))
+		require.Len(t, got.Members, 3)
+		require.Equal(t, 3, got.Total)
+		require.Equal(t, members[0].ID, got.Members[0].ID)
+		require.Equal(t, members[1].ID, got.Members[1].ID)
+		require.Equal(t, members[2].ID, got.Members[2].ID)
+
+		// search=george should return none of them
+		res = performRequest("GET", fmt.Sprintf(url, "george"), nil, map[string]string{
+			"Authorization": "Bearer " + env.jwt,
+		}, env.api.router)
+
+		require.Equal(t, http.StatusOK, res.Code)
+		require.NoError(t, json.NewDecoder(res.Body).Decode(&got))
+		require.Len(t, got.Members, 0)
+		require.Equal(t, 0, got.Total)
+	})
 	t.Run("NoMemberForCurrentUser", func(t *testing.T) {
 		env := getTestEnv(t)
 		defer env.teardown()
