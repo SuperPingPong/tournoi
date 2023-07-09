@@ -1073,7 +1073,7 @@ func TestSetMemberEntries(t *testing.T) {
 		}
 		require.NoError(t, env.db.Create(&band).Error)
 
-		url := fmt.Sprintf("/api/members/%s/set-entries", uuid.NewString())
+		url := fmt.Sprintf("/api/members/%s/set-entries", member.ID)
 		invalidBandIDs := []string{uuid.NewString(), uuid.NewString()}
 		data := map[string]interface{}{
 			"BandIDs":   append(invalidBandIDs, band.ID.String()),

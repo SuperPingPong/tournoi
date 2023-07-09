@@ -41,8 +41,8 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 	// Get the current member
 	var member models.Member
 	err = api.db.
-		Joins("LEFT JOIN entries ON entries.member_id = members.id").
-		Where("members.id = ? AND members.user_id = ?", memberID, user.ID).
+		Scopes(FilterByUserID(user)).
+		Where("id = ?", memberID).
 		First(&member).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -158,8 +158,9 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 
 	// Get the requested member
 	var member models.Member
-	err = api.db.Scopes(FilterByUserID(user)).
-		Where(&models.Member{ID: member.ID, UserID: user.ID}).
+	err = api.db.
+		Scopes(FilterByUserID(user)).
+		Where("id = ?", memberID).
 		First(&member).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -170,6 +171,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get member: %w", err))
 		return
 	}
+	fmt.Printf("member: %v\n", member)
 
 	// List possible bands for the current member
 	var bands []models.Band
@@ -178,6 +180,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 		return
 	}
 
+	fmt.Printf("bands: %v\n", bands)
 	if len(bands) != len(input.BandIDs) {
 		missingBands := lo.Filter(input.BandIDs, func(bandID uuid.UUID, _ int) bool {
 			return !lo.Contains(mapBandIDs(bands), bandID)
@@ -205,6 +208,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 		if err = tx.Where("member_id = ?", member.ID).Find(&existingEntries).Error; err != nil {
 			return fmt.Errorf("failed to list member entries: %w", err)
 		}
+		fmt.Printf("existingEntries: %v\n", existingEntries)
 
 		// We need to make sure that every band ID from the input is either confirmed or has a lock in the current session
 		var confirmedEntriesCount int
@@ -217,6 +221,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 				requestedEntries[entry.BandID] = entry
 			}
 		}
+		fmt.Printf("confirmedEntries: %v\n", existingEntries)
 
 		var entriesToConfirm []uuid.UUID
 		for _, bandID := range input.BandIDs {
@@ -233,6 +238,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 
 		// The number of entries to confirm should be the difference between the number of expected bands
 		// and the number of already confirmed entries. Otherwise, it means that some entries were expired.
+		fmt.Printf("entriesToConfirm: %v", entriesToConfirm)
 		if len(entriesToConfirm) != len(input.BandIDs)-confirmedEntriesCount {
 			return sessionExpiredError
 		}

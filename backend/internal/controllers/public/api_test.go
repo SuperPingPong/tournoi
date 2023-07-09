@@ -22,6 +22,7 @@ type testEnv struct {
 	api      *API
 	db       *gorm.DB
 	jwt      string
+	adminJWT string
 	user     *models.User
 	teardown func()
 }
@@ -52,6 +53,26 @@ func getTestEnv(t *testing.T) testEnv {
 		panic(err)
 	}
 
+	// Create admin OTP
+	adminUser := models.User{
+		Email:   "admin@example.com",
+		IsAdmin: true,
+	}
+	if tx.Create(&adminUser).Error != nil {
+		panic(err)
+	}
+
+	// Create admin OTP
+	adminOTP := models.OTP{
+		Email:     adminUser.Email,
+		Secret:    "123456",
+		ExpiresAt: time.Now().Add(otpExpirationDelay),
+	}
+	err = tx.Create(&adminOTP).Error
+	if err != nil {
+		panic(err)
+	}
+
 	// Login
 	body, err := json.Marshal(auth.LoginRequest{Email: otp.Email, Secret: otp.Secret})
 	if err != nil {
@@ -73,6 +94,24 @@ func getTestEnv(t *testing.T) testEnv {
 		panic(err)
 	}
 
+	// Login admin
+	body, err = json.Marshal(auth.LoginRequest{Email: adminOTP.Email, Secret: adminOTP.Secret})
+	if err != nil {
+		panic(err)
+	}
+	req, err = http.NewRequestWithContext(ctx, "POST", "/api/login", bytes.NewBuffer(body))
+	if err != nil {
+		panic(err)
+	}
+	api.router.ServeHTTP(recorder, req)
+
+	// Get admin JWT
+	var adminResponse loginResponse
+	err = json.NewDecoder(recorder.Body).Decode(&adminResponse)
+	if err != nil {
+		panic(err)
+	}
+
 	// Get test user
 	var user models.User
 	err = tx.Where(&models.User{Email: otp.Email}).First(&user).Error
@@ -81,11 +120,12 @@ func getTestEnv(t *testing.T) testEnv {
 	}
 
 	return testEnv{
-		ctx:  ctx,
-		api:  api,
-		db:   tx,
-		jwt:  response.Token,
-		user: &user,
+		ctx:      ctx,
+		api:      api,
+		db:       tx,
+		jwt:      response.Token,
+		adminJWT: adminResponse.Token,
+		user:     &user,
 		teardown: func() {
 			tx.Rollback()
 		},

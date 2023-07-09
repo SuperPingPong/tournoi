@@ -51,10 +51,10 @@ func (api *API) ListMembers(ctx *gin.Context) {
 		return
 	}
 	validOrderBy := map[string]string{
-		"created_at_asc":  "created_at ASC",
-		"created_at_desc": "created_at ASC",
-		"last_name_desc":  "last_name DESC",
-		"last_name_asc":   "last_name ASC",
+		"created_at_asc":  "members.created_at ASC",
+		"created_at_desc": "members.created_at DESC",
+		"last_name_asc":   "members.last_name ASC",
+		"last_name_desc":  "members.last_name DESC",
 	}
 	orderBy, valid := validOrderBy[ctx.DefaultQuery("order_by", "created_at_desc")]
 	if !valid {
@@ -71,16 +71,16 @@ func (api *API) ListMembers(ctx *gin.Context) {
 	var members []models.Member
 	var totalCount int64
 	if err := api.db.
+		Model(&models.Member{}).
 		Scopes(FilterByUserID(user)).
-		Scopes(searchMembersScope(ctx.Query("search"))).
+		Scopes(searchMembersScope(ctx.Query("search"), *user)).
 		Scopes(filterByPermitID(ctx.Query("permit_id"))).
 		Scopes(Paginate(page, pageSize)).
 		Joins("JOIN users ON users.id = members.user_id").
-		Where(&models.Member{UserID: user.ID}).
 		Select("members.*, COUNT(*) OVER () AS total_count").
+		Order(orderBy).
 		Find(&members).
-		Count(&totalCount).
-		Order(orderBy).Error; err != nil {
+		Count(&totalCount).Error; err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list members: %w", err))
 		return
 	}
@@ -117,14 +117,20 @@ func (api *API) ListMembers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &result)
 }
 
-func searchMembersScope(search string) func(db *gorm.DB) *gorm.DB {
+func searchMembersScope(search string, user models.User) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if search == "" {
 			return db
 		}
+		if user.IsAdmin {
+			return db.Where(
+				"members.last_name ILIKE ? OR members.first_name ILIKE ? OR members.club_name ILIKE ? OR users.email ILIKE ?",
+				"%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%",
+			)
+		}
 		return db.Where(
-			"members.last_name ILIKE ? OR members.first_name ILIKE ? OR members.club_name ILIKE ? OR users.email ILIKE ?",
-			"%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%",
+			"members.last_name ILIKE ? OR members.first_name ILIKE ? OR members.club_name ILIKE ?",
+			"%"+search+"%", "%"+search+"%", "%"+search+"%",
 		)
 	}
 }
