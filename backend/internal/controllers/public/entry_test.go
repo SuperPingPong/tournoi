@@ -187,11 +187,127 @@ func TestListAvailableBands(t *testing.T) {
 		}, got.Bands[2])
 
 	})
+	t.Run("SuccessWithExistingConfirmedEntries", func(t *testing.T) {
+		env := getTestEnv(t)
+		defer env.teardown()
+
+		bands := []models.Band{
+			{
+				Name:       "S",
+				Day:        1,
+				Sex:        models.BandSex_ALL,
+				MaxEntries: 3,
+				MaxPoints:  99,
+			},
+			{
+				Name:       "T",
+				Day:        1,
+				Sex:        models.BandSex_M,
+				MaxEntries: 1,
+				MaxPoints:  199,
+			},
+			{
+				Name:       "V",
+				Day:        2,
+				Sex:        models.BandSex_ALL,
+				MaxEntries: 1,
+				MaxPoints:  299,
+			},
+		}
+		require.NoError(t, env.db.Create(&bands).Error)
+
+		member := models.Member{
+			FirstName:  "John",
+			LastName:   "Doe",
+			Sex:        "M",
+			PermitID:   "000000",
+			Points:     99.0,
+			Category:   "V2",
+			ClubName:   "Jane Club",
+			PermitType: "T",
+			UserID:     env.user.ID,
+		}
+		require.NoError(t, env.db.Create(&member).Error)
+
+		sessionID := uuid.New()
+		entries := []models.Entry{
+			{
+				MemberID:    member.ID,
+				BandID:      bands[0].ID,
+				CreatedAt:   time.Now().Add(-2 * time.Second),
+				ExpiresAt:   time.Now().Add(time.Hour),
+				Confirmed:   true,
+				ConfirmedBy: uuid.NullUUID{UUID: env.user.ID, Valid: true},
+				SessionID:   sessionID,
+			},
+			{
+				MemberID:    member.ID,
+				BandID:      bands[1].ID,
+				CreatedAt:   time.Now().Add(-1 * time.Second),
+				ExpiresAt:   time.Now().Add(time.Hour),
+				Confirmed:   true,
+				ConfirmedBy: uuid.NullUUID{UUID: env.user.ID, Valid: true},
+				SessionID:   sessionID,
+			},
+		}
+		require.NoError(t, env.db.Create(&entries).Error)
+
+		// John lists availabilities
+		url := "/api/members/%s/band-availabilities"
+		res := performRequest("GET", fmt.Sprintf(url, member.ID), nil, map[string]string{
+			"Authorization": "Bearer " + env.jwt,
+		}, env.api.router)
+
+		var got listBandAvailabilitiesResponse
+		require.Equal(t, http.StatusOK, res.Code)
+		require.NoError(t, json.NewDecoder(res.Body).Decode(&got))
+		require.Len(t, got.Bands, 3)
+		require.Equal(t, BandAvailability{
+			Band:      bands[0],
+			Available: bands[0].MaxEntries - 1, // John has a confirmed entry
+			Waiting:   0,
+		}, got.Bands[0])
+		require.Equal(t, BandAvailability{
+			Band:      bands[1],
+			Available: bands[1].MaxEntries - 1, // John has a confirmed entry
+			Waiting:   0,
+		}, got.Bands[1])
+		require.Equal(t, BandAvailability{
+			Band:      bands[2],
+			Available: bands[2].MaxEntries, // No existing entry
+			Waiting:   0,
+		}, got.Bands[2])
+
+		var currentEntries []models.Entry
+		require.NoError(t, env.db.Where(&models.Entry{MemberID: member.ID}).Order("created_at ASC").Find(&currentEntries).Error)
+		require.Len(t, currentEntries, 3)
+
+		// First two entries have not been updated
+		require.Equal(t, entries[0].ID, currentEntries[0].ID)
+		require.Equal(t, entries[0].BandID, currentEntries[0].BandID)
+		require.True(t, entries[0].CreatedAt.Equal(currentEntries[0].CreatedAt))
+		require.Equal(t, entries[0].SessionID, currentEntries[0].SessionID)
+		require.True(t, currentEntries[0].Confirmed)
+		require.Equal(t, entries[0].ConfirmedBy, currentEntries[0].ConfirmedBy)
+
+		require.Equal(t, entries[1].ID, currentEntries[1].ID)
+		require.Equal(t, entries[1].BandID, currentEntries[1].BandID)
+		require.True(t, entries[1].CreatedAt.Equal(currentEntries[1].CreatedAt))
+		require.Equal(t, entries[1].SessionID, currentEntries[1].SessionID)
+		require.True(t, currentEntries[1].Confirmed)
+		require.Equal(t, entries[1].ConfirmedBy, currentEntries[1].ConfirmedBy)
+
+		// A lock has been created for the third band
+		require.Equal(t, bands[2].ID, currentEntries[2].BandID)
+		require.NotEqual(t, sessionID, currentEntries[2].SessionID)
+		require.False(t, currentEntries[2].Confirmed)
+		require.False(t, currentEntries[2].ConfirmedBy.Valid)
+	})
 	t.Run("WrongUser", func(t *testing.T) {
 		env := getTestEnv(t)
 		defer env.teardown()
 
-		user := &models.User{
+		user := models.User{
 			Email: "hdupont@example.com",
 			Members: []models.Member{
 				{
@@ -202,7 +318,7 @@ func TestListAvailableBands(t *testing.T) {
 				},
 			},
 		}
-		env.db.Create(user)
+		env.db.Create(&user)
 
 		url := "/api/members/%s/band-availabilities"
 		res := performRequest("GET", fmt.Sprintf(url, user.Members[0].ID), nil, map[string]string{
@@ -351,6 +467,100 @@ func TestSetMemberEntries(t *testing.T) {
 		require.True(t, deletedEntries[1].DeletedAt.Valid)
 		require.True(t, deletedEntries[1].DeletedBy.Valid)
 		require.Equal(t, env.user.ID, deletedEntries[1].DeletedBy.UUID)
+	})
+	t.Run("RemoveEntry", func(t *testing.T) {
+		env := getTestEnv(t)
+		defer env.teardown()
+
+		bands := []models.Band{
+			{
+				Name:      "S",
+				Sex:       models.BandSex_M,
+				MaxPoints: 799,
+				Color:     models.BandColor_GREEN,
+				Day:       1,
+			},
+			{
+				Name:      "T",
+				Sex:       models.BandSex_M,
+				MaxPoints: 999,
+				Color:     models.BandColor_BLUE,
+				Day:       2,
+			},
+		}
+		require.NoError(t, env.db.Create(&bands).Error)
+
+		member := models.Member{
+			FirstName: "John",
+			LastName:  "Doe",
+			Sex:       "M",
+			PermitID:  "000000",
+			Points:    700,
+			UserID:    env.user.ID,
+		}
+		require.NoError(t, env.db.Create(&member).Error)
+
+		sessionID := uuid.New()
+		entries := []models.Entry{
+			{
+				MemberID:  member.ID,
+				BandID:    bands[0].ID,
+				Confirmed: true,
+				CreatedAt: time.Now().Add(1 * time.Second),
+				ExpiresAt: time.Now().Add(time.Hour),
+				SessionID: sessionID,
+			},
+			{
+				MemberID:    member.ID,
+				BandID:      bands[1].ID,
+				Confirmed:   true,
+				CreatedAt:   time.Now().Add(2 * time.Second),
+				ExpiresAt:   time.Now().Add(time.Hour),
+				SessionID:   sessionID,
+				ConfirmedBy: uuid.NullUUID{UUID: uuid.New(), Valid: true},
+			},
+		}
+		require.NoError(t, env.db.Create(&entries).Error)
+
+		url := fmt.Sprintf("/api/members/%s/set-entries", member.ID)
+		data := map[string]interface{}{
+			"BandIDs": []string{
+				bands[1].ID.String(),
+			},
+			"SessionID": sessionID,
+		}
+		body, err := json.Marshal(data)
+		require.NoError(t, err)
+
+		res := performRequest("POST", url, bytes.NewBuffer(body), map[string]string{
+			"Authorization": "Bearer " + env.jwt,
+		}, env.api.router)
+
+		require.Equal(t, http.StatusOK, res.Code)
+
+		var updatedEntries []models.Entry
+		require.NoError(t, env.db.Where(&models.Entry{MemberID: member.ID, Confirmed: true}).Order("created_at ASC").Find(&updatedEntries).Error)
+		require.Len(t, updatedEntries, 1)
+		// Only the second entry is still confirmed
+		require.Equal(t, entries[1].ID, updatedEntries[0].ID)
+		require.Equal(t, entries[1].BandID, updatedEntries[0].BandID)
+		require.Equal(t, entries[1].MemberID, updatedEntries[0].MemberID)
+		require.Equal(t, entries[1].SessionID, updatedEntries[0].SessionID)
+		require.True(t, entries[1].CreatedAt.Equal(updatedEntries[0].CreatedAt))
+		require.Equal(t, entries[1].CreatedBy, updatedEntries[0].CreatedBy)
+		require.True(t, updatedEntries[0].Confirmed)
+		require.Equal(t, entries[1].ConfirmedBy, updatedEntries[0].ConfirmedBy)
+
+		// The first entry has been deleted
+		var deletedEntries []models.Entry
+		require.NoError(t, env.db.Unscoped().Where("deleted_at IS NOT NULL AND member_id = ?", member.ID).Order("created_at ASC").Find(&deletedEntries).Error)
+		require.Len(t, deletedEntries, 1)
+		require.Equal(t, entries[0].ID, deletedEntries[0].ID)
+		require.Equal(t, entries[0].MemberID, deletedEntries[0].MemberID)
+		require.Equal(t, entries[0].BandID, deletedEntries[0].BandID)
+		require.True(t, deletedEntries[0].DeletedAt.Valid)
+		require.True(t, deletedEntries[0].DeletedBy.Valid)
+		require.Equal(t, env.user.ID, deletedEntries[0].DeletedBy.UUID)
 	})
 	t.Run("LimitPerDayReached", func(t *testing.T) {
 		env := getTestEnv(t)

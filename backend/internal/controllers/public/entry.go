@@ -95,7 +95,7 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 			})
 
 			// Lock a position
-			if err = tx.Create(&models.Entry{
+			if err = tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&models.Entry{
 				BandID:    band.ID,
 				MemberID:  member.ID,
 				ExpiresAt: time.Now().Add(models.EntryLockExpirationDelay),
@@ -136,8 +136,11 @@ type SetMemberEntriesInput struct {
 var sessionExpiredError = errors.New("missing lock for entry")
 
 func (api *API) SetMemberEntries(ctx *gin.Context) {
-	claims := jwt.ExtractClaims(ctx)
-	userID := uuid.MustParse(claims[auth.IdentityKey].(string))
+	user, err := ExtractUserFromContext(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
 	memberID, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
@@ -152,9 +155,11 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 		return
 	}
 
-	// Get the current member
+	// Get the requested member
 	var member models.Member
-	err = api.db.Where(&models.Member{ID: member.ID, UserID: userID}).First(&member).Error
+	err = api.db.Scopes(FilterByUserID(user)).
+		Where(&models.Member{ID: member.ID, UserID: user.ID}).
+		First(&member).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("member %s not found", memberID))
@@ -190,7 +195,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 		// Delete the unwanted entries.
 		if err = api.db.
 			Where("member_id = ? AND band_id NOT IN ?", member.ID, input.BandIDs).
-			Updates(&models.Entry{DeletedAt: gorm.DeletedAt{Time: time.Now(), Valid: true}, DeletedBy: uuid.NullUUID{UUID: userID, Valid: true}}).Error; err != nil {
+			Updates(&models.Entry{DeletedAt: gorm.DeletedAt{Time: time.Now(), Valid: true}, DeletedBy: uuid.NullUUID{UUID: user.ID, Valid: true}}).Error; err != nil {
 			return fmt.Errorf("failed to delete entry: %w", err)
 		}
 
@@ -233,7 +238,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 
 		if err = tx.Model(models.Entry{}).
 			Where("id IN ?", entriesToConfirm).
-			Updates(models.Entry{Confirmed: true, ConfirmedBy: uuid.NullUUID{UUID: userID, Valid: true}}).Error; err != nil {
+			Updates(models.Entry{Confirmed: true, ConfirmedBy: uuid.NullUUID{UUID: user.ID, Valid: true}}).Error; err != nil {
 			return fmt.Errorf("failed to confirm entry: %w", err)
 		}
 

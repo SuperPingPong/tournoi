@@ -62,17 +62,21 @@ func (api *API) ListMembers(ctx *gin.Context) {
 		return
 	}
 
-	claims := jwt.ExtractClaims(ctx)
-	userID := uuid.MustParse(claims[auth.IdentityKey].(string))
+	user, err := ExtractUserFromContext(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
 	var members []models.Member
 	var totalCount int64
 	if err := api.db.
+		Scopes(FilterByUserID(user)).
 		Scopes(searchMembersScope(ctx.Query("search"))).
 		Scopes(filterByPermitID(ctx.Query("permit_id"))).
 		Scopes(Paginate(page, pageSize)).
 		Joins("JOIN users ON users.id = members.user_id").
-		Where(&models.Member{UserID: userID}).
+		Where(&models.Member{UserID: user.ID}).
 		Select("members.*, COUNT(*) OVER () AS total_count").
 		Find(&members).
 		Count(&totalCount).

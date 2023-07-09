@@ -20,7 +20,7 @@ func TestListMembers(t *testing.T) {
 		env := getTestEnv(t)
 		defer env.teardown()
 
-		user := &models.User{
+		user := models.User{
 			Email: "hdupont@example.com",
 			Members: []models.Member{
 				{
@@ -31,7 +31,7 @@ func TestListMembers(t *testing.T) {
 				},
 			},
 		}
-		env.db.Create(user)
+		env.db.Create(&user)
 
 		members := []models.Member{
 			{
@@ -91,7 +91,7 @@ func TestListMembers(t *testing.T) {
 			},
 			{
 				MemberID:  members[0].ID,
-				BandID:    bands[1].ID,
+				BandID:    bands[2].ID,
 				Confirmed: false,
 			},
 		}
@@ -277,7 +277,7 @@ func TestListMembers(t *testing.T) {
 		env := getTestEnv(t)
 		defer env.teardown()
 
-		user := &models.User{
+		user := models.User{
 			Email: "hdupont@example.com",
 			Members: []models.Member{
 				{
@@ -288,7 +288,7 @@ func TestListMembers(t *testing.T) {
 				},
 			},
 		}
-		env.db.Create(user)
+		env.db.Create(&user)
 
 		res := performRequest("GET", "/api/members", nil, map[string]string{
 			"Authorization": "Bearer " + env.jwt,
@@ -504,7 +504,7 @@ func TestUpdateMember(t *testing.T) {
 		env := getTestEnv(t)
 		defer env.teardown()
 
-		user := &models.User{
+		user := models.User{
 			Email: "hdupont@example.com",
 			Members: []models.Member{
 				{
@@ -515,7 +515,7 @@ func TestUpdateMember(t *testing.T) {
 				},
 			},
 		}
-		env.db.Create(user)
+		env.db.Create(&user)
 
 		url := "/api/members/" + user.Members[0].ID.String()
 		data := map[string]string{"PermitID": "000000"}
