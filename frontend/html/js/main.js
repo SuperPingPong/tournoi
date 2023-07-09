@@ -198,7 +198,7 @@ function Survey(survey) {
               input.value = band.ID;
               const label = document.createElement('label');
               label.htmlFor = `tableau-${band.Name}`;
-              label.textContent = `Tableau ${band.Name} (≤ ${band.MaxPoints} pts) - ` +
+              label.textContent = `Tableau ${band.Name} (${band.MaxPoints >= 9000 ? 'TC' : '≤ ' + band.MaxPoints + ' pts'}) - ` +
                 `${band.Available > 0 ? band.Available + " place(s) restante(s)" : ""}` +
                 `${band.Available === 0 ? "Inscription en liste d'attente" : ""}`;
               div.appendChild(input);
