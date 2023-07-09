@@ -68,34 +68,49 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 	}
 
 	err = api.db.Transaction(func(tx *gorm.DB) error {
-		// Delete unwanted entries
-		if err = tx.Where("member_id = ? AND band_id NOT IN ?", member.ID, input.BandIDs).Delete(&models.Entry{}).Error; err != nil {
+		// Delete the unwanted entries.
+		if err = api.db.Where("member_id = ? AND band_id NOT IN ?", member.ID, input.BandIDs).Delete(&models.Entry{}).Error; err != nil {
 			return fmt.Errorf("failed to delete entry: %w", err)
 		}
 
-		// Get existing entries
-		var currentEntries []models.Entry
-		if err = tx.Where("member_id = ?", member.ID).Find(&currentEntries).Error; err != nil {
+		// Find existing entries for the member
+		var existingEntries []models.Entry
+		if err = tx.Where("member_id = ?", member.ID).Find(&existingEntries).Error; err != nil {
 			return fmt.Errorf("failed to list member entries: %w", err)
 		}
-		currentBandIDEntries := map[uuid.UUID]models.Entry{}
-		for _, entry := range currentEntries {
-			currentBandIDEntries[entry.BandID] = entry
+
+		// We need to make sure that every band ID from the input is either confirmed or has a lock in the current session
+		var confirmedEntriesCount int
+		requestedEntries := map[uuid.UUID]models.Entry{}
+		for _, entry := range existingEntries {
+			if entry.Confirmed {
+				confirmedEntriesCount += 1
+				requestedEntries[entry.BandID] = entry
+			} else if entry.SessionID == input.SessionID {
+				requestedEntries[entry.BandID] = entry
+			}
 		}
 
 		var entriesToConfirm []uuid.UUID
 		for _, bandID := range input.BandIDs {
-			existingEntry, ok := currentBandIDEntries[bandID]
-			// Reject request if no lock exists for the session or if the lock is expired
-			if !ok || existingEntry.SessionID != input.SessionID || existingEntry.ExpiresAt.Before(time.Now()) {
+			requestedEntry, ok := requestedEntries[bandID]
+			// Reject request if no entry (confirmed or locked) exists for the band ID
+			if !ok {
 				return sessionExpiredError
 			}
-			// Confirm the entry if not already confirmed
-			if !existingEntry.Confirmed {
-				entriesToConfirm = append(entriesToConfirm, existingEntry.ID)
+			// Confirm the entry if not already confirmed and not expired
+			if !requestedEntry.Confirmed && requestedEntry.ExpiresAt.After(time.Now()) {
+				entriesToConfirm = append(entriesToConfirm, requestedEntry.ID)
 			}
 		}
-		if err = api.db.Model(models.Entry{}).
+
+		// The number of entries to confirm should be the difference between the number of expected bands
+		// and the number of already confirmed entries. Otherwise, it means that some entries were expired.
+		if len(entriesToConfirm) != len(input.BandIDs)-confirmedEntriesCount {
+			return sessionExpiredError
+		}
+
+		if err = tx.Model(models.Entry{}).
 			Where("id IN ?", entriesToConfirm).
 			Updates(models.Entry{Confirmed: true}).Error; err != nil {
 			return fmt.Errorf("failed to confirm entry: %w", err)
