@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -25,4 +27,7 @@ type Band struct {
 	Sex        string    `gorm:"not null"`
 	MaxPoints  float64   `gorm:"not null"`
 	MaxEntries int       `gorm:"not null"`
+	Price      int       `gorm:"not null"`
+
+	CreatedAt time.Time `gorm:"<-:create;not null"`
 }

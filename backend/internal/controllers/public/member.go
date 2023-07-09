@@ -95,6 +95,7 @@ func (api *API) ListMembers(ctx *gin.Context) {
 			Select("entries.band_id, bands.name AS band_name, entries.created_at").
 			Joins("JOIN bands ON bands.id = entries.band_id").
 			Where("entries.member_id = ? AND entries.confirmed IS TRUE", member.ID.String()).
+			Order("bands.created_at ASC").
 			Scan(&memberEntries).Error; err != nil {
 			ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list members: %w", err))
 			return

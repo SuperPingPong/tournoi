@@ -35,6 +35,7 @@ func main() {
 			Sex:        "ALL",
 			MaxPoints:  699,
 			MaxEntries: 72,
+			Price:      9,
 		},
 		{
 			Name:       "B",
@@ -43,6 +44,7 @@ func main() {
 			Sex:        "ALL",
 			MaxPoints:  1199,
 			MaxEntries: 72,
+			Price:      9,
 		},
 		{
 			Name:       "C",
@@ -51,6 +53,7 @@ func main() {
 			Sex:        "ALL",
 			MaxPoints:  799,
 			MaxEntries: 72,
+			Price:      9,
 		},
 		{
 			Name:       "D",
@@ -59,6 +62,7 @@ func main() {
 			Sex:        "ALL",
 			MaxPoints:  1399,
 			MaxEntries: 72,
+			Price:      9,
 		},
 		{
 			Name:       "E",
@@ -67,6 +71,7 @@ func main() {
 			Sex:        "F",
 			MaxPoints:  1199,
 			MaxEntries: 72,
+			Price:      9,
 		},
 		{
 			Name:       "F",
@@ -75,6 +80,7 @@ func main() {
 			Sex:        "ALL",
 			MaxPoints:  999,
 			MaxEntries: 72,
+			Price:      9,
 		},
 		{
 			Name:       "G",
@@ -83,6 +89,7 @@ func main() {
 			Sex:        "ALL",
 			MaxPoints:  1599,
 			MaxEntries: 72,
+			Price:      9,
 		},
 		{
 			Name:       "1",
@@ -91,6 +98,7 @@ func main() {
 			Sex:        "ALL",
 			MaxPoints:  1099,
 			MaxEntries: 72,
+			Price:      9,
 		},
 		{
 			Name:       "2",
@@ -99,6 +107,7 @@ func main() {
 			Sex:        "ALL",
 			MaxPoints:  1699,
 			MaxEntries: 72,
+			Price:      10,
 		},
 		{
 			Name:       "3",
@@ -107,6 +116,7 @@ func main() {
 			Sex:        "ALL",
 			MaxPoints:  1299,
 			MaxEntries: 72,
+			Price:      9,
 		},
 		{
 			Name:       "4",
@@ -115,6 +125,7 @@ func main() {
 			Sex:        "ALL",
 			MaxPoints:  1899,
 			MaxEntries: 72,
+			Price:      10,
 		},
 		{
 			Name:       "5",
@@ -123,6 +134,7 @@ func main() {
 			Sex:        "ALL",
 			MaxPoints:  2199,
 			MaxEntries: 72,
+			Price:      10,
 		},
 		{
 			Name:       "6",
@@ -131,6 +143,7 @@ func main() {
 			Sex:        "ALL",
 			MaxPoints:  1499,
 			MaxEntries: 72,
+			Price:      9,
 		},
 		{
 			Name:       "7",
@@ -139,6 +152,7 @@ func main() {
 			Sex:        "ALL",
 			MaxPoints:  9999, // TS
 			MaxEntries: 72,
+			Price:      10,
 		},
 	}
 	for _, band := range bands {

@@ -7,9 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/SuperPingPong/tournoi/internal/auth"
 	"github.com/SuperPingPong/tournoi/internal/models"
-	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
@@ -28,8 +26,11 @@ type BandAvailability struct {
 }
 
 func (api *API) ListBandAvailabilities(ctx *gin.Context) {
-	claims := jwt.ExtractClaims(ctx)
-	userID := uuid.MustParse(claims[auth.IdentityKey].(string))
+	user, err := ExtractUserFromContext(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
 	memberID, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
@@ -41,7 +42,7 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 	var member models.Member
 	err = api.db.
 		Joins("LEFT JOIN entries ON entries.member_id = members.id").
-		Where("members.id = ? AND members.user_id = ?", memberID, userID).
+		Where("members.id = ? AND members.user_id = ?", memberID, user.ID).
 		First(&member).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -101,7 +102,7 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 				ExpiresAt: time.Now().Add(models.EntryLockExpirationDelay),
 				Confirmed: false,
 				SessionID: sessionID,
-				CreatedBy: uuid.NullUUID{UUID: userID, Valid: true},
+				CreatedBy: uuid.NullUUID{UUID: user.ID, Valid: true},
 			}).Error; err != nil {
 				return fmt.Errorf("failed to lock entries: %w", err)
 			}
