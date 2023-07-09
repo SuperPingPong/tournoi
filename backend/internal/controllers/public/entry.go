@@ -171,11 +171,18 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to find bands %v", bands))
 		return
 	}
+
 	if len(bands) != len(input.BandIDs) {
 		missingBands := lo.Filter(input.BandIDs, func(bandID uuid.UUID, _ int) bool {
 			return !lo.Contains(mapBandIDs(bands), bandID)
 		})
 		ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("bands %v not found", missingBands))
+		return
+	}
+
+	// Enforce bands limit
+	if err = enforceBandsLimit(bands); err != nil {
+		ctx.AbortWithError(http.StatusConflict, err)
 		return
 	}
 
@@ -242,4 +249,35 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusOK)
+}
+
+var (
+	limitThreeBandsPerDayReachedError = errors.New("can't have more than three bands per day")
+	limitSameColorPerDayReachedError  = errors.New("can't have more than two bands of the same color the same day")
+)
+
+// Enforce a limit of max 3 bands per day and
+// ensures that no two bands of the same color are scheduled on the same day
+func enforceBandsLimit(bands []models.Band) error {
+	countPerDay := make(map[int]int)
+	colorCountPerDay := make(map[int]map[string]int)
+	for _, band := range bands {
+		countPerDay[band.Day] += 1
+
+		colorCount, ok := colorCountPerDay[band.Day]
+		if !ok {
+			colorCount = make(map[string]int)
+			colorCountPerDay[band.Day] = colorCount
+		}
+		colorCount[band.Color] += 1
+
+		if countPerDay[band.Day] > 3 {
+			return limitThreeBandsPerDayReachedError
+		}
+
+		if colorCountPerDay[band.Day][band.Color] > 1 {
+			return limitSameColorPerDayReachedError
+		}
+	}
+	return nil
 }

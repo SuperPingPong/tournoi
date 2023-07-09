@@ -223,21 +223,29 @@ func TestSetMemberEntries(t *testing.T) {
 				Name:      "S",
 				Sex:       models.BandSex_M,
 				MaxPoints: 799,
+				Color:     models.BandColor_GREEN,
+				Day:       1,
 			},
 			{
 				Name:      "T",
 				Sex:       models.BandSex_M,
 				MaxPoints: 999,
+				Color:     models.BandColor_BLUE,
+				Day:       2,
 			},
 			{
 				Name:      "U",
 				Sex:       models.BandSex_ALL,
 				MaxPoints: 999,
+				Color:     models.BandColor_GREEN,
+				Day:       2,
 			},
 			{
 				Name:      "V",
 				Sex:       models.BandSex_F,
 				MaxPoints: 1199,
+				Color:     models.BandColor_PINK,
+				Day:       2,
 			},
 		}
 		require.NoError(t, env.db.Create(&bands).Error)
@@ -343,6 +351,203 @@ func TestSetMemberEntries(t *testing.T) {
 		require.True(t, deletedEntries[1].DeletedAt.Valid)
 		require.True(t, deletedEntries[1].DeletedBy.Valid)
 		require.Equal(t, env.user.ID, deletedEntries[1].DeletedBy.UUID)
+	})
+	t.Run("LimitPerDayReached", func(t *testing.T) {
+		env := getTestEnv(t)
+		defer env.teardown()
+
+		bands := []models.Band{
+			{
+				Name:      "S",
+				Sex:       models.BandSex_M,
+				MaxPoints: 799,
+				Color:     models.BandColor_PINK,
+				Day:       1,
+			},
+			{
+				Name:      "T",
+				Sex:       models.BandSex_ALL,
+				MaxPoints: 999,
+				Color:     models.BandColor_PINK,
+				Day:       2,
+			},
+			{
+				Name:      "U",
+				Sex:       models.BandSex_M,
+				MaxPoints: 999,
+				Color:     models.BandColor_GREEN,
+				Day:       2,
+			},
+			{
+				Name:      "V",
+				Sex:       models.BandSex_M,
+				MaxPoints: 999,
+				Color:     models.BandColor_BLUE,
+				Day:       2,
+			},
+			{
+				Name:      "W",
+				Sex:       models.BandSex_ALL,
+				MaxPoints: 999,
+				Color:     models.BandColor_BROWN,
+				Day:       2,
+			},
+		}
+		require.NoError(t, env.db.Create(&bands).Error)
+
+		member := models.Member{
+			FirstName: "John",
+			LastName:  "Doe",
+			Sex:       "M",
+			PermitID:  "000000",
+			Points:    700,
+			UserID:    env.user.ID,
+		}
+		require.NoError(t, env.db.Create(&member).Error)
+
+		sessionID := uuid.New()
+		entries := []models.Entry{
+			{
+				MemberID:  member.ID,
+				BandID:    bands[0].ID,
+				Confirmed: false,
+				ExpiresAt: time.Now().Add(time.Hour),
+				SessionID: sessionID,
+			},
+			{
+				MemberID:  member.ID,
+				BandID:    bands[1].ID,
+				Confirmed: false,
+				ExpiresAt: time.Now().Add(time.Hour),
+				SessionID: sessionID,
+			},
+			{
+				MemberID:  member.ID,
+				BandID:    bands[2].ID,
+				Confirmed: false,
+				ExpiresAt: time.Now().Add(time.Hour),
+				SessionID: sessionID,
+			},
+			{
+				MemberID:  member.ID,
+				BandID:    bands[3].ID,
+				Confirmed: false,
+				ExpiresAt: time.Now().Add(time.Hour),
+				SessionID: sessionID,
+			},
+			{
+				MemberID:  member.ID,
+				BandID:    bands[4].ID,
+				Confirmed: false,
+				ExpiresAt: time.Now().Add(time.Hour),
+				SessionID: sessionID,
+			},
+		}
+		require.NoError(t, env.db.Create(&entries).Error)
+
+		url := fmt.Sprintf("/api/members/%s/set-entries", member.ID)
+		data := map[string]interface{}{
+			"BandIDs": []string{
+				bands[0].ID.String(),
+				bands[1].ID.String(),
+				bands[2].ID.String(),
+				bands[3].ID.String(),
+				bands[4].ID.String(),
+			},
+			"SessionID": uuid.New(),
+		}
+		body, err := json.Marshal(data)
+		require.NoError(t, err)
+
+		res := performRequest("POST", url, bytes.NewBuffer(body), map[string]string{
+			"Authorization": "Bearer " + env.jwt,
+		}, env.api.router)
+
+		var actual map[string]string
+		require.NoError(t, json.NewDecoder(res.Body).Decode(&actual))
+		require.NoError(t, err)
+		require.Equal(t, http.StatusConflict, res.Code)
+		require.Equal(t, limitThreeBandsPerDayReachedError.Error(), actual["error"])
+
+		var updatedEntries []models.Entry
+		require.NoError(t, env.db.Where(&models.Entry{MemberID: member.ID, Confirmed: true}).Order("created_at ASC").Find(&updatedEntries).Error)
+		require.Len(t, updatedEntries, 0)
+	})
+	t.Run("LimitPerColorPerDayReached", func(t *testing.T) {
+		env := getTestEnv(t)
+		defer env.teardown()
+
+		bands := []models.Band{
+			{
+				Name:      "S",
+				Sex:       models.BandSex_M,
+				MaxPoints: 799,
+				Color:     models.BandColor_PINK,
+				Day:       1,
+			},
+			{
+				Name:      "T",
+				Sex:       models.BandSex_ALL,
+				MaxPoints: 999,
+				Color:     models.BandColor_PINK,
+				Day:       1,
+			},
+		}
+		require.NoError(t, env.db.Create(&bands).Error)
+
+		member := models.Member{
+			FirstName: "John",
+			LastName:  "Doe",
+			Sex:       "M",
+			PermitID:  "000000",
+			Points:    700,
+			UserID:    env.user.ID,
+		}
+		require.NoError(t, env.db.Create(&member).Error)
+
+		sessionID := uuid.New()
+		entries := []models.Entry{
+			{
+				MemberID:  member.ID,
+				BandID:    bands[0].ID,
+				Confirmed: false,
+				ExpiresAt: time.Now().Add(time.Hour),
+				SessionID: sessionID,
+			},
+			{
+				MemberID:  member.ID,
+				BandID:    bands[1].ID,
+				Confirmed: false,
+				ExpiresAt: time.Now().Add(time.Hour),
+				SessionID: sessionID,
+			},
+		}
+		require.NoError(t, env.db.Create(&entries).Error)
+
+		url := fmt.Sprintf("/api/members/%s/set-entries", member.ID)
+		data := map[string]interface{}{
+			"BandIDs": []string{
+				bands[0].ID.String(),
+				bands[1].ID.String(),
+			},
+			"SessionID": uuid.New(),
+		}
+		body, err := json.Marshal(data)
+		require.NoError(t, err)
+
+		res := performRequest("POST", url, bytes.NewBuffer(body), map[string]string{
+			"Authorization": "Bearer " + env.jwt,
+		}, env.api.router)
+
+		var actual map[string]string
+		require.NoError(t, json.NewDecoder(res.Body).Decode(&actual))
+		require.NoError(t, err)
+		require.Equal(t, http.StatusConflict, res.Code)
+		require.Equal(t, limitSameColorPerDayReachedError.Error(), actual["error"])
+
+		var updatedEntries []models.Entry
+		require.NoError(t, env.db.Where(&models.Entry{MemberID: member.ID, Confirmed: true}).Order("created_at ASC").Find(&updatedEntries).Error)
+		require.Len(t, updatedEntries, 0)
 	})
 	t.Run("NoMatchingSessionID", func(t *testing.T) {
 		env := getTestEnv(t)
@@ -561,11 +766,15 @@ func TestSetMemberEntries(t *testing.T) {
 				Name:      "S",
 				Sex:       models.BandSex_M,
 				MaxPoints: 799,
+				Color:     models.BandColor_GREEN,
+				Day:       1,
 			},
 			{
 				Name:      "T",
 				Sex:       models.BandSex_M,
 				MaxPoints: 999,
+				Color:     models.BandColor_PINK,
+				Day:       1,
 			},
 		}
 		require.NoError(t, env.db.Create(&bands).Error)
