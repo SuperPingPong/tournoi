@@ -25,6 +25,8 @@ function Survey(survey) {
   let dontSubmit = false;
 
   function storeInitialData() {
+    submitButton.disabled = true;
+    submitButton.setAttribute("aria-hidden", true);
     allPanels.map(panel => {
       let index = panel.dataset.index;
       let panelName = panel.dataset.panel;
