@@ -4,13 +4,16 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/SuperPingPong/tournoi/internal/controllers/public"
 	"github.com/SuperPingPong/tournoi/internal/models"
 	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -18,6 +21,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	adminEmail := os.Getenv("ADMIN_EMAIL")
+	err = godotenv.Load()
+	if adminEmail == "" && err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	adminEmail = os.Getenv("ADMIN_EMAIL")
 
 	r := gin.Default()
 
