@@ -1,9 +1,11 @@
 package public
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/SuperPingPong/tournoi/internal/auth"
 	"github.com/SuperPingPong/tournoi/internal/models"
@@ -12,22 +14,18 @@ import (
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type SetMemberEntries struct {
-	BandIDs []uuid.UUID `binding:"required"`
+	BandIDs   []uuid.UUID `binding:"required"`
+	SessionID uuid.UUID   `binding:"required"`
 }
+
+var sessionExpiredError = errors.New("missing lock for entry")
 
 func (api *API) SetMemberEntries(ctx *gin.Context) {
 	claims := jwt.ExtractClaims(ctx)
 	userID := uuid.MustParse(claims[auth.IdentityKey].(string))
-
-	var user models.User
-	if err := api.db.Preload("Members").First(&user, userID).Error; err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get user %s: %w", userID, err))
-		return
-	}
 
 	memberID, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
@@ -42,67 +40,79 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 		return
 	}
 
-	if len(input.BandIDs) > 3 {
-
-	}
-
-	var bands []models.Band
-	for _, bandID := range input.BandIDs {
-		var band models.Band
-		if api.db.First(&band, bandID).Error != nil {
-			ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("band %s not found", bandID))
+	// Get the current member
+	var member models.Member
+	err = api.db.Where(&models.Member{ID: member.ID, UserID: userID}).First(&member).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("member %s not found", memberID))
 			return
 		}
-		bands = append(bands, band)
+
+		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get member: %w", err))
+		return
 	}
 
-	var member models.Member
-	if !userHasMember(user, memberID) || api.db.First(&member, memberID).Error != nil {
-		ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("member %s not found", memberID))
+	// List possible bands for the current member
+	var bands []models.Band
+	if api.db.Scopes(possibleBandsScope(member)).Where("id IN ?", input.BandIDs).Find(&bands).Error != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to find bands %v", bands))
+		return
+	}
+	if len(bands) != len(input.BandIDs) {
+		missingBands := lo.Filter(input.BandIDs, func(bandID uuid.UUID, _ int) bool {
+			return !lo.Contains(mapBandIDs(bands), bandID)
+		})
+		ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("bands %v not found", missingBands))
 		return
 	}
 
 	err = api.db.Transaction(func(tx *gorm.DB) error {
+		// Delete unwanted entries
+		if err = tx.Where("member_id = ? AND band_id NOT IN ?", member.ID, input.BandIDs).Delete(&models.Entry{}).Error; err != nil {
+			return fmt.Errorf("failed to delete entry: %w", err)
+		}
+
+		// Get existing entries
 		var currentEntries []models.Entry
-		if err = tx.Where(&models.Entry{MemberID: member.ID}).Find(&currentEntries).Error; err != nil {
+		if err = tx.Where("member_id = ?", member.ID).Find(&currentEntries).Error; err != nil {
 			return fmt.Errorf("failed to list member entries: %w", err)
 		}
-
+		currentBandIDEntries := map[uuid.UUID]models.Entry{}
 		for _, entry := range currentEntries {
-			if !lo.Contains(input.BandIDs, entry.BandID) {
-				if err = tx.Where(&models.Entry{BandID: entry.BandID, MemberID: entry.MemberID}).Delete(&models.Entry{}).Error; err != nil {
-					return fmt.Errorf("failed to delete entry: %w", err)
-				}
-			}
+			currentBandIDEntries[entry.BandID] = entry
 		}
 
-		for _, band := range bands {
-			if err := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&models.Entry{
-				BandID:   band.ID,
-				MemberID: member.ID,
-			}).Error; err != nil {
-				return fmt.Errorf("failed to create entry (%s, %s): %w", member.ID, band.ID, err)
+		var entriesToConfirm []uuid.UUID
+		for _, bandID := range input.BandIDs {
+			existingEntry, ok := currentBandIDEntries[bandID]
+			// Reject request if no lock exists for the session or if the lock is expired
+			if !ok || existingEntry.SessionID != input.SessionID || existingEntry.ExpiresAt.Before(time.Now()) {
+				return sessionExpiredError
 			}
+			// Confirm the entry if not already confirmed
+			if !existingEntry.Confirmed {
+				entriesToConfirm = append(entriesToConfirm, existingEntry.ID)
+			}
+		}
+		if err = api.db.Model(models.Entry{}).
+			Where("id IN ?", entriesToConfirm).
+			Updates(models.Entry{Confirmed: true}).Error; err != nil {
+			return fmt.Errorf("failed to confirm entry: %w", err)
 		}
 
 		return nil
 	})
 	if err != nil {
+		if errors.Is(err, sessionExpiredError) {
+			ctx.AbortWithError(http.StatusConflict, err)
+			return
+		}
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
 	ctx.Status(http.StatusOK)
-}
-
-func userHasMember(user models.User, memberID uuid.UUID) bool {
-	var hasMember bool
-	for _, member := range user.Members {
-		if member.ID == memberID {
-			hasMember = true
-		}
-	}
-	return hasMember
 }
 
 func (api *API) ListBands(ctx *gin.Context) {

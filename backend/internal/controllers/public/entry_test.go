@@ -24,28 +24,28 @@ func TestListAvailableBands(t *testing.T) {
 				Day:        1,
 				Sex:        models.BandSex_ALL,
 				MaxEntries: 3,
-				MaxPoints:  100,
+				MaxPoints:  99,
 			},
 			{
 				Name:       "T",
 				Day:        1,
 				Sex:        models.BandSex_M,
 				MaxEntries: 1,
-				MaxPoints:  200,
+				MaxPoints:  199,
 			},
 			{
 				Name:       "U",
 				Day:        2,
 				Sex:        models.BandSex_F,
 				MaxEntries: 2,
-				MaxPoints:  200,
+				MaxPoints:  199,
 			},
 			{
 				Name:       "V",
 				Day:        2,
 				Sex:        models.BandSex_ALL,
 				MaxEntries: 1,
-				MaxPoints:  300,
+				MaxPoints:  299,
 			},
 		}
 		require.NoError(t, env.db.Create(&bands).Error)

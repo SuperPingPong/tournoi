@@ -38,7 +38,7 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 	}
 
 	// Get the current member
-	member := models.Member{}
+	var member models.Member
 	err = api.db.
 		Joins("LEFT JOIN entries ON entries.member_id = members.id").
 		Where("members.id = ? AND members.user_id = ?", memberID, userID).
@@ -55,8 +55,7 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 
 	// List possible bands for the current member
 	var possibleBands []models.Band
-	possibleBandsFilters := api.db.Where("(sex = ? OR sex = 'ALL') AND max_points > ?", member.Sex, member.Points)
-	if err = possibleBandsFilters.Find(&possibleBands).Error; err != nil {
+	if err = api.db.Scopes(possibleBandsScope(member)).Find(&possibleBands).Error; err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list available bands: %w", err))
 		return
 	}
@@ -70,6 +69,7 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 		return
 	}
 
+	sessionID := uuid.New()
 	var entries []models.Entry
 	var bandAvailabilities []BandAvailability
 	err = api.db.Transaction(func(tx *gorm.DB) error {
@@ -100,6 +100,7 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 				MemberID:  member.ID,
 				ExpiresAt: time.Now().Add(models.EntryLockExpirationDelay),
 				Confirmed: false,
+				SessionID: sessionID,
 			}).Error; err != nil {
 				return fmt.Errorf("failed to lock entries: %w", err)
 			}
@@ -111,5 +112,17 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"bands": bandAvailabilities})
+	ctx.JSON(http.StatusOK, gin.H{"bands": bandAvailabilities, "session_id": sessionID})
+}
+
+func possibleBandsScope(member models.Member) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("(sex = ? OR sex = 'ALL') AND max_points >= ?", member.Sex, member.Points)
+	}
+}
+
+func mapBandIDs(bands []models.Band) []uuid.UUID {
+	return lo.Map(bands, func(band models.Band, _ int) uuid.UUID {
+		return band.ID
+	})
 }

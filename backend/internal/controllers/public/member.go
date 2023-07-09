@@ -50,6 +50,17 @@ func (api *API) ListMembers(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid page size: %s", ctx.Query("page_size")))
 		return
 	}
+	validOrderBy := map[string]string{
+		"created_at_asc":  "created_at ASC",
+		"created_at_desc": "created_at ASC",
+		"last_name_desc":  "last_name DESC",
+		"last_name_asc":   "last_name ASC",
+	}
+	orderBy, valid := validOrderBy[ctx.DefaultQuery("order_by", "created_at_desc")]
+	if !valid {
+		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid page size: %s", ctx.Query("page_size")))
+		return
+	}
 
 	claims := jwt.ExtractClaims(ctx)
 	userID := uuid.MustParse(claims[auth.IdentityKey].(string))
@@ -61,7 +72,8 @@ func (api *API) ListMembers(ctx *gin.Context) {
 		Where(&models.Member{UserID: userID}).
 		Select("*, COUNT(*) OVER () AS total_count").
 		Find(&members).
-		Count(&totalCount).Error; err != nil {
+		Count(&totalCount).
+		Order(orderBy).Error; err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list members: %w", err))
 		return
 	}
