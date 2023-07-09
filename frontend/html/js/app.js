@@ -1,7 +1,73 @@
+var dataTable = null;
+
+function initDataTable(data) {
+  let dataTableHTML = document.getElementById("dataTable");
+  dataTableHTML.style.display = "block";
+  dataTable = $('#dataTable').DataTable({
+    "lengthMenu": [10, 25, 50, 100],
+    "pageLength": 25,
+    "data": data,
+    "order": [], // Remove default sorting
+    "columns": [
+      {
+        data: null,
+        render: function(data, type, row) {
+          return `👤 ${row.LastName} ${row.FirstName}`;
+        }
+      },
+      {
+        data: null,
+        render: function(data, type, row) {
+          return `🏓 ${row.ClubName}`;
+        }
+      },
+      {
+        data: null,
+        render: function(data, type, row) {
+          return `🎯 ${row.Points}`;
+        }
+      },
+      {
+        data: null,
+        render: function(data, type, row) {
+          const bandNames = 'Tableaux ' + row.Entries.map(entry => entry.BandName).join(' / ');
+          return bandNames;
+        }
+      },
+      {
+        data: null,
+        render: function(data, type, row) {
+          const editButton = '<button type="submit" data-action="edit" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-pencil"></i></button>';
+          const deleteButton = '<button type="submit" data-action="delete" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-times" style="color: red;"></i></button>';
+          const buttonsContainer = '<div class="field">' + editButton + deleteButton + '</div>';
+          return buttonsContainer;
+        }
+      }
+    ],
+    "initComplete": function() {
+      // Attach click event listener to buttons
+      $('button[data-action="edit"]').on('click', function(event) {
+        event.preventDefault();
+        const member = $(this).attr('data-info');
+        editMemberBands(member);
+      });
+      $('button[data-action="delete"]').on('click', function(event) {
+        event.preventDefault();
+        const member = $(this).attr('data-info');
+        deleteMember(member);
+      });
+    }
+  });
+}
+
 function init() {
   $.ajax({
     url: '/api/members',
     type: 'GET',
+    data: {
+      page: 1,
+      page_size: 25,
+    },
     success: function(response) {
       let filteredMembers = response.Members.filter(member => member.Entries !== null);
       if (response.Members.length === 0) {
@@ -16,56 +82,7 @@ function init() {
           window.location.href = '/';
         });
       }
-      let dataTable = document.getElementById("dataTable");
-      dataTable.style.display = "block";
-      dataTable = $('#dataTable').DataTable({
-        "lengthMenu": [10, 25, 50, 100],
-        "pageLength": 10,
-        "data": filteredMembers,
-        "order": [], // Remove default sorting
-        "columns": [
-          {
-            data: null,
-            render: function(data, type, row) {
-              return `👤 ${row.LastName} ${row.FirstName}`;
-            }
-          },
-          {
-            data: null,
-            render: function(data, type, row) {
-              return `🏓 ${row.ClubName}`;
-            }
-          },
-          {
-            data: null,
-            render: function(data, type, row) {
-              return `🎯 ${row.Points}`;
-            }
-          },
-          {
-            data: null,
-            render: function(data, type, row) {
-              const bandNames = 'Tableaux ' + row.Entries.map(entry => entry.BandName).join(' / ');
-              return bandNames;
-            }
-          },
-          {
-            data: null,
-            render: function(data, type, row) {
-              const editButton = '<div class="field"><button type="submit" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-pencil"></i></button></div>';
-              return editButton;
-            }
-          }
-        ],
-        "initComplete": function() {
-          // Attach click event listener to buttons
-          $('button[type="submit"]').on('click', function(event) {
-            event.preventDefault();
-            const member = $(this).attr('data-info');
-            editMemberBands(member);
-          });
-        }
-      });
+      initDataTable(filteredMembers);
     },
     error: function(xhr, textStatus, error) {
       // console.log(error);
@@ -187,7 +204,7 @@ function editMemberBands(memberString) {
               return result.value.newBandIDs
             }
           }).then((result) => {
-            console.log(result);
+            // console.log(result);
             if (result.isConfirmed) {
               $.ajax({
                 url: `/api/members/${member.ID}/set-entries`,
@@ -198,9 +215,28 @@ function editMemberBands(memberString) {
                   Swal.fire({
                     icon: 'success',
                     title: 'Mise à jour effectuée',
-                    text: ''
+                    text: '',
+                    showConfirmButton: false,
+                    timer: 3000,
+                  }).then((result) => {
+                    // force reload dataTable
+                    $.ajax({
+                      url: '/api/members',
+                      type: 'GET',
+                      success: function(response) {
+                        let filteredMembers = response.Members.filter(member => member.Entries !== null);
+                        dataTable.destroy();
+                        initDataTable(filteredMembers);
+                      },
+                      error: function(xhr, textStatus, error) {
+                        Swal.fire({
+                          icon: 'error',
+                          title: 'Une erreur est survenue',
+                          text: ''
+                        });
+                      }
+                    });
                   });
-                  // TODO: force reload dataTable
                 },
                 error: function(xhr, textStatus, error) {
                   Swal.fire({
@@ -220,6 +256,44 @@ function editMemberBands(memberString) {
         icon: 'error',
         title: 'Une erreur est survenue',
         text: ''
+      });
+    }
+  });
+}
+
+function deleteMember(memberString) {
+  const member = JSON.parse(memberString);
+  console.log(member);
+  Swal.fire({
+    title: "Suppression l'inscription",
+    html:
+      '👤 Nom: ' + member.LastName + ' | ' +
+      '👤 Prénom: ' + member.FirstName + ' | ' +
+      '🧾 N° License: ' + member.PermitID + ' | ' +
+      '🗂️ Catégorie: ' + member.Category + ' | ' +
+      '🏓 Club: ' + member.ClubName.replace(' ', ' ') + ' | ' +
+      '⚧ Sexe: ' + member.Sex + ' | ' +
+      '🎯Officiels: ' + member.Points + '<br><br>' +
+      "Êtes-vous certain de vouloir supprimer l'inscription de ce joueur ?",
+    // input: 'text',
+    inputAttributes: {
+        autocapitalize: 'off'
+    },
+    showLoaderOnConfirm: true,
+    showCancelButton: true,
+    confirmButtonText: 'Confirmer',
+    cancelButtonText: 'Annuler',
+    confirmButtonColor: '#5468D4',
+    cancelButtonColor: '#dc3741',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      console.log(member);
+      Swal.fire({
+        icon: 'success',
+        title: 'Suppression effectuée',
+        text: ''
+      }).then(() => {
+        console.log(member);
       });
     }
   });
