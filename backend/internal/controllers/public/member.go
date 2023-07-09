@@ -69,6 +69,7 @@ func (api *API) ListMembers(ctx *gin.Context) {
 	var totalCount int64
 	if err := api.db.
 		Scopes(searchMembersScope(ctx.Query("search"))).
+		Scopes(filterByPermitID(ctx.Query("permit_id"))).
 		Scopes(Paginate(page, pageSize)).
 		Joins("JOIN users ON users.id = members.user_id").
 		Where(&models.Member{UserID: userID}).
@@ -89,7 +90,7 @@ func (api *API) ListMembers(ctx *gin.Context) {
 		if err := api.db.Model(&models.Entry{}).
 			Select("entries.band_id, bands.name AS band_name, entries.created_at").
 			Joins("JOIN bands ON bands.id = entries.band_id").
-			Where("entries.member_id = ?", member.ID.String()).
+			Where("entries.member_id = ? AND entries.confirmed IS TRUE", member.ID.String()).
 			Scan(&memberEntries).Error; err != nil {
 			ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list members: %w", err))
 			return
@@ -120,6 +121,15 @@ func searchMembersScope(search string) func(db *gorm.DB) *gorm.DB {
 			"members.last_name ILIKE ? OR members.first_name ILIKE ? OR members.club_name ILIKE ? OR users.email ILIKE ?",
 			"%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%",
 		)
+	}
+}
+
+func filterByPermitID(permitID string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if permitID == "" {
+			return db
+		}
+		return db.Where("members.permit_id = ?", permitID)
 	}
 }
 

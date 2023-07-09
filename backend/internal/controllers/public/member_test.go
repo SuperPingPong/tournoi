@@ -61,24 +61,38 @@ func TestListMembers(t *testing.T) {
 
 		bands := []models.Band{
 			{
-				Name: "A",
-				Day:  1,
+				Name:  "A",
+				Day:   1,
+				Color: models.BandColor_BLUE,
 			},
 			{
-				Name: "B",
-				Day:  2,
+				Name:  "B",
+				Day:   2,
+				Color: models.BandColor_BROWN,
+			},
+			{
+				Name:  "C",
+				Day:   2,
+				Color: models.BandColor_GREEN,
 			},
 		}
 		env.db.Create(&bands)
 
 		entries := []models.Entry{
 			{
-				MemberID: members[0].ID,
-				BandID:   bands[0].ID,
+				MemberID:  members[0].ID,
+				BandID:    bands[0].ID,
+				Confirmed: true,
 			},
 			{
-				MemberID: members[0].ID,
-				BandID:   bands[1].ID,
+				MemberID:  members[0].ID,
+				BandID:    bands[1].ID,
+				Confirmed: true,
+			},
+			{
+				MemberID:  members[0].ID,
+				BandID:    bands[1].ID,
+				Confirmed: false,
 			},
 		}
 		env.db.Create(&entries)
@@ -104,6 +118,7 @@ func TestListMembers(t *testing.T) {
 		require.Equal(t, members[0].ClubName, got.Members[0].ClubName)
 		require.Equal(t, members[0].PermitType, got.Members[0].PermitType)
 
+		// Only two entries are expected since we don't want to show non-confirmed entries
 		require.Len(t, got.Members[0].Entries, 2)
 		require.Equal(t, bands[0].ID, got.Members[0].Entries[0].BandID)
 		require.Equal(t, bands[0].Name, got.Members[0].Entries[0].BandName)
@@ -213,6 +228,50 @@ func TestListMembers(t *testing.T) {
 		require.NoError(t, json.NewDecoder(res.Body).Decode(&got))
 		require.Len(t, got.Members, 0)
 		require.Equal(t, 0, got.Total)
+	})
+	t.Run("SuccessFilterByPermitID", func(t *testing.T) {
+		env := getTestEnv(t)
+		defer env.teardown()
+
+		members := []models.Member{
+			{
+				FirstName:  "John",
+				LastName:   "Doe",
+				Sex:        "M",
+				PermitID:   "000001",
+				Points:     600.0,
+				Category:   "V2",
+				ClubName:   "Jane Club",
+				PermitType: "T",
+				UserID:     env.user.ID,
+			},
+			{
+				FirstName:  "Jane",
+				LastName:   "Doe",
+				Sex:        "F",
+				PermitID:   "000002",
+				Points:     700.0,
+				Category:   "B1",
+				ClubName:   "Jane Club",
+				PermitType: "P",
+				UserID:     env.user.ID,
+			},
+		}
+		env.db.Create(&members)
+
+		url := "/api/members?permit_id=%s"
+
+		// search=doe should return John and Jane
+		res := performRequest("GET", fmt.Sprintf(url, members[0].PermitID), nil, map[string]string{
+			"Authorization": "Bearer " + env.jwt,
+		}, env.api.router)
+
+		var got ListMembersMembers
+		require.Equal(t, http.StatusOK, res.Code)
+		require.NoError(t, json.NewDecoder(res.Body).Decode(&got))
+		require.Len(t, got.Members, 1)
+		require.Equal(t, 1, got.Total)
+		require.Equal(t, members[0].ID, got.Members[0].ID)
 	})
 	t.Run("NoMemberForCurrentUser", func(t *testing.T) {
 		env := getTestEnv(t)
