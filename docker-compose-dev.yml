@@ -26,5 +26,7 @@ services:
     depends_on:
       - db
     restart: always
+    environment:
+      - ADMIN_EMAIL=admin@example.com
     volumes:
       - $PWD/backend:/app
