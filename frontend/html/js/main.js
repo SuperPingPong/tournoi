@@ -177,6 +177,8 @@ function Survey(survey) {
     if (+currentPanel.dataset.index === 3) {
       // Dynamically field form for set-entries endpoint
       const memberId = localStorage.getItem('memberId');
+      const memberPoints = localStorage.getItem('memberPoints');
+      const memberSex = localStorage.getItem('memberSex');
       $.ajax({
         url: `/api/members/${memberId}/band-availabilities`,
         type: 'GET',
@@ -198,6 +200,10 @@ function Survey(survey) {
               input.value = band.ID;
               input.setAttribute('data-color', band.Color);
               input.setAttribute('data-day', band.Day);
+              input.setAttribute('data-maxpoints', band.Points);
+              input.setAttribute('data-sex', band.Sex);
+              input.setAttribute('data-member-points', memberPoints);
+              input.setAttribute('data-member-sex', memberSex);
               const label = document.createElement('label');
               label.htmlFor = `tableau-${band.Name}`;
               label.textContent = `Tableau ${band.Name} (${band.MaxPoints >= 9000 ? 'TC' : '≤ ' + band.MaxPoints + ' pts'}) - ` +
@@ -439,6 +445,8 @@ function Survey(survey) {
                     success: function(response) {
                       let memberId = response.ID
                       localStorage.setItem('memberId', memberId);
+                      localStorage.setItem('memberPoints', response.Points);
+                      localStorage.setItem('memberSex', response.Sex);
                       noErrors();
                       displayNextPanel();
                     },

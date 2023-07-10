@@ -4,6 +4,15 @@ function manageCheckboxRequisitesEvent(event) {
 }
 
 function manageCheckboxRequisites(checkboxTarget) {
+  const checkboxE = document.querySelector('input#tableau-E');
+  if (checkboxE) {
+    if (checkboxE.getAttribute('data-member-sex') === checkboxE.getAttribute('data-sex') &&
+      parseInt(checkboxE.getAttribute('data-member-points')) <= parseInt(checkboxE.getAttribute('data-maxpoints'))
+    ) {
+      checkboxE.checked = true;
+    }
+  }
+
   const checkboxes = $('input[type="checkbox"]');
 
   const checkboxesWithSameDay = checkboxes.filter(function () {

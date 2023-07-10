@@ -86,3 +86,29 @@ input[type="checkbox"]:disabled {
 .custom-swal-html-container {
   width: 40em;
 }
+
+.rules-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0px;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.rules-container h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.rules-container ul {
+  list-style-type: disc;
+  margin-left: 0;
+  padding-left: 2em;
+  text-align: left;
+}
+
+.rules-container li {
+  margin-bottom: 8px;
+}

@@ -160,7 +160,7 @@ func main() {
 			Day:        2,
 			Color:      "yellow",
 			Sex:        "ALL",
-			MaxPoints:  9999, // TS
+			MaxPoints:  99999, // TS
 			MaxEntries: 72,
 			Price:      10,
 		},
