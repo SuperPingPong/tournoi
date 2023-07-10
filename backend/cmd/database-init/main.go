@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
+	"os"
 
 	"github.com/SuperPingPong/tournoi/internal/models"
 
@@ -10,7 +12,10 @@ import (
 )
 
 func main() {
-	dsn := "host=db user=postgres password=postgres port=5432 sslmode=disable"
+	_ = godotenv.Load()
+	postgresUser := os.Getenv("POSTGRES_USER")
+	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
+	dsn := fmt.Sprintf("host=db user=%s password=%s dbname=database port=5432 sslmode=disable", postgresUser, postgresPassword)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)

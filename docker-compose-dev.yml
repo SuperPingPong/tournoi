@@ -10,15 +10,6 @@ services:
       - "127.0.0.1:5432:5432"
     volumes:
       - $PWD/database/data:/var/lib/postgresql/data
-  frontend:
-    build: frontend
-    depends_on:
-      - api
-    restart: always
-    ports:
-      - "0.0.0.0:40080:80"
-    volumes:
-      - $PWD/frontend/html:/usr/share/nginx/html
   api:
     build:
       context: backend
@@ -28,5 +19,32 @@ services:
     restart: always
     environment:
       - ADMIN_EMAIL=admin@example.fr
+      - JWT_SECRET_KEY=secret
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     volumes:
       - $PWD/backend:/app
+  export:
+    build: export
+    restart: always
+    environment:
+      - JWT_SECRET_KEY=secret
+      - DEBUG=True
+      - PYTHONUNBUFFERED=1
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "0.0.0.0:40081:5000"
+    volumes:
+      - $PWD/export/main.py:/app/main.py
+      - $PWD/export/utils.py:/app/utils.py
+  frontend:
+    build: frontend
+    depends_on:
+      - api
+    restart: always
+    ports:
+      - "0.0.0.0:40080:80"
+    volumes:
+      - $PWD/frontend/html:/usr/share/nginx/html
+

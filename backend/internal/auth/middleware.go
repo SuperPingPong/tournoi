@@ -2,6 +2,8 @@ package auth
 
 import (
 	"errors"
+	"log"
+	"os"
 	"time"
 
 	"github.com/SuperPingPong/tournoi/internal/models"
@@ -14,9 +16,14 @@ import (
 var IdentityKey = "uid"
 
 func (a *AuthBusiness) AuthMiddleware() (*jwt.GinJWTMiddleware, error) {
+	// _ = godotenv.Load()
+	jwtSecretKey := os.Getenv("JWT_SECRET_KEY")
+	if jwtSecretKey == "" {
+		log.Fatal("JWT_SECRET_KEY environment variable is empty")
+	}
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
-		Realm:       "test zone",
-		Key:         []byte("secret key"),
+		Realm:       "tournoi",
+		Key:         []byte(jwtSecretKey),
 		Timeout:     time.Hour * 24 * 365,
 		MaxRefresh:  time.Hour * 24 * 365,
 		IdentityKey: IdentityKey,

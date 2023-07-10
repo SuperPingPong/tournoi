@@ -22,12 +22,11 @@ func main() {
 		panic(err)
 	}
 
+	_ = godotenv.Load()
 	adminEmail := os.Getenv("ADMIN_EMAIL")
-	err = godotenv.Load()
-	if adminEmail == "" && err != nil {
-		log.Fatal("Error loading .env file")
+	if adminEmail == "" {
+		log.Fatal("ADMIN_EMAIL environment variable is empty")
 	}
-	adminEmail = os.Getenv("ADMIN_EMAIL")
 
 	r := gin.Default()
 

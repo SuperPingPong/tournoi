@@ -6,6 +6,10 @@ server {
         root /usr/share/nginx/html;
         index index.html;
 
+        location /api/export  {
+           proxy_pass  http://export:5000;
+        }
+
         location /api  {
            proxy_pass  http://api:8080;
         }

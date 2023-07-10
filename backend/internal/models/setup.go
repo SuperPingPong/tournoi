@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+	"github.com/joho/godotenv"
 	"log"
 	"os"
 
@@ -16,7 +18,10 @@ var LOGGER = logger.New(
 	})
 
 func ConnectDatabase() (*gorm.DB, error) {
-	dsn := "host=db user=postgres password=postgres dbname=database port=5432 sslmode=disable"
+	_ = godotenv.Load()
+	postgresUser := os.Getenv("POSTGRES_USER")
+	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
+	dsn := fmt.Sprintf("host=db user=%s password=%s dbname=database port=5432 sslmode=disable", postgresUser, postgresPassword)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		TranslateError: true,
 		Logger:         LOGGER,
