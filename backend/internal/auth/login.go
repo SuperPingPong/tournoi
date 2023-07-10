@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"os"
 	"time"
 
 	"github.com/SuperPingPong/tournoi/internal/models"
@@ -33,8 +34,11 @@ func (a *AuthBusiness) Login(email string, secret string) (*models.User, error) 
 		return nil, err
 	}
 
+	adminEmail := os.Getenv("ADMIN_EMAIL")
+	isAdmin := email == adminEmail
 	err = a.db.FirstOrCreate(&user, models.User{
-		Email: email,
+		Email:   email,
+		IsAdmin: isAdmin,
 	}).Error
 	if err != nil {
 		return nil, err

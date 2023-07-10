@@ -13,7 +13,7 @@ function manageCheckboxRequisites(checkboxTarget) {
     }
   }
 
-  const checkboxes = $('input[type="checkbox"]');
+  let checkboxes = $('input[type="checkbox"]');
 
   const checkboxesWithSameDay = checkboxes.filter(function () {
     const checkbox = $(this);
@@ -39,28 +39,22 @@ function manageCheckboxRequisites(checkboxTarget) {
     });
   }
 
-  checkboxes.each(function () {
-    const checkbox = $(this);
-
-    if (checkboxTarget.getAttribute('id') === checkbox.attr('id')) {
-      return
-    }
-    if (checkbox.attr('data-day') !== checkboxTarget.getAttribute('data-day')) {
-      return
-    }
-    if (checkbox.attr('data-color') !== checkboxTarget.getAttribute('data-color')) {
-      return
-    }
-
-    const label = $('label[for="' + checkbox.attr('id') + '"]');
-
-    if (checkboxTarget.checked === true) {
+  checkboxes = $('input[type="checkbox"]');
+  const checkedCheckboxes = checkboxes.filter(':checked');
+  checkedCheckboxes.each(function () {
+    const checkedCheckbox = $(this);
+    checkedCheckboxColor = checkedCheckbox.attr('data-color')
+    checkedCheckboxDay = checkedCheckbox.attr('data-day')
+    // Verify if any checkbox in checkedCheckboxes matches the same data-day and data-color
+    const conflictingCheckboxes = checkboxes.filter(function () {
+      const checkbox = $(this);
+      return checkbox.attr('id') !== checkedCheckbox.attr('id') && checkbox.attr('data-day') === checkedCheckboxDay && checkbox.attr('data-color') === checkedCheckboxColor;
+    });
+    conflictingCheckboxes.each(function () {
+      const checkbox = $(this);
       checkbox.prop('disabled', true);
+      const label = $('label[for="' + checkbox.attr('id') + '"]');
       label.attr('data-title', 'Vous ne pouvez pas sélectionner deux tableaux de la même couleur');
-    }
-    if (checkboxTarget.checked === false) {
-      checkbox.prop('disabled', false);
-      label.removeAttr('data-title');
-    }
-  })
+    });
+  });
 }

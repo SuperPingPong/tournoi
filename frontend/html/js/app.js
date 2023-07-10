@@ -160,7 +160,7 @@ function editMemberBands(memberString) {
           '🏓 Club: ' + member.ClubName.replace(' ', ' ') + ' | ' +
           '⚧ Sexe: ' + member.Sex + ' | ' +
           '🎯Officiels: ' + member.Points + '<br><br>' +
-           '<div class="rules-container"><h2>⚠️ Règlement ⚠️</h2><ul><li>Les tableaux de couleurs identiques ne pourront pas être cumulés dans la même journée.</li><li>Les féminines ont une participation dans le tableau « E » (Féminin ≤ 1199pts) obligatoire (pour le samedi uniquement, si les conditions sont remplies).</li><li>3 tableaux maximum par jour.</li><li>Les inscriptions pourront se faire jusqu’au vendredi 27 octobre 2023 – 12H00.</li></ul></div><br><br>' +
+           '<div class="rules-container"><h2>⚠️ Règlement ⚠️</h2><ul><li>Les tableaux de couleurs identiques ne pourront pas être cumulés dans la même journée.</li><li>Les féminines ont une participation dans le tableau « E » (Féminin ≤ 1199pts) obligatoire (pour le samedi uniquement, si les conditions sont remplies).</li><li>3 tableaux maximum par jour.</li><li>Les inscriptions pourront se faire jusqu’au vendredi 27 octobre 2023 – 12H00.</li><li>Les places disponibles sont bloquées pendant 10 minutes, au-delà votre session sera expirée.</li></ul></div><br><br>' +
           checkboxStringTitles[0] + checkboxStrings[0] +
           checkboxStringTitles[1] + checkboxStrings[1],
         // input: 'text',

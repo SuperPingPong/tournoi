@@ -84,7 +84,7 @@ input[type="checkbox"]:disabled {
 }
 
 .custom-swal-html-container {
-  width: 40em;
+  width: 50em;
 }
 
 .rules-container {
@@ -106,6 +106,7 @@ input[type="checkbox"]:disabled {
   list-style-type: disc;
   margin-left: 0;
   padding-left: 2em;
+  padding-right: 0.5em;
   text-align: left;
 }
 

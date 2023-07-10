@@ -451,11 +451,19 @@ function Survey(survey) {
                       displayNextPanel();
                     },
                     error: function(xhr, textStatus, error) {
-                      Swal.fire({
-                        icon: 'error',
-                        title: 'Une erreur est survenue',
-                        text: ''
-                      });
+                      if (xhr.status === 409) {
+                        Swal.fire({
+                          icon: 'error',
+                          title: 'Licencié déjà inscrit au tournoi',
+                          html: 'Le joueur est déjà inscrit par un autre utilisateur. Contactez nous.',
+                        });
+                      } else {
+                        Swal.fire({
+                          icon: 'error',
+                          title: 'Une erreur est survenue',
+                          text: ''
+                        });
+                      }
                     }
                   });
                 } else {

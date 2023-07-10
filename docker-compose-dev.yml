@@ -27,6 +27,6 @@ services:
       - db
     restart: always
     environment:
-      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_EMAIL=admin@example.fr
     volumes:
       - $PWD/backend:/app
