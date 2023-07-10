@@ -54,9 +54,10 @@ function initDataTable() {
       {
         data: null,
         render: function(data, type, row) {
+          const historyButton = '<button type="submit" data-action="history" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-history"></i></button>';
           const editButton = '<button type="submit" data-action="edit" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-pencil"></i></button>';
           const deleteButton = '<button type="submit" data-action="delete" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-times" style="color: red;"></i></button>';
-          const buttonsContainer = '<div class="field">' + editButton + deleteButton + '</div>';
+          const buttonsContainer = '<div class="field">' + historyButton + editButton + deleteButton + '</div>';
           return buttonsContainer;
         }
       }
@@ -67,6 +68,11 @@ function initDataTable() {
         dataTable.search(this.value).draw();
       });
       // Attach click event listener to parent element (dataTable)
+      $('#dataTable').on('click', 'button[data-action="history"]', function(event) {
+        event.preventDefault();
+        const member = $(this).attr('data-info');
+        historyMemberBands(member);
+      });
       $('#dataTable').on('click', 'button[data-action="edit"]', function(event) {
         event.preventDefault();
         const member = $(this).attr('data-info');
@@ -79,6 +85,11 @@ function initDataTable() {
       });
     }
   });
+}
+
+function historyMemberBands(memberString) {
+  const member = JSON.parse(memberString);
+  console.log(member);
 }
 
 function editMemberBands(memberString) {
