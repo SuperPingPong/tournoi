@@ -200,7 +200,7 @@ function Survey(survey) {
               input.value = band.ID;
               input.setAttribute('data-color', band.Color);
               input.setAttribute('data-day', band.Day);
-              input.setAttribute('data-maxpoints', band.Points);
+              input.setAttribute('data-maxpoints', band.MaxPoints);
               input.setAttribute('data-sex', band.Sex);
               input.setAttribute('data-member-points', memberPoints);
               input.setAttribute('data-member-sex', memberSex);
@@ -595,7 +595,7 @@ function Survey(survey) {
                   if (result.isConfirmed) {
                     mainElement.classList.add("submission");
                     mainElement.setAttribute("role", "alert");
-                    mainElement.innerHTML = `<svg width="126" height="118" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126 118" aria-hidden="true" style="transform: translateX(50%)"><path d="M52.5 118c28.995 0 52.5-23.729 52.5-53S81.495 12 52.5 12 0 35.729 0 65s23.505 53 52.5 53z" fill="#B9CCED"/><path d="M45.726 87L23 56.877l8.186-6.105 15.647 20.74L118.766 0 126 7.192 45.726 87z" fill="#A7E9AF"/></svg>
+                    mainElement.innerHTML = `<div style="margin: 2.5em auto; text-align: center"><svg width="126" height="118" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126 118" aria-hidden="true"><path d="M52.5 118c28.995 0 52.5-23.729 52.5-53S81.495 12 52.5 12 0 35.729 0 65s23.505 53 52.5 53z" fill="#B9CCED"/><path d="M45.726 87L23 56.877l8.186-6.105 15.647 20.74L118.766 0 126 7.192 45.726 87z" fill="#A7E9AF"/></svg></div>
                     <h2 class="submission">Merci pour votre inscription</h2>
                     <p style="text-align: center">Surveillez vos emails, une confirmation vous a été envoyé.<br>Pour revenir au menu principal: <a href="/">Cliquez ici</a><br><br><br>Pour modifier vos inscriptions: <a href="/app">Cliquez ici</a>`;
                     return false;

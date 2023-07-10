@@ -81,44 +81,6 @@ function initDataTable() {
   });
 }
 
-function init() {
-  initDataTable();
-  return;
-  $.ajax({
-    url: '/api/members',
-    type: 'GET',
-    success: function(response) {
-      const members = response.Members;
-      if (members.length === 0) {
-        Swal.fire({
-          icon: 'error',
-          title: "Modification des tableaux",
-          text: "Aucune inscription n'est associé à votre compte, vous allez être redirigé vers la page d'accueil pour enregistrer votre première inscription.",
-          confirmButtonText: 'OK',
-          showConfirmButton: true,
-          timer: 5000,
-        }).then(function() {
-          window.location.href = '/';
-        });
-      }
-      initDataTable();
-    },
-    error: function(xhr, textStatus, error) {
-      // console.log(error);
-      Swal.fire({
-        icon: 'error',
-        title: "Echec de l'authentification",
-        text: "Vous n'êtes plus authentifié ou votre authentification a expiré, vous allez être redirigé vers la page de connexion",
-        confirmButtonText: 'OK',
-        showConfirmButton: true,
-        timer: 5000,
-      }).then(function() {
-        window.location.href = '/';
-      });
-    }
-  });
-}
-
 function editMemberBands(memberString) {
   const member = JSON.parse(memberString);
   const bandIDs = member.Entries === null ? [] : member.Entries.map(obj => obj.BandID);
@@ -345,6 +307,85 @@ function deleteMember(memberString) {
     }
   });
 }
+
+function init() {
+  $.ajax({
+    url: '/api/members',
+    type: 'GET',
+    success: function(response) {
+      const members = response.Members;
+      if (members.length === 0) {
+        Swal.fire({
+          icon: 'error',
+          title: "Modification des tableaux",
+          text: "Aucune inscription n'est associé à votre compte, vous allez être redirigé vers la page d'accueil pour enregistrer votre première inscription.",
+          confirmButtonText: 'OK',
+          showConfirmButton: true,
+          timer: 5000,
+        }).then(function() {
+          window.location.href = '/';
+        });
+      }
+      initDataTable();
+    },
+    error: function(xhr, textStatus, error) {
+      // console.log(error);
+      Swal.fire({
+        icon: 'error',
+        title: "Echec de l'authentification",
+        text: "Vous n'êtes plus authentifié ou votre authentification a expiré, vous allez être redirigé vers la page de connexion",
+        confirmButtonText: 'OK',
+        showConfirmButton: true,
+        timer: 5000,
+      }).then(function() {
+        window.location.href = '/';
+      });
+    }
+  });
+
+  // Add click event listener to logout button
+  $('#logoutButton').on('click', function(event) {
+    event.preventDefault();
+    Swal.fire({
+      title: 'Confirmation de déconnexion',
+      text: 'Êtes-vous sûr de vouloir vous déconnecter ?',
+      icon: 'question',
+      showLoaderOnConfirm: true,
+      showCancelButton: true,
+      confirmButtonText: 'Confirmer',
+      cancelButtonText: 'Annuler',
+      confirmButtonColor: '#5468D4',
+      cancelButtonColor: '#dc3741',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = '/';
+      }
+    });
+  });
+
+  $('#exportButton').on('click', function (event) {
+    event.preventDefault();
+    Swal.fire({
+      title: 'Exporter les données',
+      text: 'Êtes-vous sûr de vouloir télécharger les données ?',
+      icon: 'warning',
+      showLoaderOnConfirm: true,
+      showCancelButton: true,
+      confirmButtonText: 'Confirmer',
+      cancelButtonText: 'Annuler',
+      // confirmButtonColor: '#5468D4',
+      confirmButtonColor: '#1F7145',
+      cancelButtonColor: '#dc3741',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Redirect or make AJAX call to /api/export
+        // Replace the below line with your own logic
+        // window.location.href = '/api/export';
+      }
+    });
+  });
+}
+
 
 $(document).ready(function() {
   init();

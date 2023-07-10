@@ -9,7 +9,12 @@ function manageCheckboxRequisites(checkboxTarget) {
     if (checkboxE.getAttribute('data-member-sex') === checkboxE.getAttribute('data-sex') &&
       parseInt(checkboxE.getAttribute('data-member-points')) <= parseInt(checkboxE.getAttribute('data-maxpoints'))
     ) {
-      checkboxE.checked = true;
+      console.log(checkboxE);
+      const checkboxesWithSameDay = document.querySelectorAll(`input[data-day="${checkboxE.getAttribute('data-day')}"]:checked`);
+      console.log(checkboxesWithSameDay);
+      if (checkboxesWithSameDay.length > 0) {
+        checkboxE.checked = true;
+      }
     }
   }
 
