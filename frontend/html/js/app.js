@@ -66,13 +66,13 @@ function initDataTable() {
       searchInput.on('keyup', function () {
         dataTable.search(this.value).draw();
       });
-      // Attach click event listener to buttons
-      $('button[data-action="edit"]').on('click', function(event) {
+      // Attach click event listener to parent element (dataTable)
+      $('#dataTable').on('click', 'button[data-action="edit"]', function(event) {
         event.preventDefault();
         const member = $(this).attr('data-info');
         editMemberBands(member);
       });
-      $('button[data-action="delete"]').on('click', function(event) {
+      $('#dataTable').on('click', 'button[data-action="delete"]', function(event) {
         event.preventDefault();
         const member = $(this).attr('data-info');
         deleteMember(member);
