@@ -6,30 +6,22 @@ function initDataTable() {
   dataTable = $('#dataTable').DataTable({
     "lengthMenu": [15, 30, 60, 100],
     "pageLength": 15,
-    // "searchDelay": 350,
-    // "searching": false,
     "serverSide": true,
     "ajax": {
       "url": "/api/members",
       "dataSrc": function (data) {
+        data.recordsTotal = data.Total;
+        data.recordsFiltered = data.Total;
         return data.Members;
       },
       "data": function (params) {
         params.search = $('input[aria-controls="dataTable"]').val();
-        // params.page = 1;
         params.page = (params.start / params.length) + 1;
         params.page_size = params.length;
-        // params.page_size = dataTable.page.len();
-        // params.page_size = dataTable.page.len();
         return params
       },
     },
-    "order": [], // Remove default sorting
-    /*
-    "oLanguage": {
-        "sSearch": "Filtrer les résultats:"
-    },
-    */
+    "order": [],
     "language": {
         "url": '/locales/datatable/fr-FR.json',
     },
@@ -90,13 +82,11 @@ function initDataTable() {
 }
 
 function init() {
+  initDataTable();
+  return;
   $.ajax({
     url: '/api/members',
     type: 'GET',
-    data: {
-      page: 1,
-      page_size: 15,
-    },
     success: function(response) {
       const members = response.Members;
       if (members.length === 0) {

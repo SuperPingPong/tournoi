@@ -70,6 +70,19 @@ func (api *API) ListMembers(ctx *gin.Context) {
 
 	var members []models.Member
 	var totalCount int64
+
+	if err := api.db.
+		Model(&models.Member{}).
+		Scopes(FilterByUserID(user)).
+		Scopes(searchMembersScope(ctx.Query("search"), *user)).
+		Scopes(filterByPermitID(ctx.Query("permit_id"))).
+		Joins("JOIN users ON users.id = members.user_id").
+		Select("COUNT(*) AS total_count").
+		Count(&totalCount).Error; err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to count members: %w", err))
+		return
+	}
+
 	if err := api.db.
 		Model(&models.Member{}).
 		Scopes(FilterByUserID(user)).
@@ -77,10 +90,10 @@ func (api *API) ListMembers(ctx *gin.Context) {
 		Scopes(filterByPermitID(ctx.Query("permit_id"))).
 		Scopes(Paginate(page, pageSize)).
 		Joins("JOIN users ON users.id = members.user_id").
-		Select("members.*, COUNT(*) OVER () AS total_count").
+		Select("members.*").
 		Order(orderBy).
 		Find(&members).
-		Count(&totalCount).Error; err != nil {
+		Error; err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list members: %w", err))
 		return
 	}
@@ -89,6 +102,7 @@ func (api *API) ListMembers(ctx *gin.Context) {
 		Members: []ListMembersMember{},
 		Total:   int(totalCount),
 	}
+
 	for _, member := range members {
 		var memberEntries []ListMembersEntry
 		if err := api.db.Model(&models.Entry{}).
