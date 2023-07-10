@@ -135,7 +135,17 @@ function editMemberBands(memberString) {
       [1, 2].forEach(day => {
         let bandsDay = response.bands.filter(band => band.Day === day);
         bandsDay.forEach(band => {
-          checkboxStrings[day-1] += `<div class="form-group" style="text-align: left"><input type="checkbox" ${bandIDs.includes(band.ID) ? "checked" : ""} class="checkbox" id="tableau-${band.Name}" data-member="${member.ID}" name="editMemberBands" value="${band.ID}"><label for="tableau-${band.Name}">Tableau ${band.Name} (72 places restantes)</label></div>`;
+          checkboxStrings[day-1] += `<div class="form-group" style="text-align: left">` +
+            `<input type="checkbox" ${bandIDs.includes(band.ID) ? "checked" : ""} ` +
+            `class="checkbox" id="tableau-${band.Name}" ` +
+            `data-color="${band.Color}" data-day="${band.Day}"` +
+            `data-member="${member.ID}" name="editMemberBands" value="${band.ID}">` +
+            `<label for="tableau-${band.Name}">` +
+             `Tableau ${band.Name} (${band.MaxPoints >= 9000 ? 'TC' : '≤ ' + band.MaxPoints + ' pts'}) - ` +
+                `${band.Available >= 0 ? band.Available + " place(s) restante(s)" : ""}` +
+                `${band.Available === 0 ? "Inscription en liste d'attente" : ""}` +
+            `</label>` +
+            `</div>`;
         })
       })
       Swal.fire({
@@ -151,6 +161,16 @@ function editMemberBands(memberString) {
           checkboxStringTitles[0] + checkboxStrings[0] +
           checkboxStringTitles[1] + checkboxStrings[1],
         // input: 'text',
+        customClass: 'custom-swal-html-container',
+        didRender: () => {
+          const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+          checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('click', manageCheckboxRequisitesEvent);
+            if (checkbox.checked) {
+              manageCheckboxRequisites(checkbox);
+            }
+          });
+        },
         inputAttributes: {
             autocapitalize: 'off'
         },

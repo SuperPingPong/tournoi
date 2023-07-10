@@ -196,6 +196,8 @@ function Survey(survey) {
               input.id = `tableau-${band.Name}`;
               input.name = 'question_3';
               input.value = band.ID;
+              input.setAttribute('data-color', band.Color);
+              input.setAttribute('data-day', band.Day);
               const label = document.createElement('label');
               label.htmlFor = `tableau-${band.Name}`;
               label.textContent = `Tableau ${band.Name} (${band.MaxPoints >= 9000 ? 'TC' : '≤ ' + band.MaxPoints + ' pts'}) - ` +
@@ -212,6 +214,8 @@ function Survey(survey) {
             hiddenInput.value = sessionId;
             bandDayContainer.appendChild(hiddenInput);
           });
+          const question3CheckBoxes = survey.querySelectorAll("[name='question_3']");
+          question3CheckBoxes.forEach(elem => elem.addEventListener("click", manageCheckboxRequisitesEvent));
         },
         error: function(xhr, textStatus, error) {
           Swal.fire({

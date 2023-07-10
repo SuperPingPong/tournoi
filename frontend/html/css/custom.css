@@ -72,3 +72,17 @@ table#dataTable {
     overflow-x: auto;
   }
 }
+
+/* Tooltip Styles */
+input[type="checkbox"]:disabled + label {
+  color: #999;
+  cursor: not-allowed;
+}
+
+input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+}
+
+.custom-swal-html-container {
+  width: 40em;
+}
