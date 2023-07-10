@@ -54,34 +54,49 @@ function initDataTable() {
       {
         data: null,
         render: function(data, type, row) {
-          const historyButton = '<button type="submit" data-action="history" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-history"></i></button>';
+          const historyButton = '<button style="display:none" type="submit" data-action="history" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-history"></i></button>';
+          const mailButton = '<button style="display: none" type="submit" data-action="mail" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-envelope"></i></button>';
           const editButton = '<button type="submit" data-action="edit" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-pencil"></i></button>';
-          const deleteButton = '<button type="submit" data-action="delete" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-times" style="color: red;"></i></button>';
-          const buttonsContainer = '<div class="field">' + historyButton + editButton + deleteButton + '</div>';
+          const deleteButton = '<button type="submit" data-action="delete" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-rectangle-xmark" style="color: red;"></i></button>';
+          const buttonsContainer = '<div class="field">' + historyButton + mailButton + editButton + deleteButton + '</div>';
           return buttonsContainer;
         }
       }
     ],
+    "drawCallback": function(settings) {
+      // Attach click event listener to parent element (dataTable)
+      const isAdmin = settings.json.IsAdmin
+      console.log(isAdmin);
+      if (isAdmin === true) {
+        $('button[data-action="history"]').show();
+        $('#dataTable').off('click', 'button[data-action="history"]').on('click', 'button[data-action="history"]', function(event) {
+          event.preventDefault();
+          const memberString = $(this).attr('data-info');
+          historyMemberBands(memberString);
+        });
+        $('button[data-action="mail"]').show();
+        $('#dataTable').off('mail', 'button[data-action="mail"]').on('click', 'button[data-action="mail"]', function(event) {
+          event.preventDefault();
+          const memberString = $(this).attr('data-info');
+          mailMemberBands(memberString);
+        });
+      }
+    },
     "initComplete": function() {
       let searchInput = $('input[aria-controls="dataTable"]');
       searchInput.on('keyup', function () {
         dataTable.search(this.value).draw();
       });
       // Attach click event listener to parent element (dataTable)
-      $('#dataTable').on('click', 'button[data-action="history"]', function(event) {
-        event.preventDefault();
-        const member = $(this).attr('data-info');
-        historyMemberBands(member);
-      });
       $('#dataTable').on('click', 'button[data-action="edit"]', function(event) {
         event.preventDefault();
-        const member = $(this).attr('data-info');
-        editMemberBands(member);
+        const memberString = $(this).attr('data-info');
+        editMemberBands(memberString);
       });
       $('#dataTable').on('click', 'button[data-action="delete"]', function(event) {
         event.preventDefault();
-        const member = $(this).attr('data-info');
-        deleteMember(member);
+        const memberString = $(this).attr('data-info');
+        deleteMember(memberString);
       });
     }
   });
@@ -90,6 +105,19 @@ function initDataTable() {
 function historyMemberBands(memberString) {
   const member = JSON.parse(memberString);
   console.log(member);
+}
+
+function mailMemberBands(memberString) {
+  const member = JSON.parse(memberString);
+  console.log(member);
+  Swal.fire({
+    title: 'Email du joueur',
+    html: `<a href="mailto:${member.User.UserEmail}">${member.User.UserEmail}</a>`,
+    icon: 'info',
+    showCancelButton: false,
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#5468D4',
+  });
 }
 
 function editMemberBands(memberString) {
@@ -348,7 +376,12 @@ function init() {
           timer: 5000,
         }).then(function() {
           window.location.href = '/';
+          return
         });
+      }
+      const isAdmin = response.IsAdmin;
+      if (isAdmin === true) {
+        $('p[id="export"]').show();
       }
       initDataTable();
     },

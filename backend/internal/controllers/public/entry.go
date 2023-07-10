@@ -41,7 +41,7 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 	// Get the current member
 	var member models.Member
 	err = api.db.
-		Scopes(FilterByUserID(user)).
+		Scopes(FilterByUserID(user, "user_id")).
 		Where("id = ?", memberID).
 		First(&member).Error
 	if err != nil {
@@ -159,7 +159,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 	// Get the requested member
 	var member models.Member
 	err = api.db.
-		Scopes(FilterByUserID(user)).
+		Scopes(FilterByUserID(user, "user_id")).
 		Where("id = ?", memberID).
 		First(&member).Error
 	if err != nil {

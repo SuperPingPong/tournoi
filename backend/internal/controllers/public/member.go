@@ -21,6 +21,11 @@ type ListMembersEntry struct {
 	CreatedAt time.Time
 }
 
+type ListMembersUser struct {
+	UserID    uuid.UUID
+	UserEmail string
+}
+
 type ListMembersMember struct {
 	ID         uuid.UUID
 	PermitID   string
@@ -32,10 +37,12 @@ type ListMembersMember struct {
 	ClubName   string
 	PermitType string
 	Entries    []ListMembersEntry
+	User       ListMembersUser
 }
 
 type ListMembersMembers struct {
 	Members []ListMembersMember
+	IsAdmin bool
 	Total   int
 }
 
@@ -68,12 +75,10 @@ func (api *API) ListMembers(ctx *gin.Context) {
 		return
 	}
 
-	var members []models.Member
 	var totalCount int64
-
 	if err := api.db.
 		Model(&models.Member{}).
-		Scopes(FilterByUserID(user)).
+		Scopes(FilterByUserID(user, "user_id")).
 		Scopes(searchMembersScope(ctx.Query("search"), *user)).
 		Scopes(filterByPermitID(ctx.Query("permit_id"))).
 		Joins("JOIN users ON users.id = members.user_id").
@@ -83,9 +88,10 @@ func (api *API) ListMembers(ctx *gin.Context) {
 		return
 	}
 
+	var members []models.Member
 	if err := api.db.
 		Model(&models.Member{}).
-		Scopes(FilterByUserID(user)).
+		Scopes(FilterByUserID(user, "user_id")).
 		Scopes(searchMembersScope(ctx.Query("search"), *user)).
 		Scopes(filterByPermitID(ctx.Query("permit_id"))).
 		Scopes(Paginate(page, pageSize)).
@@ -100,6 +106,7 @@ func (api *API) ListMembers(ctx *gin.Context) {
 
 	result := ListMembersMembers{
 		Members: []ListMembersMember{},
+		IsAdmin: user.IsAdmin,
 		Total:   int(totalCount),
 	}
 
@@ -114,6 +121,17 @@ func (api *API) ListMembers(ctx *gin.Context) {
 			ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list members: %w", err))
 			return
 		}
+		var memberUser ListMembersUser
+		if user.IsAdmin {
+			if err := api.db.Model(&models.User{}).
+				Select("users.id AS user_id, users.email AS user_email").
+				Joins("JOIN members ON members.user_id = users.id").
+				Where("members.id = ?", member.ID.String()).
+				Scan(&memberUser).Error; err != nil {
+				ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list members: %w", err))
+				return
+			}
+		}
 		result.Members = append(result.Members, ListMembersMember{
 			ID:         member.ID,
 			PermitID:   member.PermitID,
@@ -125,6 +143,7 @@ func (api *API) ListMembers(ctx *gin.Context) {
 			ClubName:   member.ClubName,
 			PermitType: member.PermitType,
 			Entries:    memberEntries,
+			User:       memberUser,
 		})
 	}
 
@@ -168,6 +187,12 @@ func (api *API) GetMember(ctx *gin.Context) {
 		return
 	}
 
+	user, err := ExtractUserFromContext(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	member := models.Member{}
 	err = api.db.First(&member, id).Error
 	if err != nil {
@@ -180,7 +205,7 @@ func (api *API) GetMember(ctx *gin.Context) {
 		return
 	}
 
-	if member.UserID != userID {
+	if member.UserID != userID && user.IsAdmin == false {
 		ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("member %s not found", id))
 		return
 	}
@@ -254,6 +279,12 @@ func (api *API) UpdateMember(ctx *gin.Context) {
 		return
 	}
 
+	user, err := ExtractUserFromContext(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	member := models.Member{}
 	err = api.db.First(&member, id).Error
 	if err != nil {
@@ -266,7 +297,7 @@ func (api *API) UpdateMember(ctx *gin.Context) {
 		return
 	}
 
-	if member.UserID != userID {
+	if member.UserID != userID || user.IsAdmin == false {
 		ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("member %s not found", id))
 		return
 	}
@@ -298,6 +329,9 @@ func (api *API) UpdateMember(ctx *gin.Context) {
 }
 
 func (api *API) DeleteMember(ctx *gin.Context) {
+	claims := jwt.ExtractClaims(ctx)
+	userID := uuid.MustParse(claims[auth.IdentityKey].(string))
+
 	id, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid member id: %s", ctx.Param("id")))
@@ -310,13 +344,27 @@ func (api *API) DeleteMember(ctx *gin.Context) {
 		return
 	}
 
+	member := models.Member{}
+	err = api.db.First(&member, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("member %s not found", id))
+			return
+		}
+
+		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get member: %w", err))
+		return
+	}
+
+	if member.UserID != userID && user.IsAdmin == false {
+		ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("member %s not found", id))
+		return
+	}
+
 	// Delete member and related entries
 	err = api.db.Transaction(func(tx *gorm.DB) error {
 		// Delete entries
 		if err := tx.
-			Scopes(FilterByUserID(user)).
-			Joins("JOIN users ON users.id = members.user_id").
-			Joins("JOIN members ON members.id = entries.member_id").
 			Where("member_id = ?", id).
 			Delete(&models.Entry{}).
 			Error; err != nil {
@@ -325,8 +373,7 @@ func (api *API) DeleteMember(ctx *gin.Context) {
 
 		// Delete member
 		if err := tx.
-			Scopes(FilterByUserID(user)).
-			Joins("JOIN users ON users.id = members.user_id").
+			Where("id = ?", id).
 			Delete(&models.Member{}, id).
 			Error; err != nil {
 			return fmt.Errorf("failed to delete member: %w", err)
@@ -336,7 +383,7 @@ func (api *API) DeleteMember(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to delete member: %w", err))
+		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to make delete transaction: %w", err))
 		return
 	}
 
