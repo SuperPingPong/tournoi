@@ -235,7 +235,6 @@ function editMemberBands(memberString) {
                         const members = response.Members;
                         dataTable.destroy();
                         initDataTable();
-                        // dataTable.clear().rows.add(members).draw();
                       },
                       error: function(xhr, textStatus, error) {
                         Swal.fire({
@@ -272,7 +271,6 @@ function editMemberBands(memberString) {
 
 function deleteMember(memberString) {
   const member = JSON.parse(memberString);
-  console.log(member);
   Swal.fire({
     title: "Suppression l'inscription",
     html:
@@ -296,13 +294,28 @@ function deleteMember(memberString) {
     cancelButtonColor: '#dc3741',
   }).then((result) => {
     if (result.isConfirmed) {
-      console.log(member);
-      Swal.fire({
-        icon: 'success',
-        title: 'Suppression effectuée',
-        text: ''
-      }).then(() => {
-        console.log(member);
+      $.ajax({
+        url: `/api/members/${member.ID}`,
+        type: 'DELETE',
+        success: function(response) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Suppression effectuée',
+            text: '',
+            showConfirmButton: false,
+            timer: 3000,
+          }).then((result) => {
+            dataTable.destroy();
+            initDataTable();
+          })
+        },
+        error: function(xhr, textStatus, error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Une erreur est survenue',
+            text: ''
+          });
+        }
       });
     }
   });

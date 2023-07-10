@@ -296,3 +296,49 @@ func (api *API) UpdateMember(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, &member)
 }
+
+func (api *API) DeleteMember(ctx *gin.Context) {
+	id, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid member id: %s", ctx.Param("id")))
+		return
+	}
+
+	user, err := ExtractUserFromContext(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	// Delete member and related entries
+	err = api.db.Transaction(func(tx *gorm.DB) error {
+		// Delete entries
+		if err := tx.
+			Scopes(FilterByUserID(user)).
+			Joins("JOIN users ON users.id = members.user_id").
+			Joins("JOIN members ON members.id = entries.member_id").
+			Where("member_id = ?", id).
+			Delete(&models.Entry{}).
+			Error; err != nil {
+			return fmt.Errorf("failed to delete entries: %w", err)
+		}
+
+		// Delete member
+		if err := tx.
+			Scopes(FilterByUserID(user)).
+			Joins("JOIN users ON users.id = members.user_id").
+			Delete(&models.Member{}, id).
+			Error; err != nil {
+			return fmt.Errorf("failed to delete member: %w", err)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to delete member: %w", err))
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}
