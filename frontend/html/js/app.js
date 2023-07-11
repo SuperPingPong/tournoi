@@ -66,7 +66,6 @@ function initDataTable() {
     "drawCallback": function(settings) {
       // Attach click event listener to parent element (dataTable)
       const isAdmin = settings.json.IsAdmin
-      console.log(isAdmin);
       if (isAdmin === true) {
         $('button[data-action="history"]').show();
         $('#dataTable').off('click', 'button[data-action="history"]').on('click', 'button[data-action="history"]', function(event) {
@@ -102,14 +101,80 @@ function initDataTable() {
   });
 }
 
+function formatEventDetails(event) {
+  let emoji = '';
+
+  if (event.EventByIsAdmin) {
+    emoji = '🛡️';
+  }
+
+  switch (event.EventType.toLowerCase()) {
+    case 'created':
+      emoji += '✅ Ajout du tableau ' + event.BandName;
+      break;
+    case 'deleted':
+      emoji += '❌ Suppression du tableau ' + event.BandName;
+      break;
+  }
+
+  const eventTime = new Date(event.EventTime);
+  const eventTimeFormatted = eventTime.toLocaleString('fr-FR', {
+    timeZone: 'Europe/Paris',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+
+  return `${emoji} - ${eventTimeFormatted}`;
+}
+
 function historyMemberBands(memberString) {
   const member = JSON.parse(memberString);
   console.log(member);
+  $.ajax({
+    url: `/api/members/${member.ID}/get-entries-history`,
+    type: 'GET',
+    contentType: 'application/json',
+    success: function(response) {
+      const history = response.history;
+      let historyText = ''
+      if (history) {
+        history.forEach(event => {
+          historyText += formatEventDetails(event) + '<br>';
+        })
+      }
+      Swal.fire({
+        title: 'Historique des modifications',
+        html:
+          '👤 Nom: ' + member.LastName + ' | ' +
+          '👤 Prénom: ' + member.FirstName + ' | ' +
+          '🧾 N° License: ' + member.PermitID + ' | ' +
+          '🗂️ Catégorie: ' + member.Category + ' | ' +
+          '🏓 Club: ' + member.ClubName.replace(' ', ' ') + ' | ' +
+          '⚧ Sexe: ' + member.Sex + ' | ' +
+          '🎯Officiels: ' + member.Points + '<br><br>' +
+          '<div style=""><h4>📄 Légende 📄</h4><div>🛡️: Événement effectué par un admin</div></div><br><br>' +
+          '<div style="text-align: left">' + historyText + '</div>',
+        showCancelButton: false,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#5468D4'
+      });
+    },
+    error: function(xhr, textStatus, error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Une erreur est survenue',
+        text: ''
+      });
+    }
+  });
 }
 
 function mailMemberBands(memberString) {
   const member = JSON.parse(memberString);
-  console.log(member);
   Swal.fire({
     title: 'Email du joueur',
     html: `<a href="mailto:${member.User.UserEmail}">${member.User.UserEmail}</a>`,

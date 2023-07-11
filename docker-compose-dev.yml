@@ -28,9 +28,10 @@ services:
     build: export
     restart: always
     environment:
-      - JWT_SECRET_KEY=secret
       - DEBUG=True
       - PYTHONUNBUFFERED=1
+      - ADMIN_EMAIL=admin@example.fr
+      - JWT_SECRET_KEY=secret
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:

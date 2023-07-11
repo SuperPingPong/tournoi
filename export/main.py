@@ -14,6 +14,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 # Debug
 debug = os.environ.get('DEBUG', False)
 app.debug = debug
+admin_email = os.environ.get('ADMIN_EMAIL', 'admin@example.fr')
 
 # Database connection details
 db_host = "db"
@@ -56,6 +57,9 @@ def extract_email_from_jwt(jwt_cookie):
     email = get_email_from_db(uid)
     if not email:
         return jsonify({'error': 'Invalid JWT'}), 401
+
+    if email != os.environ.get('ADMIN_EMAIL'):
+        return jsonify({'error': 'Access forbidden'}), 403
 
     return email, 200
 

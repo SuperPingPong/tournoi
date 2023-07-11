@@ -51,6 +51,7 @@ func (api *API) setupRouter() {
 		authenticated.POST("/members", api.CreateMember)
 		authenticated.PATCH("/members/:id", api.UpdateMember)
 		authenticated.DELETE("/members/:id", api.DeleteMember)
+		authenticated.GET("/members/:id/get-entries-history", api.GetMemberEntriesHistory)
 		authenticated.POST("/members/:id/set-entries", api.SetMemberEntries)
 		authenticated.GET("/members/:id/band-availabilities", api.ListBandAvailabilities)
 		authenticated.GET("/bands", api.ListBands)

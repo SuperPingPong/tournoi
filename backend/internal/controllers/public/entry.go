@@ -117,6 +117,84 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"bands": bandAvailabilities, "session_id": sessionID})
 }
 
+type EntriesHistory struct {
+	ID             uuid.UUID
+	BandId         string
+	BandName       string
+	EventTime      time.Time
+	EventType      string
+	EventBy        string
+	EventByIsAdmin bool `gorm:"column:event_by_is_admin"`
+}
+
+func (api *API) GetMemberEntriesHistory(ctx *gin.Context) {
+	user, err := ExtractUserFromContext(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	if !user.IsAdmin {
+		ctx.AbortWithError(http.StatusForbidden, fmt.Errorf("user %s should be admin", user.ID.String()))
+		return
+	}
+
+	memberID, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid member ID: %s", ctx.Param("id")))
+		return
+	}
+
+	var history []EntriesHistory
+	query := `
+        SELECT
+            entries.id,
+            entries.band_id,
+            entries.created_at AS event_time,
+            'created' AS event_type,
+            users.email AS event_by,
+            bands.name AS band_name,
+            users.is_admin AS event_by_is_admin
+        FROM
+            entries
+        JOIN
+            users ON entries.created_by = users.id
+        JOIN
+            bands ON entries.band_id = bands.id
+        WHERE
+            entries.confirmed = ?
+            AND entries.member_id = ?
+        UNION ALL
+        SELECT
+            entries.id,
+            entries.band_id,
+            entries.deleted_at AS event_time,
+            'deleted' AS event_type,
+            users.email AS event_by,
+            bands.name AS band_name,
+            users.is_admin AS event_by_is_admin
+        FROM
+            entries
+        JOIN
+            users ON entries.deleted_by = users.id
+        JOIN
+            bands ON entries.band_id = bands.id
+        WHERE
+            entries.confirmed = ?
+            AND entries.deleted_at IS NOT NULL
+            AND entries.member_id = ?
+        ORDER BY
+            event_time DESC
+    `
+	if err := api.db.Raw(query, true, memberID, true, memberID).Scan(&history).Error; err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get entries: %w", err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"history": history})
+
+}
+
 func possibleBandsScope(member models.Member) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("(sex = ? OR sex = 'ALL') AND max_points >= ?", member.Sex, member.Points)
