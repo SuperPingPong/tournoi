@@ -156,7 +156,7 @@ function historyMemberBands(memberString) {
           '🏓 Club: ' + member.ClubName.replace(' ', ' ') + ' | ' +
           '⚧ Sexe: ' + member.Sex + ' | ' +
           '🎯Officiels: ' + member.Points + '<br><br>' +
-          '<div style=""><h4>📄 Légende 📄</h4><div>🛡️: Événement effectué par un admin</div></div><br><br>' +
+          '<div style=""><h4>📄 Légende 📄</h4><div>🛡️: Évènement effectué par un admin</div></div><br><br>' +
           '<div style="text-align: left">' + historyText + '</div>',
         showCancelButton: false,
         confirmButtonText: 'OK',
