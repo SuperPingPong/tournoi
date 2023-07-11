@@ -4,8 +4,8 @@ function initDataTable() {
   let dataTableHTML = document.getElementById("dataTable");
   dataTableHTML.style.display = "block";
   dataTable = $('#dataTable').DataTable({
-    "lengthMenu": [15, 30, 60, 100],
-    "pageLength": 15,
+    "lengthMenu": [5, 10, 25, 50],
+    "pageLength": 5,
     "serverSide": true,
     "ajax": {
       "url": "/api/members",

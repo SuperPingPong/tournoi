@@ -174,6 +174,11 @@ func main() {
 		}
 	}
 
+	_, err = public.GetGmailService()
+	if err != nil {
+		panic(err)
+	}
+
 	err = r.Run("0.0.0.0:8080")
 	if err != nil {
 		panic(err)
