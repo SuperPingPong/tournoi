@@ -62,10 +62,20 @@ function initDataTable() {
       {
         data: null,
         render: function(data, type, row) {
+
+          const parisTime = new Date().toLocaleString('en-US', { timeZone: 'Europe/Paris' });
+          const formattedParisTime = new Date(parisTime).toISOString().split('.')[0];
+          const targetDateTime = '2023-10-27T12:00:00';
+          const isAfterDeadline = formattedParisTime > targetDateTime;
+
           const historyButton = '<button style="display:none" type="submit" data-action="history" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-history"></i></button>';
           const mailButton = '<button style="display: none" type="submit" data-action="mail" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-envelope"></i></button>';
-          const editButton = '<button type="submit" data-action="edit" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-pencil"></i></button>';
-          const deleteButton = '<button type="submit" data-action="delete" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-rectangle-xmark" style="color: red;"></i></button>';
+
+          const editButtonStyle = isAfterDeadline ? 'display: none' : '';
+          const editButton = '<button style="' + editButtonStyle + '" type="submit" data-action="edit" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-pencil"></i></button>';
+          const deleteButtonStyle = isAfterDeadline ? 'display: none' : 'color: red;';
+          const deleteButton = '<button style="' + deleteButtonStyle + '" type="submit" data-action="delete" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-rectangle-xmark" style="color: red;"></i></button>';
+
           const buttonsContainer = '<div class="field">' + historyButton + mailButton + editButton + deleteButton + '</div>';
           return buttonsContainer;
         }
@@ -75,6 +85,8 @@ function initDataTable() {
       // Attach click event listener to parent element (dataTable)
       const isAdmin = settings.json.IsAdmin
       if (isAdmin === true) {
+        $('button[data-action="edit"]').show();
+        $('button[data-action="delete"]').show();
         $('button[data-action="history"]').show();
         $('#dataTable').off('click', 'button[data-action="history"]').on('click', 'button[data-action="history"]', function(event) {
           event.preventDefault();

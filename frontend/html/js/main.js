@@ -168,6 +168,25 @@ function Survey(survey) {
       prevButton.disabled = false;
       prevButton.setAttribute("aria-hidden", false);
     }
+    if (+currentPanel.dataset.index === 2) {
+      const parisTime = new Date().toLocaleString('en-US', { timeZone: 'Europe/Paris' });
+      const formattedParisTime = new Date(parisTime).toISOString().split('.')[0];
+      const targetDateTime = '2023-10-27T12:00:00';
+      const isAfterDeadline = formattedParisTime > targetDateTime;
+      if (isAfterDeadline) {
+        $('.no-switch').hide();
+        $('.switch').show();
+        prevButton.disabled = true;
+        prevButton.setAttribute("aria-hidden", true);
+        nextButton.disabled = true;
+        nextButton.setAttribute("aria-hidden", true);
+        submitButton.disabled = true;
+        submitButton.setAttribute("aria-hidden", true);
+      } else {
+        $('.no-switch').show();
+        $('.switch').hide();
+      }
+    }
     if (+currentPanel.dataset.index === 3) {
       nextButton.disabled = true;
       nextButton.setAttribute("aria-hidden", true);
