@@ -169,10 +169,7 @@ function Survey(survey) {
       prevButton.setAttribute("aria-hidden", false);
     }
     if (+currentPanel.dataset.index === 2) {
-      const parisTime = new Date().toLocaleString('en-US', { timeZone: 'Europe/Paris' });
-      const formattedParisTime = new Date(parisTime).toISOString().split('.')[0];
-      const targetDateTime = '2023-10-27T12:00:00';
-      const isAfterDeadline = formattedParisTime > targetDateTime;
+      const isAfterDeadline = isAfterDeadline();
       if (isAfterDeadline) {
         $('.no-switch').hide();
         $('.switch').show();
@@ -243,11 +240,7 @@ function Survey(survey) {
           question3CheckBoxes.forEach(elem => elem.addEventListener("click", manageCheckboxRequisitesEvent));
         },
         error: function(xhr, textStatus, error) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Une erreur est survenue',
-            text: ''
-          });
+          notificationError();
         }
       });
     }
@@ -306,17 +299,9 @@ function Survey(survey) {
               error: function(xhr, textStatus, error) {
                 // Handle error if OTP code is invalid
                 if (xhr.status == 403) {
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Le code OTP est incorrect',
-                    text: ''
-                  });
+                  notificationError('', 'Le code OTP est incorrect');
                 } else {
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Une erreur est survenue',
-                    text: ''
-                  });
+                  notificationError();
                 }
               }
             });
@@ -347,11 +332,7 @@ function Survey(survey) {
         if (xhr.status == 400) {
           Swal.fire('Adresse email invalide');
         } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Une erreur est survenue',
-            text: ''
-          });
+          notificationError();
         }
       }
     });
@@ -477,11 +458,7 @@ function Survey(survey) {
                           html: 'Le joueur est déjà inscrit par un autre utilisateur. Contactez nous.',
                         });
                       } else {
-                        Swal.fire({
-                          icon: 'error',
-                          title: 'Une erreur est survenue',
-                          text: ''
-                        });
+                        notificationError();
                       }
                     }
                   });
@@ -504,21 +481,13 @@ function Survey(survey) {
                 }
               },
               error: function(xhr, textStatus, error) {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Une erreur est survenue',
-                  text: ''
-                });
+                notificationError();
               }
             });
          });
          },
          error: function(xhr, textStatus, error) {
-           Swal.fire({
-             icon: 'error',
-             title: 'Une erreur est survenue',
-             text: ''
-           });
+           notificationError();
          }
       });
     }
@@ -631,30 +600,18 @@ function Survey(survey) {
                   }
                 },
                 error: function(xhr, textStatus, error) {
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Une erreur est survenue',
-                    text: ''
-                  });
+                  notificationError();
                 }
               });
             });
           },
           error: function(xhr, textStatus, error) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Une erreur est survenue',
-              text: ''
-            });
+            notificationError();
           }
         });
       },
       error: function(xhr, textStatus, error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Une erreur est survenue',
-          text: ''
-        });
+        notificationError();
       }
     });
   }

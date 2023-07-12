@@ -63,3 +63,20 @@ function manageCheckboxRequisites(checkboxTarget) {
     });
   });
 }
+
+
+function isAfterDeadline() {
+  const parisTime = new Date().toLocaleString('en-US', { timeZone: 'Europe/Paris' });
+  const formattedParisTime = new Date(parisTime).toISOString().split('.')[0];
+  const targetDateTime = '2023-10-27T12:00:00';
+  const isAfterDeadline = formattedParisTime > targetDateTime;
+  return isAfterDeadline
+}
+
+function notificationError(text = '', title = 'Une erreur est survenue') {
+  Swal.fire({
+    icon: 'error',
+    title: title,
+    text: text
+  });
+}

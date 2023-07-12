@@ -63,10 +63,7 @@ function initDataTable() {
         data: null,
         render: function(data, type, row) {
 
-          const parisTime = new Date().toLocaleString('en-US', { timeZone: 'Europe/Paris' });
-          const formattedParisTime = new Date(parisTime).toISOString().split('.')[0];
-          const targetDateTime = '2023-10-27T12:00:00';
-          const isAfterDeadline = formattedParisTime > targetDateTime;
+          const isAfterDeadline = isAfterDeadline();
 
           const historyButton = '<button style="display:none" type="submit" data-action="history" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-history"></i></button>';
           const mailButton = '<button style="display: none" type="submit" data-action="mail" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-envelope"></i></button>';
@@ -184,11 +181,7 @@ function historyMemberBands(memberString) {
       });
     },
     error: function(xhr, textStatus, error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Une erreur est survenue',
-        text: ''
-      });
+      notificationError();
     }
   });
 }
@@ -361,21 +354,13 @@ function editMemberBands(memberString) {
                         initDataTable();
                       },
                       error: function(xhr, textStatus, error) {
-                        Swal.fire({
-                          icon: 'error',
-                          title: 'Une erreur est survenue',
-                          text: ''
-                        });
+                        notificationError();
                       }
                     });
                   });
                 },
                 error: function(xhr, textStatus, error) {
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Une erreur est survenue',
-                    text: ''
-                  });
+                  notificationError();
                 }
               });
             }
@@ -384,11 +369,7 @@ function editMemberBands(memberString) {
       });
     },
     error: function(xhr, textStatus, error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Une erreur est survenue',
-        text: ''
-      });
+      notificationError();
     }
   });
 }
@@ -434,11 +415,7 @@ function deleteMember(memberString) {
           })
         },
         error: function(xhr, textStatus, error) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Une erreur est survenue',
-            text: ''
-          });
+          notificationError();
         }
       });
     }
