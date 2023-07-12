@@ -29,19 +29,19 @@ function initDataTable() {
       {
         data: null,
         render: function(data, type, row) {
-          return `👤 ${row.LastName} ${row.FirstName}`;
+          return `<span style="white-space:nowrap">👤${row.LastName}</span> ${row.FirstName}`;
         }
       },
       {
         data: null,
         render: function(data, type, row) {
-          return `🏓 ${row.ClubName}`;
+          return `🏓${row.ClubName}`;
         }
       },
       {
         data: null,
         render: function(data, type, row) {
-          return `🎯 ${row.Points}`;
+          return `🎯${row.Points}`;
         }
       },
       {

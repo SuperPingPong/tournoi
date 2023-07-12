@@ -195,3 +195,7 @@ input[type="checkbox"]:disabled {
 p#export {
   display: block;
 }
+
+.fa-solid {
+  vertical-align: middle;
+}
