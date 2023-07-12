@@ -409,13 +409,13 @@ function Survey(survey) {
           Swal.fire({
             title: 'Confirmer les informations',
             html:
-                '👤 Nom: ' + response.nom + '<br>' +
-                '👤 Prénom: ' + response.prenom + '<br>' +
-                '🧾 N° License: ' + response.licence + '<br>' +
-                '🗂️ Catégorie: ' + response.cat + '<br>' +
-                '🏓 Club: ' + response.nomclub + '<br>' +
-                '⚧ Sexe: ' + response.sexe + '<br>' +
-                '🎯 Officiels: ' + response.point ,
+                '👤 Nom: ' + response.nom + '<br>' +
+                '👤 Prénom: ' + response.prenom + '<br>' +
+                '🧾 N° License: ' + response.licence + '<br>' +
+                '🗂 Catégorie: ' + response.cat + '<br>' +
+                '🏓 Club: ' + response.nomclub.replace(' ', ' ') + '<br>' +
+                '⚧ Sexe: ' + response.sexe + '<br>' +
+                '🎯 Officiels: ' + response.point ,
             showCancelButton: true,
             confirmButtonText: 'Confirmer',
             cancelButtonText: 'Annuler',
