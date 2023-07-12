@@ -39,6 +39,7 @@ services:
     volumes:
       - $PWD/export/main.py:/app/main.py
       - $PWD/export/utils.py:/app/utils.py
+      - $PWD/export/client_secret.json:/app/client_sercret.json
   frontend:
     build: frontend
     depends_on:

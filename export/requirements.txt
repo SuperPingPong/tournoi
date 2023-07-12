@@ -1,5 +1,7 @@
 flask
 flask_cors
+gspread
+oauth2client
 psycopg2-binary
 pyjwt
 requests

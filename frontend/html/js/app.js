@@ -500,9 +500,70 @@ function init() {
       cancelButtonColor: '#dc3741',
     }).then((result) => {
       if (result.isConfirmed) {
-        // Redirect or make AJAX call to /api/export
-        // Replace the below line with your own logic
         // window.location.href = '/api/export';
+        Swal.fire({
+          title: 'Traitement en cours',
+          html: 'Veuillez patienter...<br><progress value="0" max="10"></progress>',
+          timer: 10 * 1000, // timer in ms
+          timerProgressBar: true,
+          allowOutsideClick: false,
+          didOpen: () => {
+            const progressBar = Swal.getHtmlContainer().querySelector('progress');
+            const interval = setInterval(() => {
+              const currentValue = parseInt(progressBar.value);
+              if (currentValue < 10) {
+                progressBar.value = currentValue + 1;
+              }
+            }, 1000);
+            Swal.showLoading();
+            // Make AJAX call to /api/export
+            // Replace the below line with your own logic
+            fetch('/api/export')
+              .then(response => {
+                clearInterval(interval);
+                if (response.ok) {
+                  return response.blob();
+                } else {
+                  throw new Error('Une erreur est survenue lors du téléchargement.');
+                }
+              })
+              .then(blob => {
+                const downloadLink = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = 'tournoi-de-lognes.xlsx';
+                downloadLink.style.display = 'none';
+                document.body.appendChild(downloadLink);
+
+                // Trigger the download
+                downloadLink.click();
+
+                // Cleanup the temporary download link
+                URL.revokeObjectURL(url);
+                document.body.removeChild(downloadLink);
+
+                Swal.fire({
+                  title: 'Téléchargement terminé',
+                  icon: 'success',
+                  // timer: 2000,  // 2 seconds
+                  showConfirmButton: true,
+                  confirmButtonText: 'OK',
+                  cancelButtonText: 'Annuler',
+                  // confirmButtonColor: '#5468D4',
+                  confirmButtonColor: '#1F7145',
+                });
+              })
+              .catch(error => {
+                Swal.fire({
+                  title: 'Erreur',
+                  text: error.message,
+                  icon: 'error',
+                  timer: 2000,  // 2 seconds
+                  showConfirmButton: false
+                });
+              });
+          }
+        });
       }
     });
   });

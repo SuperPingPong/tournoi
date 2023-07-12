@@ -83,9 +83,11 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 		bandCounts := lo.SliceToMap(possibleBands, func(b models.Band) (uuid.UUID, int) {
 			return b.ID, 0
 		})
+		fmt.Println(bandCounts)
 		for _, entry := range entries {
 			bandCounts[entry.BandID] += 1
 		}
+		fmt.Println(bandCounts)
 
 		for _, band := range possibleBands {
 			// Compute each bands' available spots and number of people in the waiting list

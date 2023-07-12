@@ -1,11 +1,16 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
+from datetime import datetime
+import json
 import jwt
+import os
 import psycopg2
 import psycopg2.extras
 
-import os
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import utils
 
 app = Flask(__name__)
 CORS(app)
@@ -31,6 +36,23 @@ jwt_secret_key = os.environ.get('JWT_SECRET_KEY', 'secret')
 
 # Create a cursor object to execute SQL queries
 db = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+# Perform the join query
+query = "SELECT day, name, max_entries FROM bands"
+db.execute(query)
+BANDS = list(map(dict, db.fetchall()))
+BANDS = {
+    band['name']: {
+        'index': key,
+        'day': band['day'],
+        'max_entries': band['max_entries'],
+    } for key, band in enumerate(BANDS)
+}
+
+# Use your Google Service Account credentials to authenticate with Google
+scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+credentials = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+gc = gspread.authorize(credentials)
 
 
 def get_email_from_db(uid):
@@ -72,61 +94,53 @@ def export():
     if status_code != 200:
         return response, status_code
 
-    email = response
-    print(email)
-    print(email)
+    # Open the target Google Sheet by its url
+    spreadsheet_id = '1hA2P_yKZKJ7JZ3hgZmVu-Um_pPBgjVIHzaq2yeqrwrA'
+    spreadsheet_url = f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}"
+    workbook = gc.open_by_url(spreadsheet_url)
+    worksheet = workbook.worksheet("Base inscrits")
 
-    # Perform the join query
     query = """
-            SELECT entries.*, members.*, users.*
+            SELECT users.email, 
+            members.last_name,
+            members.first_name,
+            members.permit_id,
+            members.club_name,
+            members.points::int,
+            members.category,
+            bands.name as band_name,
+            bands.max_entries AS band_max_entries,
+            users.email
             FROM entries
             JOIN members ON entries.member_id = members.id
             JOIN users ON members.user_id = users.id
+            JOIN bands ON entries.band_id = bands.id
+            WHERE entries.confirmed is TRUE
+            AND entries.deleted_at is NULL
+            ORDER BY entries.created_at ASC
         """
-    db.execute(query)
-    results = db.fetchall()
-    """
-    for row in results:
-        print(row)
-        pass
-    """
-    return jsonify(results), 200
     try:
-        # Perform the join query
-        query = """
-            SELECT entries.*, members.*, users.*
-            FROM entries
-            JOIN members ON entries.member_id = members.id
-            JOIN users ON members.user_id = users.id
-        """
         db.execute(query)
+        entries = db.fetchall()
+    except Exception as _:
+        error_message = "An error occurred during the database query."
+        return jsonify({"error": error_message}), 500
 
-        # Fetch all the results
-        results = db.fetchall()
+    utils.clean_worksheet(worksheet)
+    utils.fill_worksheet(worksheet, BANDS, entries)
 
-        # Format the results
-        formatted_results = []
-        for row in results:
-            formatted_results.append({
-                'entry_id': row[0],
-                'entry_data': row[1],
-                'member_id': row[2],
-                'member_data': row[3],
-                'user_id': row[4],
-                'user_data': row[5]
-            })
+    # Download the workbook as XLSX
+    workbook_as_xlsx = workbook.export(format='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-        # Return the formatted results as JSON
-        return jsonify(formatted_results[:10]), 200
+    # Save the exported workbook to a file
+    timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    exported_file_path = f'{timestamp}-tournoi-de-lognes.xlsx'
 
-    except psycopg2.Error as e:
-        # Handle any database errors
-        return jsonify({'error': str(e)}), 500
+    with open(exported_file_path, 'wb') as f:
+        f.write(workbook_as_xlsx)
 
-    finally:
-        # Close the cursor and the database connection
-        db.close()
-        conn.close()
+    # Send the file to the user for download
+    return send_file(exported_file_path, as_attachment=True)
 
 
 if __name__ == "__main__":

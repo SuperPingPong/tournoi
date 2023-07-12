@@ -1,0 +1,5 @@
+# credentials
+*.json
+
+# cache
+__pycache__
