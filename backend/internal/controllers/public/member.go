@@ -18,6 +18,7 @@ import (
 type ListMembersEntry struct {
 	BandID    uuid.UUID
 	BandName  string
+	BandPrice int
 	CreatedAt time.Time
 }
 
@@ -113,7 +114,7 @@ func (api *API) ListMembers(ctx *gin.Context) {
 	for _, member := range members {
 		var memberEntries []ListMembersEntry
 		if err := api.db.Model(&models.Entry{}).
-			Select("entries.band_id, bands.name AS band_name, entries.created_at").
+			Select("entries.band_id, bands.name AS band_name, bands.price AS band_price, entries.created_at").
 			Joins("JOIN bands ON bands.id = entries.band_id").
 			Where("entries.member_id = ? AND entries.confirmed IS TRUE", member.ID.String()).
 			Order("bands.created_at ASC").

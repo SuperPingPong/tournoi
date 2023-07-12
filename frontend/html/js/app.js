@@ -54,6 +54,14 @@ function initDataTable() {
       {
         data: null,
         render: function(data, type, row) {
+          const bandPrices = row.Entries === null ? '' : row.Entries.map(entry => entry.BandPrice);
+          const sumOfBandPrices = bandPrices.length > 0 ? bandPrices.reduce((total, price) => total + price) : '';
+          return sumOfBandPrices;
+        }
+      },
+      {
+        data: null,
+        render: function(data, type, row) {
           const historyButton = '<button style="display:none" type="submit" data-action="history" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-history"></i></button>';
           const mailButton = '<button style="display: none" type="submit" data-action="mail" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-envelope"></i></button>';
           const editButton = '<button type="submit" data-action="edit" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-pencil"></i></button>';
