@@ -166,13 +166,7 @@ function historyMemberBands(memberString) {
       Swal.fire({
         title: 'Historique des modifications',
         html:
-          '👤 Nom: ' + member.LastName + ' | ' +
-          '👤 Prénom: ' + member.FirstName + ' | ' +
-          '🧾 N° License: ' + member.PermitID + ' | ' +
-          '🗂️ Catégorie: ' + member.Category + ' | ' +
-          '🏓 Club: ' + member.ClubName.replace(' ', ' ') + ' | ' +
-          '⚧ Sexe: ' + member.Sex + ' | ' +
-          '🎯Officiels: ' + member.Points + '<br><br>' +
+           getMemberHeaderHtml(member) +
           '<div style=""><h4>📄 Légende 📄</h4><div>🛡️: Évènement effectué par un admin</div></div><br><br>' +
           '<div style="text-align: left">' + historyText + '</div>',
         showCancelButton: false,
@@ -232,13 +226,7 @@ function editMemberBands(memberString) {
       Swal.fire({
         title: 'Mise a jour des tableaux',
         html:
-          '👤 Nom: ' + member.LastName + ' | ' +
-          '👤 Prénom: ' + member.FirstName + ' | ' +
-          '🧾 N° License: ' + member.PermitID + ' | ' +
-          '🗂️ Catégorie: ' + member.Category + ' | ' +
-          '🏓 Club: ' + member.ClubName.replace(' ', ' ') + ' | ' +
-          '⚧ Sexe: ' + member.Sex + ' | ' +
-          '🎯Officiels: ' + member.Points + '<br><br>' +
+           getMemberHeaderHtml(member) +
            '<div class="rules-container"><h2>⚠️ Règlement ⚠️</h2><ul><li>Les tableaux de couleurs identiques ne pourront pas être cumulés dans la même journée.</li><li>Les féminines ont une participation dans le tableau « E » (Féminin ≤ 1199pts) obligatoire (pour le samedi uniquement, si les conditions sont remplies).</li><li>3 tableaux maximum par jour.</li><li>Les inscriptions pourront se faire jusqu’au vendredi 27 octobre 2023 – 12H00.</li><li>Les places disponibles sont bloquées pendant 10 minutes, au-delà votre session sera expirée.</li></ul></div><br><br>' +
           checkboxStringTitles[0] + checkboxStrings[0] +
           checkboxStringTitles[1] + checkboxStrings[1],
@@ -304,13 +292,7 @@ function editMemberBands(memberString) {
           Swal.fire({
             title: 'Confirmer la mise a jour',
             html:
-              '👤 Nom: ' + member.LastName + ' | ' +
-              '👤 Prénom: ' + member.FirstName + ' | ' +
-              '🧾 N° License: ' + member.PermitID + ' | ' +
-              '🗂️ Catégorie: ' + member.Category + ' | ' +
-              '🏓 Club: ' + member.ClubName.replace(' ', ' ') + ' | ' +
-              '⚧ Sexe: ' + member.Sex + ' | ' +
-              '🎯Officiels: ' + member.Points + '<br><br>' +
+              getMemberHeaderHtml(member) +
               confirmText,
             // input: 'text',
             inputAttributes: {
@@ -379,13 +361,7 @@ function deleteMember(memberString) {
   Swal.fire({
     title: "Suppression l'inscription",
     html:
-      '👤 Nom: ' + member.LastName + ' | ' +
-      '👤 Prénom: ' + member.FirstName + ' | ' +
-      '🧾 N° License: ' + member.PermitID + ' | ' +
-      '🗂️ Catégorie: ' + member.Category + ' | ' +
-      '🏓 Club: ' + member.ClubName.replace(' ', ' ') + ' | ' +
-      '⚧ Sexe: ' + member.Sex + ' | ' +
-      '🎯Officiels: ' + member.Points + '<br><br>' +
+      getMemberHeaderHtml(member) +
       "Êtes-vous certain de vouloir supprimer l'inscription de ce joueur ?",
     // input: 'text',
     inputAttributes: {

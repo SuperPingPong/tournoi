@@ -80,3 +80,13 @@ function notificationError(text = '', title = 'Une erreur est survenue') {
     text: text
   });
 }
+
+function getMemberHeaderHtml(member) {
+    return '👤 Nom: ' + member.LastName + ' | ' +
+      '👤 Prénom: ' + member.FirstName + ' | ' +
+      '🧾 N° License: ' + member.PermitID + ' | ' +
+      '🗂️ Catégorie: ' + member.Category + ' | ' +
+      '🏓 Club: ' + member.ClubName.replace(' ', ' ') + ' | ' +
+      '⚧ Sexe: ' + member.Sex + ' | ' +
+      '🎯 Officiels: ' + member.Points + '<br><br>'
+}
