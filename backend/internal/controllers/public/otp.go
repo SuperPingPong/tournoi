@@ -2,9 +2,7 @@ package public
 
 import (
 	"crypto/rand"
-	"encoding/base64"
 	"fmt"
-	"google.golang.org/api/gmail/v1"
 	"math/big"
 	"net/http"
 	"time"
@@ -16,24 +14,6 @@ import (
 )
 
 const otpExpirationDelay = 10 * time.Minute
-
-func sendEmail(to string, code string) error {
-	service, err := GetGmailService()
-
-	// Set up the email message
-	message := &gmail.Message{
-		Raw: base64.RawURLEncoding.EncodeToString([]byte(
-			fmt.Sprintf("To: %s\r\nSubject: OTP %s Tournoi de Lognes\r\n\r\nVoici votre code de vérification OTP: %s", to, code, code)),
-		),
-	}
-
-	_, err = service.Users.Messages.Send("me", message).Do()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
 
 type SendOTPInput struct {
 	Email string `binding:"required,email"`
@@ -82,7 +62,7 @@ func (api *API) SendOTP(ctx *gin.Context) {
 		return
 	}
 
-	err = sendEmail(input.Email, password)
+	err = sendEmailOTP(input.Email, password)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to send email: %w", err))
 		return

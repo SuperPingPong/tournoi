@@ -1,6 +1,7 @@
 package public
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"golang.org/x/oauth2"
@@ -10,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/SuperPingPong/tournoi/internal/auth"
 	"github.com/SuperPingPong/tournoi/internal/models"
@@ -143,4 +145,56 @@ func GetGmailService() (*gmail.Service, error) {
 	}
 
 	return service, err
+}
+
+func sendEmailOTP(to string, code string) error {
+	service, err := GetGmailService()
+
+	// Set up the email message
+	message := &gmail.Message{
+		Raw: base64.RawURLEncoding.EncodeToString([]byte(
+			fmt.Sprintf("To: %s\r\nSubject: OTP %s Tournoi de Lognes\r\n\r\nVoici votre code de vérification OTP: %s", to, code, code)),
+		),
+	}
+
+	_, err = service.Users.Messages.Send("me", message).Do()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func sendEmailHTML(to string, lastName string, firstName string) error {
+	service, err := GetGmailService()
+	if err != nil {
+		return fmt.Errorf("failed to get Gmail service: %v", err)
+	}
+
+	// Read the HTML content from the file
+	htmlContent, err := ioutil.ReadFile("email_template.html")
+	if err != nil {
+		return fmt.Errorf("failed to read email HTML file: %v", err)
+	}
+
+	// Replace the placeholder with the environment variable
+	externalURL := os.Getenv("EXTERNAL_URL")
+	if externalURL == "" {
+		return fmt.Errorf("EXTERNAL_URL environment variable not set")
+	}
+	replacedContent := strings.Replace(string(htmlContent), "EXTERNAL_URL", externalURL, -1)
+
+	// Set up the email message
+	message := &gmail.Message{
+		Raw: base64.RawURLEncoding.EncodeToString([]byte(
+			fmt.Sprintf("To: %s\r\nSubject: Confirmation inscription %s %s Tournoi de Lognes\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=\"utf-8\"\r\n\r\n%s", to, lastName, firstName, replacedContent)),
+		),
+	}
+
+	_, err = service.Users.Messages.Send("me", message).Do()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

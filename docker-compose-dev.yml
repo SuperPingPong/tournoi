@@ -18,6 +18,7 @@ services:
       - db
     restart: always
     environment:
+      - EXTERNAL_URL=http://127.0.0.1:40080/app
       - ADMIN_EMAIL=admin@example.fr
       - JWT_SECRET_KEY=secret
       - POSTGRES_USER=postgres

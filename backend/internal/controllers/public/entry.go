@@ -340,6 +340,21 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 		return
 	}
 
+	// Only send email if it's the first registration
+	if !member.HasBeenNotified {
+		err = sendEmailHTML(user.Email, member.LastName, member.FirstName)
+		if err != nil {
+			ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to send email: %w", err))
+			return
+		}
+		if err = api.db.Model(models.Member{}).
+			Where("id", memberID).
+			Updates(models.Member{HasBeenNotified: true}).Error; err != nil {
+			ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to update member: %w", err))
+		}
+
+	}
+
 	ctx.Status(http.StatusOK)
 }
 
