@@ -40,12 +40,12 @@ func ExtractUserFromContext(ctx *gin.Context) (*models.User, error) {
 	return user, nil
 }
 
-func FilterByUserID(user *models.User, columnName string) func(db *gorm.DB) *gorm.DB {
+func FilterByUserID(user *models.User) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if user.IsAdmin {
 			return db
 		}
-		return db.Where(fmt.Sprintf("%s = ?", columnName), user.ID)
+		return db.Where("user_id = ?", user.ID)
 	}
 }
 

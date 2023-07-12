@@ -79,7 +79,7 @@ func (api *API) ListMembers(ctx *gin.Context) {
 	var totalCount int64
 	if err := api.db.
 		Model(&models.Member{}).
-		Scopes(FilterByUserID(user, "user_id")).
+		Scopes(FilterByUserID(user)).
 		Scopes(searchMembersScope(ctx.Query("search"), *user)).
 		Scopes(filterByPermitID(ctx.Query("permit_id"))).
 		Joins("JOIN users ON users.id = members.user_id").
@@ -92,7 +92,7 @@ func (api *API) ListMembers(ctx *gin.Context) {
 	var members []models.Member
 	if err := api.db.
 		Model(&models.Member{}).
-		Scopes(FilterByUserID(user, "user_id")).
+		Scopes(FilterByUserID(user)).
 		Scopes(searchMembersScope(ctx.Query("search"), *user)).
 		Scopes(filterByPermitID(ctx.Query("permit_id"))).
 		Scopes(Paginate(page, pageSize)).
