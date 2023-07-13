@@ -20,7 +20,7 @@ services:
     restart: always
     environment:
       - SENTRY_DSN=https://f0f3980ec56e4c79986e4e4bdef50bea@o4505519663939584.ingest.sentry.io/4505519664791552
-      - EXTERNAL_URL=http://127.0.0.1:40080/app
+      - EXTERNAL_URL=http://127.0.0.1:41080/app
       - ADMIN_EMAIL=admin@example.com
       - JWT_SECRET_KEY=secret
       - POSTGRES_USER=postgres
@@ -52,7 +52,7 @@ services:
       - api
     restart: always
     ports:
-      - "0.0.0.0:40080:80"
+      - "0.0.0.0:41080:80"
     volumes:
       - $PWD/frontend/html:/usr/share/nginx/html
 

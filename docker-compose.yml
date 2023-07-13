@@ -47,5 +47,5 @@ services:
       - api
     restart: always
     ports:
-      - "0.0.0.0:40080:80"
+      - "0.0.0.0:41080:80"
 
