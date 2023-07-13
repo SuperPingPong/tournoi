@@ -9,6 +9,8 @@ services:
     volumes:
       - $PWD/database/data:/var/lib/postgresql/data
       - $PWD/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - tournoi
   api:
     build: backend
     depends_on:
@@ -23,6 +25,8 @@ services:
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - TOKEN_JSON=$TOKEN_JSON
       - CREDENTIALS_JSON=$CREDENTIALS_JSON
+    networks:
+      - tournoi
   export:
     build: export
     depends_on:
@@ -35,6 +39,8 @@ services:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       - CLIENT_SECRET_JSON=$CLIENT_SECRET_JSON
+    networks:
+      - tournoi
   frontend:
     build: frontend
     depends_on:
@@ -42,4 +48,11 @@ services:
     restart: always
     ports:
       - "0.0.0.0:41080:80"
+    networks:
+      - tournoi
 
+networks:
+  tournoi:
+    ipam:
+      config:
+        - subnet: 172.16.0.0/24
