@@ -24,7 +24,7 @@ admin_email = os.environ.get('ADMIN_EMAIL', 'admin@example.com')
 # Database connection details
 db_host = "db"
 db_name = "database"
-db_user = os.environ.get('POSTGRES_USERNAME', 'postgres')
+db_user = os.environ.get('POSTGRES_USER', 'postgres')
 db_password = os.environ.get('POSTGRES_PASSWORD', 'postgres')
 
 # Establish a connection to the database
