@@ -5,7 +5,10 @@
 ```bash
 source .env
 mkdir -p database/data
-#  find . -type f -o -type d | xargs chmod +r
+# $ find . -type f -o -type d | xargs chmod +r
+# $ docker exec -it tournoi_frontend_1 bash
+# root@b914e6bc0371:/# chown -R nginx:nginx /usr/share/nginx/html/
+
 docker-compose up
 ```
 
