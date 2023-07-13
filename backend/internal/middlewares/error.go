@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -55,7 +54,7 @@ func captureErrorToSentry(c *gin.Context, message string) {
 	request := c.Request
 
 	// Capture and set the request body payload
-	fmt.Println(request.Body)
+	// fmt.Println(request.Body)
 
 	event.Request = (*sentry.Request)(&Request{
 		URL:    request.URL.String(),
