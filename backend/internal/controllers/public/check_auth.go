@@ -7,6 +7,7 @@ import (
 	"github.com/SuperPingPong/tournoi/internal/auth"
 	"github.com/SuperPingPong/tournoi/internal/models"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 )
 
 type CheckAuthInput struct {
@@ -21,7 +22,7 @@ func (api *API) CheckAuth(ctx *gin.Context) {
 	}
 
 	var input CheckAuthInput
-	err := ctx.ShouldBindJSON(&input)
+	err := ctx.ShouldBindBodyWith(&input, binding.JSON)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid input: %w", err))
 		return

@@ -11,6 +11,7 @@ import (
 	"github.com/SuperPingPong/tournoi/internal/models"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -254,7 +255,7 @@ func (api *API) CreateMember(ctx *gin.Context) {
 
 	var input CreateMemberInput
 
-	err := ctx.ShouldBindJSON(&input)
+	err := ctx.ShouldBindBodyWith(&input, binding.JSON)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid input: %w", err))
 		return
@@ -305,7 +306,7 @@ func (api *API) UpdateMember(ctx *gin.Context) {
 	}
 
 	var input UpdateMemberInput
-	err = ctx.ShouldBindJSON(&input)
+	err = ctx.ShouldBindBodyWith(&input, binding.JSON)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid input: %w", err))
 		return

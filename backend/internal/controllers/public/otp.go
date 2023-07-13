@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/SuperPingPong/tournoi/internal/models"
+	"github.com/gin-gonic/gin/binding"
 
 	"github.com/gin-gonic/gin"
 	_ "golang.org/x/oauth2/google"
@@ -22,7 +23,7 @@ type SendOTPInput struct {
 func (api *API) SendOTP(ctx *gin.Context) {
 	var input SendOTPInput
 
-	err := ctx.ShouldBindJSON(&input)
+	err := ctx.ShouldBindBodyWith(&input, binding.JSON)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid input: %w", err))
 		return

@@ -1,10 +1,14 @@
 package middlewares
 
 import (
-	"github.com/getsentry/sentry-go"
-	"github.com/gin-gonic/gin"
+	"encoding/json"
 	"net/http"
 	"strings"
+
+	"github.com/getsentry/sentry-go"
+	"github.com/gin-gonic/gin"
+
+	"github.com/gin-gonic/gin/binding"
 )
 
 type Request struct {
@@ -50,16 +54,20 @@ func captureErrorToSentry(c *gin.Context, message string) {
 	event.Message = message
 	event.Level = sentry.LevelError
 
-	// Capture and set the request details
+	// Capture the request details
 	request := c.Request
 
-	// Capture and set the request body payload
-	// fmt.Println(request.Body)
+	var body json.RawMessage
+	err := c.ShouldBindBodyWith(&body, binding.JSON)
+	if err != nil {
+		body = []byte("failed to extract request body")
+	}
 
+	// Capture and set the request body payload
 	event.Request = (*sentry.Request)(&Request{
-		URL:    request.URL.String(),
-		Method: request.Method,
-		// Data:        payload,
+		URL:         request.URL.String(),
+		Method:      request.Method,
+		Data:        string(body),
 		QueryString: request.URL.RawQuery,
 		Cookies:     extractRequestCookies(request),
 		Headers:     extractRequestHeaders(request),

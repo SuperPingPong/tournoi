@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 )
 
 //go:generate mockery --name HTTPClient
@@ -87,7 +88,7 @@ type SearchFFTTPlayersInput struct {
 
 func (api *API) SearchFFTTPlayers(ctx *gin.Context) {
 	var input SearchFFTTPlayersInput
-	err := ctx.ShouldBindJSON(&input)
+	err := ctx.ShouldBindBodyWith(&input, binding.JSON)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid input: %w", err))
 		return

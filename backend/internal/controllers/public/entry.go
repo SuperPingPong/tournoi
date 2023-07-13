@@ -9,6 +9,7 @@ import (
 
 	"github.com/SuperPingPong/tournoi/internal/models"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"gorm.io/gorm"
@@ -228,7 +229,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 	}
 
 	var input SetMemberEntriesInput
-	err = ctx.ShouldBindJSON(&input)
+	err = ctx.ShouldBindBodyWith(&input, binding.JSON)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid input: %w", err))
 		return

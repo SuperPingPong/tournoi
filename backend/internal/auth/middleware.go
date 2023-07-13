@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/SuperPingPong/tournoi/internal/models"
+	"github.com/gin-gonic/gin/binding"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
@@ -37,7 +38,7 @@ func (a *AuthBusiness) AuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		},
 		Authenticator: func(ctx *gin.Context) (interface{}, error) {
 			var loginRequest LoginRequest
-			if err := ctx.ShouldBindJSON(&loginRequest); err != nil {
+			if err := ctx.ShouldBindBodyWith(&loginRequest, binding.JSON); err != nil {
 				return "", errors.New("authentication required")
 			}
 
