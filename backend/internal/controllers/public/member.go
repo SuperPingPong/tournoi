@@ -133,6 +133,7 @@ func (api *API) ListMembers(ctx *gin.Context) {
             FROM (
               SELECT
                 entries.band_id,
+                bands.created_at AS band_created_at,
                 bands.name AS band_name,
                 bands.price AS band_price,
                 entries.created_at,
@@ -150,7 +151,7 @@ func (api *API) ListMembers(ctx *gin.Context) {
             WHERE
               subquery.member_id = ?
             ORDER BY
-              subquery.band_id ASC, subquery.created_at ASC;
+              subquery.band_created_at ASC;
         `
 		if err := api.db.Raw(query, member.ID.String()).Scan(&memberEntries).Error; err != nil {
 			sentry.CaptureException(fmt.Errorf("failed to list members: %w", err))
