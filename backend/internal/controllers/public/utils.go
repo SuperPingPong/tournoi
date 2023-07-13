@@ -7,6 +7,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/gmail/v1"
+	"html"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -165,7 +166,7 @@ func sendEmailHTML(to string, lastName string, firstName string) error {
 	// Set up the email message
 	message := &gmail.Message{
 		Raw: base64.RawURLEncoding.EncodeToString([]byte(
-			fmt.Sprintf("To: %s\r\nSubject: Confirmation inscription %s %s Tournoi de Lognes\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=\"utf-8\"\r\n\r\n%s", to, lastName, firstName, replacedContent)),
+			fmt.Sprintf("To: %s\r\nSubject: Confirmation inscription %s %s Tournoi de Lognes\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=\"utf-8\"\r\n\r\n%s", to, html.EscapeString(lastName), html.EscapeString(firstName), replacedContent)),
 		),
 	}
 
