@@ -10,6 +10,7 @@ import (
 	"html"
 	"io/ioutil"
 	"log"
+	"mime"
 	"net/http"
 	"os"
 	"strings"
@@ -163,10 +164,16 @@ func sendEmailHTML(to string, lastName string, firstName string) error {
 	}
 	replacedContent := strings.Replace(string(htmlContent), "EXTERNAL_URL", externalURL, -1)
 
+	// Escape the first name and last name to ensure proper encoding
+	escapedFirstName := html.EscapeString(firstName)
+	escapedLastName := html.EscapeString(lastName)
+
 	// Set up the email message
+	subject := fmt.Sprintf("Confirmation inscription %s %s Tournoi de Lognes", escapedLastName, escapedFirstName)
+	encodedSubject := encodeHeader(subject)
 	message := &gmail.Message{
-		Raw: base64.RawURLEncoding.EncodeToString([]byte(
-			fmt.Sprintf("To: %s\r\nSubject: Confirmation inscription %s %s Tournoi de Lognes\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=\"utf-8\"\r\n\r\n%s", to, html.EscapeString(lastName), html.EscapeString(firstName), replacedContent)),
+		Raw: base64.URLEncoding.EncodeToString([]byte(
+			fmt.Sprintf("To: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=\"utf-8\"\r\n\r\n%s", to, encodedSubject, replacedContent)),
 		),
 	}
 
@@ -176,4 +183,10 @@ func sendEmailHTML(to string, lastName string, firstName string) error {
 	}
 
 	return nil
+}
+
+// encodeHeader encodes special characters in the given header string using MIME encoding
+func encodeHeader(header string) string {
+	encoded := mime.QEncoding.Encode("utf-8", header)
+	return encoded
 }
