@@ -23,6 +23,8 @@ services:
       - JWT_SECRET_KEY=$JWT_SECRET_KEY
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - TOKEN_JSON=$TOKEN_JSON
+      - CREDENTIALS_JSON=$CREDENTIALS_JSON
   export:
     build: export
     depends_on:
@@ -34,6 +36,7 @@ services:
       - JWT_SECRET_KEY=$JWT_SECRET_KEY
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - CLIENT_SECRET_JSON=$CLIENT_SECRET_JSON
     volumes:
       - $PWD/export/main.py:/app/main.py
       - $PWD/export/utils.py:/app/utils.py
