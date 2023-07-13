@@ -5,7 +5,7 @@
 ```bash
 source .env
 mkdir -p database/data
-# chmod -R +r .
+#  find . -type f -o -type d | xargs chmod +r
 docker-compose up
 ```
 
