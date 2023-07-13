@@ -117,16 +117,43 @@ function initDataTable() {
         dataTable.search(this.value).draw();
       });
       // Attach click event listener to parent element (dataTable)
-      $('#dataTable').off('edit', 'button[data-action="edit"]').on('click', 'button[data-action="edit"]', function(event) {
-        event.preventDefault();
-        const memberString = $(this).attr('data-info');
-        editMemberBands(memberString);
-      });
-      $('#dataTable').off('delete', 'button[data-action="delete"]').on('click', 'button[data-action="delete"]', function(event) {
-        event.preventDefault();
-        const memberString = $(this).attr('data-info');
-        deleteMember(memberString);
-      });
+
+      const clickHandlers = $._data($('#dataTable')[0], 'events').click;
+      if (clickHandlers) {
+        const editHandler = clickHandlers.find(handler => {
+          return handler.selector === 'button[data-action="edit"]';
+        });
+        if (editHandler) {
+          $('#dataTable').off('click', 'button[data-action="edit"]', editHandler.handler);
+        }
+        $('#dataTable').on('click', 'button[data-action="edit"]', function(event) {
+          event.preventDefault();
+          const memberString = $(this).attr('data-info');
+          editMemberBands(memberString);
+        });
+        const deleteHandler = clickHandlers.find(handler => {
+          return handler.selector === 'button[data-action="delete"]';
+        });
+        if (deleteHandler) {
+          $('#dataTable').off('click', 'button[data-action="delete"]', deleteHandler.handler);
+        }
+        $('#dataTable').on('click', 'button[data-action="delete"]', function(event) {
+          event.preventDefault();
+          const memberString = $(this).attr('data-info');
+          deleteMember(memberString);
+        });
+      } else {
+        $('#dataTable').on('click', 'button[data-action="edit"]', function(event) {
+          event.preventDefault();
+          const memberString = $(this).attr('data-info');
+          editMemberBands(memberString);
+        });
+        $('#dataTable').on('click', 'button[data-action="delete"]', function(event) {
+          event.preventDefault();
+          const memberString = $(this).attr('data-info');
+          deleteMember(memberString);
+        });
+      }
     }
   });
 }
