@@ -29,26 +29,41 @@ function initDataTable() {
       {
         data: null,
         render: function(data, type, row) {
-          return `<span style="white-space:nowrap">👤${row.LastName}</span> ${row.FirstName}`;
+          return `<div style="margin: 0.3em 0 0.3em 0"><span style="white-space:nowrap">👤${row.LastName}</span> ${row.FirstName}</div>
+          <div style="margin: 0.3em 0 0.3em 0">🏓${row.ClubName}</div>
+          <div style="margin: 0.3em 0 0.3em 0">🎯${row.Points} pts</div>`;
         }
       },
       {
         data: null,
         render: function(data, type, row) {
-          return `🏓${row.ClubName}`;
-        }
-      },
-      {
-        data: null,
-        render: function(data, type, row) {
-          return `🎯${row.Points}`;
-        }
-      },
-      {
-        data: null,
-        render: function(data, type, row) {
-          const bandNames = row.Entries === null ? '' : row.Entries.map(entry => entry.BandName).join(' / ');
-          return bandNames;
+          const bandsConfirmed = [];
+          const bandsWaiting = [];
+          let resultText = ''
+
+          if (row.Entries !== null) {
+            row.Entries.forEach(entry => {
+              if (entry.BandRank > entry.BandMaxEntries) {
+                bandsWaiting.push(entry)
+              } else {
+                bandsConfirmed.push(entry)
+              }
+            })
+
+            if (bandsConfirmed.length > 0) {
+              resultText = 'Confirmé(s):<br>' + bandsConfirmed.map(entry => entry.BandName).join(' / ') + '<br>';
+            }
+            if (bandsWaiting.length > 0) {
+              resultText += `<ul style="padding-left: 5px">List d'attente:`
+              bandsWaiting.forEach(entry => {
+                resultText += '<li>' +
+                  entry.BandName + (entry.BandRank < entry.BandMaxEntries ? ` (Rang liste d'attente : ${entry.BandRank - entry.BandMaxEntries})` : '') +
+                  '</li>'
+              })
+              resultText += '</ul>'
+            }
+          }
+          return resultText
         }
       },
       {

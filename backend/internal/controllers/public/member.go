@@ -18,10 +18,12 @@ import (
 )
 
 type ListMembersEntry struct {
-	BandID    uuid.UUID
-	BandName  string
-	BandPrice int
-	CreatedAt time.Time
+	BandID         uuid.UUID
+	BandName       string
+	BandPrice      int
+	BandMaxEntries int
+	BandRank       int
+	CreatedAt      time.Time
 }
 
 type ListMembersUser struct {
@@ -120,17 +122,44 @@ func (api *API) ListMembers(ctx *gin.Context) {
 
 	for _, member := range members {
 		var memberEntries []ListMembersEntry
-		if err := api.db.Model(&models.Entry{}).
-			Select("entries.band_id, bands.name AS band_name, bands.price AS band_price, entries.created_at").
-			Joins("JOIN bands ON bands.id = entries.band_id").
-			Where("entries.member_id = ? AND entries.confirmed IS TRUE", member.ID.String()).
-			Order("bands.created_at ASC").
-			Scan(&memberEntries).Error; err != nil {
+		query := `
+            SELECT
+              subquery.band_id,
+              subquery.band_name,
+              subquery.band_price,
+              subquery.created_at,
+              subquery.entry_index AS band_rank,
+              bands.max_entries AS band_max_entries
+            FROM (
+              SELECT
+                entries.band_id,
+                bands.name AS band_name,
+                bands.price AS band_price,
+                entries.created_at,
+                ROW_NUMBER() OVER (PARTITION BY entries.band_id ORDER BY entries.created_at ASC) AS entry_index,
+                entries.member_id
+              FROM
+                entries
+              JOIN
+                bands ON bands.id = entries.band_id
+              WHERE
+                entries.confirmed IS TRUE AND entries.deleted_at IS NULL
+            ) AS subquery
+            JOIN
+              bands ON bands.id = subquery.band_id
+            WHERE
+              subquery.member_id = ?
+            ORDER BY
+              subquery.band_id ASC, subquery.created_at ASC;
+        `
+		if err := api.db.Raw(query, member.ID.String()).Scan(&memberEntries).Error; err != nil {
 			sentry.CaptureException(fmt.Errorf("failed to list members: %w", err))
 			ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list members: %w", err))
 			return
 		}
+
 		var memberUser ListMembersUser
+		// disable search by email if not admin
 		if user.IsAdmin {
 			if err := api.db.Model(&models.User{}).
 				Select("users.id AS user_id, users.email AS user_email").
