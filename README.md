@@ -4,7 +4,8 @@
 
 ```bash
 source .env
-docker-compose -f docker-compose-dev.yml up
+mkdir -p database/data
+docker-compose up
 ```
 
 #### Annex
