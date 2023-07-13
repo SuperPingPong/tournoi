@@ -5,7 +5,7 @@
 ```bash
 source .env
 mkdir -p database/data
-# chmod 644 db/init.sql
+# chmod -R +r .
 docker-compose up
 ```
 
