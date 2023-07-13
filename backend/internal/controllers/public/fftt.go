@@ -9,8 +9,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-
-	"github.com/getsentry/sentry-go"
 )
 
 //go:generate mockery --name HTTPClient
@@ -59,11 +57,9 @@ func (api *API) GetFFTTPlayer(ctx *gin.Context) {
 
 	player, err := api.GetFFTTPlayerData(permitID)
 	if err != nil {
-		sentry.CaptureException(fmt.Errorf("failed to get FFTT player: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get FFTT player: %w", err))
 	}
 	if len(player.LastName) == 0 && len(player.FirstName) == 0 {
-		sentry.CaptureException(fmt.Errorf("FFTT player %s not found", permitID))
 		ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("FFTT player %s not found", permitID))
 		return
 	}
@@ -93,14 +89,12 @@ func (api *API) SearchFFTTPlayers(ctx *gin.Context) {
 	var input SearchFFTTPlayersInput
 	err := ctx.ShouldBindJSON(&input)
 	if err != nil {
-		sentry.CaptureException(fmt.Errorf("invalid input: %w", err))
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid input: %w", err))
 		return
 	}
 
 	req, err := http.NewRequest(http.MethodGet, "https://fftt.dafunker.com/v1//proxy/xml_liste_joueur_o.php", nil)
 	if err != nil {
-		sentry.CaptureException(fmt.Errorf("failed to build request: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to build request: %w", err))
 		return
 	}
@@ -115,21 +109,18 @@ func (api *API) SearchFFTTPlayers(ctx *gin.Context) {
 	}
 	req.URL.RawQuery = q.Encode()
 	if err != nil {
-		sentry.CaptureException(fmt.Errorf("failed to build request query parameters: %w", err))
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("failed to build request query parameters: %w", err))
 		return
 	}
 
 	resp, err := api.httpClient.Do(req)
 	if err != nil || resp.StatusCode != http.StatusOK {
-		sentry.CaptureException(fmt.Errorf("failed to search FFTT player: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to search FFTT player: %w", err))
 		return
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		sentry.CaptureException(fmt.Errorf("failed to parse search response from FFTT: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse search response from FFTT: %w", err))
 		return
 	}
@@ -139,7 +130,6 @@ func (api *API) SearchFFTTPlayers(ctx *gin.Context) {
 	xmlBytes := []byte(xmlString)
 	err = xml.Unmarshal(xmlBytes, &data)
 	if err != nil {
-		sentry.CaptureException(fmt.Errorf("failed to unmarshal search response from FFTT: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to unmarshal search response from FFTT: %w", err))
 		return
 	}

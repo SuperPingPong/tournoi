@@ -7,8 +7,6 @@ import (
 	"github.com/SuperPingPong/tournoi/internal/auth"
 	"github.com/SuperPingPong/tournoi/internal/models"
 	"github.com/gin-gonic/gin"
-
-	"github.com/getsentry/sentry-go"
 )
 
 type CheckAuthInput struct {
@@ -18,7 +16,6 @@ type CheckAuthInput struct {
 func (api *API) CheckAuth(ctx *gin.Context) {
 	user, ok := ctx.Get(auth.IdentityKey)
 	if !ok {
-		sentry.CaptureException(fmt.Errorf("failed to extract current user"))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to extract current user"))
 		return
 	}
@@ -26,7 +23,6 @@ func (api *API) CheckAuth(ctx *gin.Context) {
 	var input CheckAuthInput
 	err := ctx.ShouldBindJSON(&input)
 	if err != nil {
-		sentry.CaptureException(fmt.Errorf("invalid input: %w", err))
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid input: %w", err))
 		return
 	}

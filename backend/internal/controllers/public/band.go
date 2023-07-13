@@ -8,8 +8,6 @@ import (
 	"github.com/SuperPingPong/tournoi/internal/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-
-	"github.com/getsentry/sentry-go"
 )
 
 func (api *API) ListBands(ctx *gin.Context) {
@@ -25,7 +23,6 @@ func (api *API) ListBands(ctx *gin.Context) {
 
 	err = filteredBands.Find(&bands).Error
 	if err != nil {
-		sentry.CaptureException(fmt.Errorf("failed to list bands: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list bands: %w", err))
 		return
 	}
