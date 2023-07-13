@@ -9,7 +9,7 @@ import (
 
 type Member struct {
 	ID              uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid();->"`
-	PermitID        string    `gorm:"not null;unique;index;where:deleted_at IS NULL"`
+	PermitID        string    `gorm:"not null;uniqueIndex:idx_members_permit_id,where:deleted_at IS NULL"`
 	FirstName       string    `gorm:"not null"`
 	LastName        string    `gorm:"not null"`
 	Sex             string    `gorm:"not null"`
