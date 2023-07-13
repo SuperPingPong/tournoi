@@ -117,12 +117,12 @@ function initDataTable() {
         dataTable.search(this.value).draw();
       });
       // Attach click event listener to parent element (dataTable)
-      $('#dataTable').on('click', 'button[data-action="edit"]', function(event) {
+      $('#dataTable').off('edit', 'button[data-action="edit"]').on('click', 'button[data-action="edit"]', function(event) {
         event.preventDefault();
         const memberString = $(this).attr('data-info');
         editMemberBands(memberString);
       });
-      $('#dataTable').on('click', 'button[data-action="delete"]', function(event) {
+      $('#dataTable').off('delete', 'button[data-action="delete"]').on('click', 'button[data-action="delete"]', function(event) {
         event.preventDefault();
         const memberString = $(this).attr('data-info');
         deleteMember(memberString);
