@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   db:
-    build: db
+    image: postgres:15.3-alpine
     container_name: 'postgres'
     restart: always
     environment:
@@ -9,3 +9,5 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - '127.0.0.1:5432:5432'
+    volumes:
+      - $PWD/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro

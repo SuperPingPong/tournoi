@@ -1,12 +1,17 @@
 package public
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/SuperPingPong/tournoi/internal/auth"
 	"github.com/SuperPingPong/tournoi/internal/middlewares"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+
+	"github.com/getsentry/sentry-go"
 )
 
 type API struct {
@@ -16,7 +21,26 @@ type API struct {
 	authMiddleware *jwt.GinJWTMiddleware
 }
 
-func NewAPI(db *gorm.DB, r *gin.Engine, client HTTPClient) *API {
+func NewAPI(db *gorm.DB, r *gin.Engine, client HTTPClient, sentryDSN string) *API {
+	// Initialize Sentry
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn: sentryDSN,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	// Set the default error handler to Sentry's CaptureException
+	r.Use(func(c *gin.Context) {
+		defer func() {
+			if r := recover(); r != nil {
+				sentry.CaptureException(fmt.Errorf("%v", r))
+				c.AbortWithStatus(http.StatusInternalServerError)
+			}
+		}()
+		c.Next()
+	})
+
 	c := &API{
 		db:         db,
 		router:     r,

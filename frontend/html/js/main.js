@@ -169,8 +169,7 @@ function Survey(survey) {
       prevButton.setAttribute("aria-hidden", false);
     }
     if (+currentPanel.dataset.index === 2) {
-      const isAfterDeadline = isAfterDeadline();
-      if (isAfterDeadline) {
+      if (isAfterDeadline()) {
         $('.no-switch').hide();
         $('.switch').show();
         prevButton.disabled = true;
@@ -341,7 +340,7 @@ function Survey(survey) {
   function handleNextButton() {
     survey.classList.remove("form-error");
     const index = currentPanel.dataset.index;
-    console.log(formData[index]);
+    // console.log(formData[index]);
 
     // ignore step 1 and step 2
     /*
@@ -507,7 +506,7 @@ function Survey(survey) {
     e.preventDefault();
     survey.classList.remove("form-error");
     const index = currentPanel.dataset.index;
-    console.log(formData[index]);
+    //  console.log(formData[index]);
     checkRequirements();
     if (survey.classList.contains("form-error")) {
       return;

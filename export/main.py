@@ -19,7 +19,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 # Debug
 debug = os.environ.get('DEBUG', False)
 app.debug = debug
-admin_email = os.environ.get('ADMIN_EMAIL', 'admin@example.fr')
+admin_email = os.environ.get('ADMIN_EMAIL', 'admin@example.com')
 
 # Database connection details
 db_host = "db"

@@ -3,6 +3,7 @@ package public
 import (
 	"crypto/rand"
 	"fmt"
+	"github.com/getsentry/sentry-go"
 	"math/big"
 	"net/http"
 	"time"
@@ -24,6 +25,7 @@ func (api *API) SendOTP(ctx *gin.Context) {
 
 	err := ctx.ShouldBindJSON(&input)
 	if err != nil {
+		sentry.CaptureException(fmt.Errorf("invalid input: %w", err))
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid input: %w", err))
 		return
 	}
@@ -47,6 +49,7 @@ func (api *API) SendOTP(ctx *gin.Context) {
 
 	password, err = generatePassword()
 	if err != nil {
+		sentry.CaptureException(fmt.Errorf("failed to generate OTP: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to generate OTP: %w", err))
 		return
 	}
@@ -58,12 +61,14 @@ func (api *API) SendOTP(ctx *gin.Context) {
 	}
 	err = api.db.Create(&otp).Error
 	if err != nil {
+		sentry.CaptureException(fmt.Errorf("failed to create OTP: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to create OTP: %w", err))
 		return
 	}
 
 	err = sendEmailOTP(input.Email, password)
 	if err != nil {
+		sentry.CaptureException(fmt.Errorf("failed to send email: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to send email: %w", err))
 		return
 	}

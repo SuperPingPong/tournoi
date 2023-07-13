@@ -63,14 +63,12 @@ function initDataTable() {
         data: null,
         render: function(data, type, row) {
 
-          const isAfterDeadline = isAfterDeadline();
-
           const historyButton = '<button style="display:none" type="submit" data-action="history" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-history"></i></button>';
           const mailButton = '<button style="display: none" type="submit" data-action="mail" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-envelope"></i></button>';
 
-          const editButtonStyle = isAfterDeadline ? 'display: none' : '';
+          const editButtonStyle = isAfterDeadline() ? 'display: none' : '';
           const editButton = '<button style="' + editButtonStyle + '" type="submit" data-action="edit" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-pencil"></i></button>';
-          const deleteButtonStyle = isAfterDeadline ? 'display: none' : 'color: red;';
+          const deleteButtonStyle = isAfterDeadline() ? 'display: none' : 'color: red;';
           const deleteButton = '<button style="' + deleteButtonStyle + '" type="submit" data-action="delete" data-info=\'' + JSON.stringify(row) + '\'><i class="fa-solid fa-rectangle-xmark" style="color: red;"></i></button>';
 
           const buttonsContainer = '<div class="field">' + historyButton + mailButton + editButton + deleteButton + '</div>';
@@ -150,7 +148,7 @@ function formatEventDetails(event) {
 
 function historyMemberBands(memberString) {
   const member = JSON.parse(memberString);
-  console.log(member);
+  // console.log(member);
   $.ajax({
     url: `/api/members/${member.ID}/get-entries-history`,
     type: 'GET',

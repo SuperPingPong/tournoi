@@ -4,9 +4,11 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"github.com/getsentry/sentry-go"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/SuperPingPong/tournoi/internal/controllers/public"
 	"github.com/SuperPingPong/tournoi/internal/models"
@@ -23,10 +25,30 @@ func main() {
 	}
 
 	_ = godotenv.Load()
-	adminEmail := os.Getenv("ADMIN_EMAIL")
-	if adminEmail == "" {
-		log.Fatal("ADMIN_EMAIL environment variable is empty")
+
+	var mandatoryEnvVars = []string{
+		"ADMIN_EMAIL", "EXTERNAL_URL", "JWT_SECRET_KEY", "SENTRY_DSN",
 	}
+	for _, envVar := range mandatoryEnvVars {
+		if os.Getenv(envVar) == "" {
+			log.Fatalf("%s environment variable is empty", envVar)
+		}
+	}
+
+	sentryDsn := os.Getenv("SENTRY_DSN")
+	err = sentry.Init(sentry.ClientOptions{
+		Dsn: sentryDsn,
+		// Set TracesSampleRate to 1.0 to capture 100%
+		// of transactions for performance monitoring.
+		// We recommend adjusting this value in production,
+		TracesSampleRate: 1.0,
+	})
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
+	}
+
+	// Flush buffered events before the program terminates.
+	defer sentry.Flush(2 * time.Second)
 
 	r := gin.Default()
 
@@ -34,7 +56,7 @@ func main() {
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
-	})
+	}, sentryDsn)
 
 	bands := []models.Band{
 		{

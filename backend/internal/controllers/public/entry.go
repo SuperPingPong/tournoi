@@ -13,6 +13,8 @@ import (
 	"github.com/samber/lo"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+
+	"github.com/getsentry/sentry-go"
 )
 
 type ListBandAvailabilitiesInput struct {
@@ -34,6 +36,7 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 
 	memberID, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
+		sentry.CaptureException(fmt.Errorf("invalid member ID: %s", ctx.Param("id")))
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid member ID: %s", ctx.Param("id")))
 		return
 	}
@@ -46,10 +49,12 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 		First(&member).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			sentry.CaptureException(fmt.Errorf("member %s not found", memberID))
 			ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("member %s not found", memberID))
 			return
 		}
 
+		sentry.CaptureException(fmt.Errorf("failed to get member: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get member: %w", err))
 		return
 	}
@@ -57,6 +62,7 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 	// List possible bands for the current member
 	var possibleBands []models.Band
 	if err = api.db.Scopes(possibleBandsScope(member)).Find(&possibleBands).Error; err != nil {
+		sentry.CaptureException(fmt.Errorf("failed to list available bands: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list available bands: %w", err))
 		return
 	}
@@ -66,6 +72,7 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 
 	// Delete existing locks for the current member
 	if err = api.db.Where("member_id = ? AND band_id IN ? AND confirmed IS FALSE", member.ID, possibleBandIDs).Delete(&models.Entry{}).Error; err != nil {
+		sentry.CaptureException(fmt.Errorf("failed to delete locked entries for available bands: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to delete locked entries for available bands: %w", err))
 		return
 	}
@@ -137,12 +144,14 @@ func (api *API) GetMemberEntriesHistory(ctx *gin.Context) {
 	}
 
 	if !user.IsAdmin {
+		sentry.CaptureException(fmt.Errorf("user %s should be admin", user.ID.String()))
 		ctx.AbortWithError(http.StatusForbidden, fmt.Errorf("user %s should be admin", user.ID.String()))
 		return
 	}
 
 	memberID, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
+		sentry.CaptureException(fmt.Errorf("invalid member ID: %s", ctx.Param("id")))
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid member ID: %s", ctx.Param("id")))
 		return
 	}
@@ -189,6 +198,7 @@ func (api *API) GetMemberEntriesHistory(ctx *gin.Context) {
             event_time DESC
     `
 	if err := api.db.Raw(query, true, memberID, true, memberID).Scan(&history).Error; err != nil {
+		sentry.CaptureException(fmt.Errorf("failed to get entries: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get entries: %w", err))
 		return
 	}
@@ -225,6 +235,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 
 	memberID, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
+		sentry.CaptureException(fmt.Errorf("invalid member id: %s", ctx.Param("id")))
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid member id: %s", ctx.Param("id")))
 		return
 	}
@@ -232,6 +243,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 	var input SetMemberEntriesInput
 	err = ctx.ShouldBindJSON(&input)
 	if err != nil {
+		sentry.CaptureException(fmt.Errorf("invalid input: %w", err))
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid input: %w", err))
 		return
 	}
@@ -244,10 +256,12 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 		First(&member).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			sentry.CaptureException(fmt.Errorf("member %s not found", memberID))
 			ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("member %s not found", memberID))
 			return
 		}
 
+		sentry.CaptureException(fmt.Errorf("failed to get member: %w", err))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get member: %w", err))
 		return
 	}
@@ -256,6 +270,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 	// List possible bands for the current member
 	var bands []models.Band
 	if api.db.Scopes(possibleBandsScope(member)).Where("id IN ?", input.BandIDs).Find(&bands).Error != nil {
+		sentry.CaptureException(fmt.Errorf("failed to find bands %v", bands))
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to find bands %v", bands))
 		return
 	}
@@ -265,6 +280,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 		missingBands := lo.Filter(input.BandIDs, func(bandID uuid.UUID, _ int) bool {
 			return !lo.Contains(mapBandIDs(bands), bandID)
 		})
+		sentry.CaptureException(fmt.Errorf("bands %v not found", missingBands))
 		ctx.AbortWithError(http.StatusNotFound, fmt.Errorf("bands %v not found", missingBands))
 		return
 	}
@@ -280,6 +296,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 		if err = api.db.
 			Where("member_id = ? AND band_id NOT IN ?", member.ID, input.BandIDs).
 			Updates(&models.Entry{DeletedAt: gorm.DeletedAt{Time: time.Now(), Valid: true}, DeletedBy: uuid.NullUUID{UUID: user.ID, Valid: true}}).Error; err != nil {
+			sentry.CaptureException(fmt.Errorf("failed to delete entry: %w", err))
 			return fmt.Errorf("failed to delete entry: %w", err)
 		}
 
@@ -344,12 +361,14 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 	if !member.HasBeenNotified {
 		err = sendEmailHTML(user.Email, member.LastName, member.FirstName)
 		if err != nil {
+			sentry.CaptureException(fmt.Errorf("failed to send email: %w", err))
 			ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to send email: %w", err))
 			return
 		}
 		if err = api.db.Model(models.Member{}).
 			Where("id", memberID).
 			Updates(models.Member{HasBeenNotified: true}).Error; err != nil {
+			sentry.CaptureException(fmt.Errorf("failed to update member: %w", err))
 			ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to update member: %w", err))
 		}
 
