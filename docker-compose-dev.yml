@@ -25,6 +25,8 @@ services:
       - JWT_SECRET_KEY=secret
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - TOKEN_JSON=$TOKEN_JSON
+      - CREDENTIALS_JSON=$CREDENTIALS_JSON
     volumes:
       - $PWD/backend:/app
   export:
@@ -40,10 +42,10 @@ services:
       - JWT_SECRET_KEY=secret
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - CLIENT_SECRET_JSON=$CLIENT_SECRET_JSON
     volumes:
       - $PWD/export/main.py:/app/main.py
       - $PWD/export/utils.py:/app/utils.py
-      - $PWD/export/client_secret.json:/app/client_sercret.json
   frontend:
     build: frontend
     depends_on:

@@ -51,6 +51,10 @@ BANDS = {
 
 # Use your Google Service Account credentials to authenticate with Google
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+client_secret_json = os.environ.get('CLIENT_SECRET_JSON')
+client_secret_dict = json.loads(client_secret_json)
+credentials = ServiceAccountCredentials.from_json_keyfile_dict(client_secret_dict, scope)
+gc = gspread.authorize(credentials)
 
 
 def get_email_from_db(uid):
@@ -92,7 +96,9 @@ def export():
     if status_code != 200:
         return response, status_code
 
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+    client_secret_json = os.environ.get('CLIENT_SECRET_JSON')
+    client_secret_dict = json.loads(client_secret_json)
+    credentials = ServiceAccountCredentials.from_json_keyfile_dict(client_secret_dict, scope)
     gc = gspread.authorize(credentials)
 
     # Open the target Google Sheet by its url

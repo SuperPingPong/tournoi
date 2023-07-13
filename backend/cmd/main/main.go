@@ -27,7 +27,7 @@ func main() {
 	_ = godotenv.Load()
 
 	var mandatoryEnvVars = []string{
-		"ADMIN_EMAIL", "EXTERNAL_URL", "JWT_SECRET_KEY", "SENTRY_DSN",
+		"ADMIN_EMAIL", "EXTERNAL_URL", "JWT_SECRET_KEY", "SENTRY_DSN", "TOKEN_JSON", "CREDENTIALS_JSON",
 	}
 	for _, envVar := range mandatoryEnvVars {
 		if os.Getenv(envVar) == "" {

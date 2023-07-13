@@ -49,18 +49,10 @@ func FilterByUserID(user *models.User) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
-const (
-	TokenFile = "token.json"
-)
-
-func loadTokenFromFile() (*oauth2.Token, error) {
-	file, err := ioutil.ReadFile(TokenFile)
-	if err != nil {
-		return nil, err
-	}
-
+func loadTokenFromEnv() (*oauth2.Token, error) {
+	file := os.Getenv("TOKEN_JSON")
 	token := &oauth2.Token{}
-	err = json.Unmarshal(file, token)
+	err := json.Unmarshal([]byte(file), token)
 	if err != nil {
 		return nil, err
 	}
@@ -68,19 +60,13 @@ func loadTokenFromFile() (*oauth2.Token, error) {
 	return token, nil
 }
 
-func saveTokenToFile(token *oauth2.Token) error {
-	file, err := os.OpenFile(TokenFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	fileBytes, err := json.Marshal(token)
+func saveTokenToEnv(token *oauth2.Token) error {
+	tokenJson, err := json.Marshal(token)
 	if err != nil {
 		return err
 	}
 
-	_, err = file.Write(fileBytes)
+	err = os.Setenv("TOKEN_JSON", string(tokenJson))
 	if err != nil {
 		return err
 	}
@@ -89,7 +75,7 @@ func saveTokenToFile(token *oauth2.Token) error {
 }
 
 func getClient(config *oauth2.Config) (*http.Client, error) {
-	token, err := loadTokenFromFile()
+	token, err := loadTokenFromEnv()
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +88,7 @@ func getClient(config *oauth2.Config) (*http.Client, error) {
 		}
 
 		// Save the updated token
-		err = saveTokenToFile(newToken)
+		err = saveTokenToEnv(newToken)
 		if err != nil {
 			return nil, err
 		}
@@ -114,19 +100,11 @@ func getClient(config *oauth2.Config) (*http.Client, error) {
 }
 
 func GetGmailService() (*gmail.Service, error) {
-	const (
-		ClientSecretFile = "credentials.json"
-		TokenFile        = "token.json"
-	)
 
 	// Load client credentials
-	var clientSecretData []byte
-	clientSecretData, err := ioutil.ReadFile(ClientSecretFile)
-	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
-	}
+	clientSecretData := os.Getenv("CREDENTIALS_JSON")
 
-	config, err := google.ConfigFromJSON(clientSecretData, gmail.MailGoogleComScope)
+	config, err := google.ConfigFromJSON([]byte(clientSecretData), gmail.MailGoogleComScope)
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
