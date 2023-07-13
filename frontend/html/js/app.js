@@ -54,7 +54,7 @@ function initDataTable() {
               resultText = 'Confirmé(s):<br>' + bandsConfirmed.map(entry => entry.BandName).join(' / ') + '<br>';
             }
             if (bandsWaiting.length > 0) {
-              resultText += `<ul style="padding-left: 5px">List d'attente:`
+              resultText += `<ul style="padding-left: 5px">Liste d'attente:`
               bandsWaiting.forEach(entry => {
                 resultText += '<li>' +
                   entry.BandName + (entry.BandRank < entry.BandMaxEntries ? ` (Rang liste d'attente : ${entry.BandRank - entry.BandMaxEntries})` : '') +
