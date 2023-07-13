@@ -1,11 +1,43 @@
 version: '2'
 services:
   db:
-    build: db
+    image: postgres:15.3-alpine
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - $PWD/database/data:/var/lib/postgresql/data
+      - $PWD/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+  api:
+    build: backend
+    depends_on:
+      - db
+    restart: always
+    environment:
+      - SENTRY_DSN=$SENTRY_DSN
+      - EXTERNAL_URL=$EXTERNAL_URL
+      - ADMIN_EMAIL=$ADMIN_EMAIL
+      - JWT_SECRET_KEY=$JWT_SECRET_KEY
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+  export:
+    build: export
+    depends_on:
+      - db
+      - api
+    restart: always
+    environment:
+      - ADMIN_EMAIL=$ADMIN_EMAIL
+      - JWT_SECRET_KEY=$JWT_SECRET_KEY
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    volumes:
+      - $PWD/export/main.py:/app/main.py
+      - $PWD/export/utils.py:/app/utils.py
+      - $PWD/export/client_secret.json:/app/client_sercret.json
   frontend:
     build: frontend
     depends_on:
@@ -13,8 +45,4 @@ services:
     restart: always
     ports:
       - "0.0.0.0:40080:80"
-  api:
-    build: backend
-    depends_on:
-      - db
-    restart: always
+
