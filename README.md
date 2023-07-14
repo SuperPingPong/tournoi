@@ -5,11 +5,16 @@
 ```bash
 source .env
 mkdir -p database/data
-# $ find . -type f -o -type d | xargs chmod +r
-# $ docker exec -it tournoi_frontend_1 bash
-# root@b914e6bc0371:/# chown -R nginx:nginx /usr/share/nginx/html/
+docker-compose up -d
+```
 
-docker-compose up
+## Upgrade
+
+```bash
+git pull
+docker-compose build
+source .env
+docker-compose up -d
 ```
 
 #### Annex
