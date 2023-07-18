@@ -89,3 +89,52 @@ function getMemberHeaderHtml(member) {
       '⚧ Sexe: ' + member.Sex + ' | ' +
       '🎯 Officiels: ' + member.Points + '<br><br>'
 }
+
+function logout() {
+  $.ajax({
+    url: `/api/logout`,
+    type: 'GET',
+    contentType: 'application/json',
+    success: function(response) {
+      Swal.fire({
+        title: 'Confirmation de déconnexion',
+        text: 'Déconnexion effectuée avec succès',
+        icon: 'success',
+        confirmButtonText: 'OK',
+        showConfirmButton: true,
+        timer: 5000,
+      }).then(function() {
+        window.location.href = '/';
+        return
+      });
+    },
+    error: function(xhr, textStatus, error) {
+      notificationError();
+    }
+  });
+}
+
+function commonInit() {
+  $('#logoutButton').on('click', function(event) {
+    event.preventDefault();
+    Swal.fire({
+      title: 'Confirmation de déconnexion',
+      text: 'Êtes-vous sûr de vouloir vous déconnecter ?',
+      icon: 'question',
+      showLoaderOnConfirm: true,
+      showCancelButton: true,
+      confirmButtonText: 'Confirmer',
+      cancelButtonText: 'Annuler',
+      confirmButtonColor: '#5468D4',
+      cancelButtonColor: '#dc3741',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        logout();
+      }
+    });
+  });
+}
+
+$(document).ready(function() {
+  commonInit();
+});

@@ -164,7 +164,7 @@ function Survey(survey) {
     currentPanel.classList.add("survey__panel--current");
     currentPanel.setAttribute("aria-hidden", false);
     updateProgressbar();
-    if (+currentPanel.dataset.index > 1) {
+    if (+currentPanel.dataset.index > 2) {
       prevButton.disabled = false;
       prevButton.setAttribute("aria-hidden", false);
     }
@@ -252,7 +252,7 @@ function Survey(survey) {
     currentPanel.classList.add("survey__panel--current");
     currentPanel.setAttribute("aria-hidden", false);
     updateProgressbarBar();
-    if (+currentPanel.dataset.index === 1) {
+    if (+currentPanel.dataset.index <= 2) {
       prevButton.disabled = true;
       prevButton.setAttribute("aria-hidden", true);
     }
@@ -627,6 +627,25 @@ function Survey(survey) {
   prevButton.addEventListener("click", handleprevButton);
   addListenersTo(options);
   survey.addEventListener("submit", handleFormSubmit);
+
+  function manageIfAuth() {
+    const index = currentPanel.dataset.index;
+    $.ajax({
+      url: '/api/members',
+      type: 'GET',
+      contentType: 'application/json',
+      success: function(response) {
+        noErrors();
+        displayNextPanel();
+      },
+      error: function(xhr, textStatus, error) {
+        // console.log(error);
+      }
+    });
+  }
+
+  manageIfAuth();
+
 }
 
 const survey = Survey(document.querySelector(".survey"));

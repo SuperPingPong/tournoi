@@ -479,25 +479,6 @@ function init() {
   });
 
   // Add click event listener to logout button
-  $('#logoutButton').on('click', function(event) {
-    event.preventDefault();
-    Swal.fire({
-      title: 'Confirmation de déconnexion',
-      text: 'Êtes-vous sûr de vouloir vous déconnecter ?',
-      icon: 'question',
-      showLoaderOnConfirm: true,
-      showCancelButton: true,
-      confirmButtonText: 'Confirmer',
-      cancelButtonText: 'Annuler',
-      confirmButtonColor: '#5468D4',
-      cancelButtonColor: '#dc3741',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.href = '/';
-      }
-    });
-  });
-
   $('#exportButton').on('click', function (event) {
     event.preventDefault();
     Swal.fire({
