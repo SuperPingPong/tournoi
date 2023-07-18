@@ -137,11 +137,13 @@ function commonInit() {
   $(document).on("keydown", "#email", function (event) {
     if (event.key === "Enter") {
       event.preventDefault();
+      $("[name='next']").trigger("click");
     }
   });
   $(document).on("keydown", "#license", function (event) {
     if (event.key === "Enter") {
       event.preventDefault();
+      $("[name='next']").trigger("click");
     }
   });
 }
