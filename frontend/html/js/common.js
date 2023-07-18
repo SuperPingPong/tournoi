@@ -133,6 +133,17 @@ function commonInit() {
       }
     });
   });
+
+  $(document).on("keydown", "#email", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+    }
+  });
+  $(document).on("keydown", "#license", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+    }
+  });
 }
 
 $(document).ready(function() {
