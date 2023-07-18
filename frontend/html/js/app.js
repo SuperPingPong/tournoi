@@ -7,6 +7,7 @@ function initDataTable() {
     "lengthMenu": [5, 10, 25, 50],
     "pageLength": 5,
     "serverSide": true,
+    "ordering": false,
     "ajax": {
       "url": "/api/members",
       "dataSrc": function (data) {
