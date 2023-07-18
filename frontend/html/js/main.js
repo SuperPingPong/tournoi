@@ -569,39 +569,41 @@ function Survey(survey) {
                 return bands
               }
             }).then((result) => {
-              $.ajax({
-                url: `/api/members/${memberId}/set-entries`,
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                  bandids: bandIDs,
-                  sessionid: sessionId,
-                }),
-                success: function(response) {
-                  // console.log(response);
-                  if (result.isConfirmed) {
-                    mainElement.classList.add("submission");
-                    mainElement.setAttribute("role", "alert");
-                    mainElement.innerHTML = `<div style="margin: 2.5em auto; text-align: center"><svg width="126" height="118" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126 118" aria-hidden="true"><path d="M52.5 118c28.995 0 52.5-23.729 52.5-53S81.495 12 52.5 12 0 35.729 0 65s23.505 53 52.5 53z" fill="#B9CCED"/><path d="M45.726 87L23 56.877l8.186-6.105 15.647 20.74L118.766 0 126 7.192 45.726 87z" fill="#A7E9AF"/></svg></div>
-                    <h2 class="submission">Merci pour votre inscription</h2>
-                    <p style="text-align: center">Une confirmation vous a été envoyé par email.
-                    <br><span style="font-size: 88%">(<i>N'oubliez pas de vérifier vos spams</i><span>)</span>
-                    <p style="text-align: center">
-                        <a href="/" style="margin-top: 0.5em; background-color: #5f6caf; color: #ffffff; display: inline-block; text-decoration: none; font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.4; text-align: center; padding: 10px 25px; border-radius: 3px;">
-                            Revenir au menu principal
-                        </a>
-                        <a href="/app" style="margin-top: 0.5em; background-color: #5f6caf; color: #ffffff; display: inline-block; text-decoration: none; font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.4; text-align: center; padding: 10px 25px; border-radius: 3px;">
-                            Gérer mes inscriptions
-                        </a>
-                    </p>
-                    `;
-                    return false;
+              if (result.isConfirmed) {
+                $.ajax({
+                  url: `/api/members/${memberId}/set-entries`,
+                  type: 'POST',
+                  contentType: 'application/json',
+                  data: JSON.stringify({
+                    bandids: bandIDs,
+                    sessionid: sessionId,
+                  }),
+                  success: function(response) {
+                    // console.log(response);
+                    if (result.isConfirmed) {
+                      mainElement.classList.add("submission");
+                      mainElement.setAttribute("role", "alert");
+                      mainElement.innerHTML = `<div style="margin: 2.5em auto; text-align: center"><svg width="126" height="118" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126 118" aria-hidden="true"><path d="M52.5 118c28.995 0 52.5-23.729 52.5-53S81.495 12 52.5 12 0 35.729 0 65s23.505 53 52.5 53z" fill="#B9CCED"/><path d="M45.726 87L23 56.877l8.186-6.105 15.647 20.74L118.766 0 126 7.192 45.726 87z" fill="#A7E9AF"/></svg></div>
+                      <h2 class="submission">Merci pour votre inscription</h2>
+                      <p style="text-align: center">Une confirmation vous a été envoyé par email.
+                      <br><span style="font-size: 88%">(<i>N'oubliez pas de vérifier vos spams</i><span>)</span>
+                      <p style="text-align: center">
+                          <a href="/" style="margin-top: 0.5em; background-color: #5f6caf; color: #ffffff; display: inline-block; text-decoration: none; font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.4; text-align: center; padding: 10px 25px; border-radius: 3px;">
+                              Revenir au menu principal
+                          </a>
+                          <a href="/app" style="margin-top: 0.5em; background-color: #5f6caf; color: #ffffff; display: inline-block; text-decoration: none; font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.4; text-align: center; padding: 10px 25px; border-radius: 3px;">
+                              Gérer mes inscriptions
+                          </a>
+                      </p>
+                      `;
+                      return false;
+                    }
+                  },
+                  error: function(xhr, textStatus, error) {
+                    notificationError();
                   }
-                },
-                error: function(xhr, textStatus, error) {
-                  notificationError();
-                }
-              });
+                });
+              }
             });
           },
           error: function(xhr, textStatus, error) {
