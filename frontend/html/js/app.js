@@ -55,7 +55,7 @@ function initDataTable() {
               resultText = 'Confirmé(s):<br>' + bandsConfirmed.map(entry => entry.BandName).join(' / ') + '<br>';
             }
             if (bandsWaiting.length > 0) {
-              resultText += `<ul style="padding-left: 5px">Liste d'attente:`
+              resultText += `<ul class="band-list"><span class="band-list">Liste d'attente:</span>`
               bandsWaiting.forEach(entry => {
                 resultText += '<li>' +
                   entry.BandName + (entry.BandRank < entry.BandMaxEntries ? ` (Rang liste d'attente : ${entry.BandRank - entry.BandMaxEntries})` : '') +
@@ -444,20 +444,6 @@ function init() {
     url: '/api/members',
     type: 'GET',
     success: function(response) {
-      const members = response.Members;
-      if (members.length === 0) {
-        Swal.fire({
-          icon: 'error',
-          title: "Modification des tableaux",
-          text: "Aucune inscription n'est associé à votre compte, vous allez être redirigé vers la page d'accueil pour enregistrer votre première inscription.",
-          confirmButtonText: 'OK',
-          showConfirmButton: true,
-          timer: 5000,
-        }).then(function() {
-          window.location.href = '/';
-          return
-        });
-      }
       const isAdmin = response.IsAdmin;
       if (isAdmin === true) {
         $('p[id="export"]').show();

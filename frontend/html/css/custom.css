@@ -182,7 +182,7 @@ input[type="checkbox"]:disabled {
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 16px;
+  font-size: 14px;
   margin: 4px 2px;
   cursor: pointer;
   border-radius: 4px;
@@ -212,4 +212,14 @@ p#export {
 #dataTable th:last-child,
 #dataTable td:last-child {
   border-right: none;
+}
+
+.band-list {
+  padding-left: 0px;
+  list-style-position: inside;
+}
+
+.band-list li {
+  margin-top: 2.5px;
+  margin-bottom: 2.5px;
 }
