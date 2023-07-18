@@ -199,3 +199,17 @@ p#export {
 .fa-solid {
   vertical-align: middle;
 }
+
+#dataTable {
+  border-collapse: collapse;
+}
+
+#dataTable th,
+#dataTable td {
+  border-right: 1px solid #e0e0e0;
+}
+
+#dataTable th:last-child,
+#dataTable td:last-child {
+  border-right: none;
+}
