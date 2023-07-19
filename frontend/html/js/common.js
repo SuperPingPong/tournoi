@@ -119,7 +119,8 @@ function commonInit() {
     event.preventDefault();
     Swal.fire({
       title: 'Confirmation de déconnexion',
-      text: 'Êtes-vous sûr de vouloir vous déconnecter ?',
+      html: `Êtes-vous sûr de vouloir vous déconnecter ?` +
+      `<br>Si vous n'avez pas besoin de vous connecter sur un autre compte, fermez simplement l'onglet/la page`,
       icon: 'question',
       showLoaderOnConfirm: true,
       showCancelButton: true,
