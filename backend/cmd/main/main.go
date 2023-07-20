@@ -101,7 +101,7 @@ func main() {
 			Color:      "yellow",
 			Sex:        "F",
 			MaxPoints:  1199,
-			MaxEntries: 72,
+			MaxEntries: 36,
 			Price:      9,
 		},
 		{
@@ -110,7 +110,7 @@ func main() {
 			Color:      "green",
 			Sex:        "ALL",
 			MaxPoints:  999,
-			MaxEntries: 72,
+			MaxEntries: 36,
 			Price:      9,
 		},
 		{
