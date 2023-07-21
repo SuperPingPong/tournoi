@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/SuperPingPong/tournoi/internal/models"
@@ -42,7 +43,7 @@ func (a *AuthBusiness) AuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 				return "", errors.New("authentication required")
 			}
 
-			user, err := a.Login(loginRequest.Email, loginRequest.Secret)
+			user, err := a.Login(strings.ToLower(loginRequest.Email), loginRequest.Secret)
 			if err != nil {
 				return "", errors.New("authentication failed")
 			}

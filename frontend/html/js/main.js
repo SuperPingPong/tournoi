@@ -297,7 +297,7 @@ function Survey(survey) {
               timeout: 3000, // Add timeout option to abort the request after 3 seconds
               error: function(xhr, textStatus, error) {
                 // Handle error if OTP code is invalid
-                if (xhr.status == 403) {
+                if (xhr.status == 401) {
                   notificationError('', 'Le code OTP est incorrect');
                 } else {
                   notificationError();
@@ -357,7 +357,7 @@ function Survey(survey) {
     }
 
     if (index === "1") {
-      var email = $('input[name="email"]').val();
+      var email = $('input[name="email"]').val().toLowerCase();
 
       // Test if jwt is valid
       $.ajax({
@@ -382,12 +382,12 @@ function Survey(survey) {
               }
             });
           } else {
-            ask_otp(email);
+            ask_otp(email.toLowerCase());
           }
         },
         error: function(xhr, textStatus, error) {
           // console.log(error);
-          ask_otp(email);
+          ask_otp(email.toLowerCase());
         }
       });
     }

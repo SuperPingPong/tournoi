@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/SuperPingPong/tournoi/internal/models"
@@ -28,6 +29,9 @@ func (api *API) SendOTP(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid input: %w", err))
 		return
 	}
+
+	// Convert the email to lowercase
+	input.Email = strings.ToLower(input.Email)
 
 	// Check if there is a valid otp for the input email in database
 	var existingOTP models.OTP
