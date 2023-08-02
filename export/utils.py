@@ -5,16 +5,43 @@ def get_cells_to_update(worksheet):
     # Get the range of cells to update
     player_ids = worksheet.range(f'A{START_LINE}:A')
     license_numbers = worksheet.range(f'B{START_LINE}:B')
+    surname = worksheet.range(f'D{START_LINE}:D')
+    name = worksheet.range(f'E{START_LINE}:E')
+    club = worksheet.range(f'F{START_LINE}:F')
+    rank = worksheet.range(f'G{START_LINE}:G')
+    category = worksheet.range(f'H{START_LINE}:H')
     tournament_tables_day_1 = worksheet.range(f'K{START_LINE}:Q')
     tournament_tables_day_2 = worksheet.range(f'S{START_LINE}:Y')
     emails = worksheet.range(f'AC{START_LINE}:AC')
-    return player_ids, license_numbers, tournament_tables_day_1, tournament_tables_day_2, emails
+    return (
+        player_ids,
+        license_numbers,
+        surname,
+        name,
+        club,
+        rank,
+        category,
+        tournament_tables_day_1,
+        tournament_tables_day_2,
+        emails
+    )
 
 
 def clean_worksheet(worksheet):
-    player_ids, license_numbers, tournament_tables_day_1, tournament_tables_day_2, emails = get_cells_to_update(
-        worksheet)
-    cells_to_update = player_ids + license_numbers + tournament_tables_day_1 + tournament_tables_day_2 + emails
+    (
+        player_ids,
+        license_numbers,
+        surname,
+        name,
+        club,
+        rank,
+        category,
+        tournament_tables_day_1,
+        tournament_tables_day_2,
+        emails
+    ) = get_cells_to_update(worksheet)
+    cells_to_update = player_ids + license_numbers + surname + name + club + rank + category \
+        + tournament_tables_day_1 + tournament_tables_day_2 + emails
 
     # Update the cells with an empty string
     for cell in cells_to_update:
@@ -43,6 +70,11 @@ def fill_worksheet(worksheet, bands, entries):
         if choice_mapping.get(permit_id) is None:
             choice_mapping[permit_id] = {
                 'email': entry.get('email'),
+                'last_name': entry.get('last_name'),
+                'first_name': entry.get('first_name'),
+                'club_name': entry.get('club_name'),
+                'points': entry.get('points'),
+                'category': entry.get('category'),
                 'bands': {},
             }
 
@@ -53,10 +85,20 @@ def fill_worksheet(worksheet, bands, entries):
         else:
             choice_mapping[permit_id]['bands'][band_name] = f'L{abs(remaining_after)}'
 
-    player_ids, license_numbers, tournament_tables_day_1, tournament_tables_day_2, emails = get_cells_to_update(
-        worksheet
-    )
-    cells_to_update = player_ids + license_numbers + tournament_tables_day_1 + tournament_tables_day_2 + emails
+    (
+        player_ids,
+        license_numbers,
+        surname,
+        name,
+        club,
+        rank,
+        category,
+        tournament_tables_day_1,
+        tournament_tables_day_2,
+        emails
+    ) = get_cells_to_update(worksheet)
+    cells_to_update = player_ids + license_numbers + surname + name + club + rank + category \
+        + tournament_tables_day_1 + tournament_tables_day_2 + emails
 
     length_bands_day_1 = len([name for name, band in bands.items() if band['day'] == 1])
     length_bands_day_2 = len([name for name, band in bands.items() if band['day'] == 2])
@@ -65,6 +107,11 @@ def fill_worksheet(worksheet, bands, entries):
         player_ids[key].value = 1 + key
         license_numbers[key].value = permit_id
         emails[key].value = choice_values.get('email')
+        surname[key].value = choice_values.get('last_name')
+        name[key].value = choice_values.get('fist_name')
+        club[key].value = choice_values.get('club_name')
+        rank[key].value = choice_values.get('points')
+        category[key].value = choice_values.get('category')
         license_numbers[key].value = permit_id
 
         for band_name, cell_value in choice_mapping[permit_id]['bands'].items():
