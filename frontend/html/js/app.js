@@ -58,7 +58,7 @@ function initDataTable() {
               resultText += `<ul class="band-list"><span class="band-list">Liste d'attente:</span>`
               bandsWaiting.forEach(entry => {
                 resultText += '<li>' +
-                  entry.BandName + (entry.BandRank < entry.BandMaxEntries ? ` (Rang liste d'attente : ${entry.BandRank - entry.BandMaxEntries})` : '') +
+                  entry.BandName + (entry.BandRank > entry.BandMaxEntries ? ` (Rang liste d'attente : ${entry.BandRank - entry.BandMaxEntries})` : '') +
                   '</li>'
               })
               resultText += '</ul>'
@@ -258,7 +258,7 @@ function editMemberBands(memberString) {
             `data-member="${member.ID}" name="editMemberBands" value="${band.ID}">` +
             `<label for="tableau-${band.Name}">` +
              `Tableau ${band.Name} (${band.MaxPoints >= 9000 ? 'TC' : '≤ ' + band.MaxPoints + ' pts'}) - ` +
-                `${band.Available >= 0 ? band.Available + " place(s) restante(s)" : ""}` +
+                `${band.Available > 0 ? band.Available + " place(s) restante(s)" : ""}` +
                 `${band.Available === 0 ? "Inscription en liste d'attente" : ""}` +
             `</label>` +
             `</div>`;
