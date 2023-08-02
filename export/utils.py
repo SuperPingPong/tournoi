@@ -108,7 +108,7 @@ def fill_worksheet(worksheet, bands, entries):
         license_numbers[key].value = permit_id
         emails[key].value = choice_values.get('email')
         surname[key].value = choice_values.get('last_name')
-        name[key].value = choice_values.get('fist_name')
+        name[key].value = choice_values.get('first_name')
         club[key].value = choice_values.get('club_name')
         rank[key].value = choice_values.get('points')
         category[key].value = choice_values.get('category')
