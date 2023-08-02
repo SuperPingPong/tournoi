@@ -223,3 +223,9 @@ p#export {
   margin-top: 2.5px;
   margin-bottom: 2.5px;
 }
+
+@media (min-width: 700px) {
+  .onlymobile {
+    display: none;
+  }
+}

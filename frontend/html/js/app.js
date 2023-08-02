@@ -8,6 +8,7 @@ function initDataTable() {
     "pageLength": 5,
     "serverSide": true,
     "ordering": false,
+    "dom": '<"toolbar">frtip',
     "ajax": {
       "url": "/api/members",
       "dataSrc": function (data) {
@@ -93,6 +94,7 @@ function initDataTable() {
       }
     ],
     "drawCallback": function(settings) {
+      document.querySelector('div.toolbar').innerHTML = '<span class="onlymobile">Faire défiler sur la droite pour modifier les tableaux</span>';
       // Attach click event listener to parent element (dataTable)
       const isAdmin = settings.json.IsAdmin
       if (isAdmin === true) {
