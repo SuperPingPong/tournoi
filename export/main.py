@@ -38,7 +38,7 @@ jwt_secret_key = os.environ.get('JWT_SECRET_KEY', 'secret')
 db = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
 # Perform the join query
-query = "SELECT day, name, max_entries FROM bands"
+query = "SELECT day, name, max_entries FROM bands ORDER BY created_at"
 db.execute(query)
 BANDS = list(map(dict, db.fetchall()))
 BANDS = {

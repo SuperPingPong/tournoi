@@ -34,8 +34,6 @@ def fill_worksheet(worksheet, bands, entries):
         } for name, band in bands.items()
     }
 
-    counter = 1
-    counter_mapping = {}
     choice_mapping = {}
     for key, item in enumerate(entries):
         entry = dict(item)
@@ -56,11 +54,12 @@ def fill_worksheet(worksheet, bands, entries):
             choice_mapping[permit_id]['bands'][band_name] = f'L{abs(remaining_after)}'
 
     player_ids, license_numbers, tournament_tables_day_1, tournament_tables_day_2, emails = get_cells_to_update(
-        worksheet)
+        worksheet
+    )
     cells_to_update = player_ids + license_numbers + tournament_tables_day_1 + tournament_tables_day_2 + emails
 
     length_bands_day_1 = len([name for name, band in bands.items() if band['day'] == 1])
-    length_bands_day_2 = len([name for name, band in bands.items() if band['day'] == 1])
+    length_bands_day_2 = len([name for name, band in bands.items() if band['day'] == 2])
 
     for key, (permit_id, choice_values) in enumerate(choice_mapping.items()):
         player_ids[key].value = 1 + key
@@ -69,12 +68,15 @@ def fill_worksheet(worksheet, bands, entries):
         license_numbers[key].value = permit_id
 
         for band_name, cell_value in choice_mapping[permit_id]['bands'].items():
-            band_index = bands[band_name]['index']
-            tournament_tables_day_1[length_bands_day_1 * key + band_index].value = cell_value
-
-        for band_name, cell_value in choice_mapping[permit_id]['bands'].items():
-            band_index = bands[band_name]['index'] - length_bands_day_1
-            tournament_tables_day_2[length_bands_day_2 * key + band_index].value = cell_value
+            if bands[band_name]['day'] == 1:
+                prefix = length_bands_day_1
+                band_index = bands[band_name]['index']
+                tournament_table = tournament_tables_day_1
+            else:
+                prefix = length_bands_day_2
+                band_index = bands[band_name]['index'] - length_bands_day_1
+                tournament_table = tournament_tables_day_2
+            tournament_table[prefix * key + band_index].value = cell_value
 
     # Update the cells in bulk
     worksheet.update_cells(cells_to_update)
