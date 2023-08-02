@@ -382,12 +382,12 @@ function Survey(survey) {
               }
             });
           } else {
-            ask_otp(email.toLowerCase());
+            ask_otp(email.toLowerCase().trim());
           }
         },
         error: function(xhr, textStatus, error) {
           // console.log(error);
-          ask_otp(email.toLowerCase());
+          ask_otp(email.toLowerCase().trim());
         }
       });
     }
