@@ -58,7 +58,7 @@ function initDataTable() {
               resultText += `<ul class="band-list"><span class="band-list">Liste d'attente:</span>`
               bandsWaiting.forEach(entry => {
                 resultText += '<li>' +
-                  entry.BandName + (entry.BandRank > entry.BandMaxEntries ? ` (Rang liste d'attente : ${entry.BandRank - entry.BandMaxEntries})` : '') +
+                  entry.BandName + (entry.BandRank > entry.BandMaxEntries ? ` (Rang liste d'attente: ${entry.BandRank - entry.BandMaxEntries})` : '') +
                   '</li>'
               })
               resultText += '</ul>'
