@@ -218,6 +218,7 @@ p#export {
 .band-list {
   padding-left: 0px;
   list-style-position: inside;
+  margin-bottom: 0px;
 }
 
 .band-list li {
