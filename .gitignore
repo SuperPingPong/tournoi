@@ -5,6 +5,7 @@ token.json
 
 # IDE
 .idea
+.vscode
 
 # mock
 mock_*
