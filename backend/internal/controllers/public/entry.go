@@ -276,8 +276,13 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 
 	err = api.db.Transaction(func(tx *gorm.DB) error {
 		// Delete the unwanted entries.
-		if err = api.db.
-			Where("member_id = ? AND band_id NOT IN ?", member.ID, input.BandIDs).
+		inputBandIDs := input.BandIDs
+		// We add uuid.Nil to input.BandIDs when it is empty since "band_id NOT IN (NULL)" doesn't match any entry
+		if len(input.BandIDs) == 0 {
+		    inputBandIDs = []uuid.UUID{uuid.Nil}
+		}
+		if err = tx.
+			Where("member_id = ? AND band_id NOT IN ?", member.ID, inputBandIDs).
 			Updates(&models.Entry{DeletedAt: gorm.DeletedAt{Time: time.Now(), Valid: true}, DeletedBy: uuid.NullUUID{UUID: user.ID, Valid: true}}).Error; err != nil {
 			return fmt.Errorf("failed to delete entry: %w", err)
 		}

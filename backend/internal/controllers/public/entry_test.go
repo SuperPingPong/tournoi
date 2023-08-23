@@ -561,6 +561,30 @@ func TestSetMemberEntries(t *testing.T) {
 		require.True(t, deletedEntries[0].DeletedAt.Valid)
 		require.True(t, deletedEntries[0].DeletedBy.Valid)
 		require.Equal(t, env.user.ID, deletedEntries[0].DeletedBy.UUID)
+		
+		// Delete all entries
+		url := fmt.Sprintf("/api/members/%s/set-entries", member.ID)
+		data := map[string]interface{}{
+			"BandIDs": []string{},
+			"SessionID": sessionID,
+		}
+		body, err := json.Marshal(data)
+		require.NoError(t, err)
+
+		res := performRequest("POST", url, bytes.NewBuffer(body), map[string]string{
+			"Authorization": "Bearer " + env.jwt,
+		}, env.api.router)
+
+		require.Equal(t, http.StatusOK, res.Code)
+
+		var updatedEntries []models.Entry
+		require.NoError(t, env.db.Where(&models.Entry{MemberID: member.ID, Confirmed: true}).Order("created_at ASC").Find(&updatedEntries).Error)
+		// The second entry has been deleted as well
+		require.Len(t, updatedEntries, 0)
+
+		var deletedEntries []models.Entry
+		require.NoError(t, env.db.Unscoped().Where("deleted_at IS NOT NULL AND member_id = ?", member.ID).Order("created_at ASC").Find(&deletedEntries).Error)
+		require.Len(t, deletedEntries, 2)
 	})
 	t.Run("LimitPerDayReached", func(t *testing.T) {
 		env := getTestEnv(t)
