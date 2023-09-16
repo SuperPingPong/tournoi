@@ -1,4 +1,4 @@
-# tournoi 
+# tournoi
 
 ## Deployment
 
@@ -16,6 +16,11 @@ docker-compose build
 source .env
 docker-compose up -d
 ```
+
+#### Dashboard
+
+![](grafana/img/img1.png)
+![](grafana/img/img2.png)
 
 #### Annex
 
