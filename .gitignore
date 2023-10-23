@@ -12,3 +12,4 @@ mock_*
 
 # database
 database/*
+*.sql
