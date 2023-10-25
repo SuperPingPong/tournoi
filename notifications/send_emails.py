@@ -6,13 +6,11 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
-from email.header import Header
 
 import os.path
 import time
 import base64
-from typing import List, Optional
+from typing import Optional
 
 # Use your Google Service Account credentials to authenticate with Google
 # Define the scopes for accessing the Gmail API
@@ -85,7 +83,7 @@ def send_email(service_gmail: Resource, to):
     message = MIMEMultipart()
 
     # Add the subject
-    message['subject'] = f'Rappel: Tournoi de Lognes'
+    message['subject'] = f'Informations: Tournoi de Lognes 28-29/10/2023'
 
     # Add the recipient(s)
     message['from'] = f'eplognes <tournoiseplognes@gmail.com>'
@@ -114,9 +112,12 @@ def send_email(service_gmail: Resource, to):
 
 
 service_gmail = get_service_gmail()
-#  send_email(service_gmail, 'aurelienduboc96@gmail.com')
+"""
+send_email(service_gmail, 'aurelienduboc96@gmail.com')
+exit(0)
+"""
 
-with open('emails.txt', 'r') as f:
+with open('to.txt', 'r') as f:
     EMAILS = [
         item.strip()
         for item in f.read().split('\n')
