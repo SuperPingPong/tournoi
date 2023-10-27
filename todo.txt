@@ -1,0 +1,3 @@
+
+- Rajouter un msg après l'arrêt des inscription dans la partie /app pour signifier qu'il n'est plus possible de modifier 
+
