@@ -1,3 +1,4 @@
 
 - Rajouter un msg après l'arrêt des inscription dans la partie /app pour signifier qu'il n'est plus possible de modifier 
+- Rajouter une page html avec un message de remerciement et un lien vers le site de lognestt quand le tournoi ets terminé
 
