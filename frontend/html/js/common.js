@@ -66,8 +66,8 @@ function manageCheckboxRequisites(checkboxTarget) {
 
 
 function isAfterDeadline() {
-  const parisTime = new Date().toLocaleString('en-US', { timeZone: 'Europe/Paris' });
-  const formattedParisTime = new Date(parisTime).toISOString().split('.')[0];
+  const parisTime = DateTime.now().setZone('Europe/Paris');
+  const formattedParisTime = parisTime.toISO().split('.')[0];
   const targetDateTime = '2023-10-27T12:00:00';
   return formattedParisTime > targetDateTime;
 }
