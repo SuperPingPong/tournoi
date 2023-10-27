@@ -1,4 +1,9 @@
 
 - Rajouter un msg après l'arrêt des inscription dans la partie /app pour signifier qu'il n'est plus possible de modifier 
 - Rajouter une page html avec un message de remerciement et un lien vers le site de lognestt quand le tournoi ets terminé
+- Disable event enter (sentry errors) input on search player 
+- Notifier les members lorsqu'un player n'est plus en liste d'attente 
+
+To fix:
+- bug player wong nathalie detected as M in api endpoint search player
 
