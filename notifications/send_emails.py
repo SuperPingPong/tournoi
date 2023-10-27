@@ -83,7 +83,7 @@ def send_email(service_gmail: Resource, to):
     message = MIMEMultipart()
 
     # Add the subject
-    message['subject'] = f'Informations: Tournoi de Lognes 28-29/10/2023'
+    message['subject'] = f'Dernier rappel: Tournoi de Lognes 28-29/10/2023'
 
     # Add the recipient(s)
     message['from'] = f'eplognes <tournoiseplognes@gmail.com>'
@@ -113,9 +113,9 @@ def send_email(service_gmail: Resource, to):
 
 service_gmail = get_service_gmail()
 """
+"""
 send_email(service_gmail, 'aurelienduboc96@gmail.com')
 exit(0)
-"""
 
 with open('to.txt', 'r') as f:
     EMAILS = [
