@@ -18,5 +18,5 @@ Features:
 
 To fix:
 - bug player wong nathalie detected as M in api endpoint search player
-- Penser à faire la formule pour le nombre de présents (c'est écrit "72", pas (=somme...)
+- ~~Penser à faire la formule pour le nombre de présents (c'est écrit "72", pas (=somme...)~~
 - fix mail providers in error (orange, laposte, etc)
