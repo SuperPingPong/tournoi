@@ -21,8 +21,13 @@ server {
             try_files $uri $uri/ /app.html;
         }
 
+        location /end {
+            try_files $uri $uri/ /end.html;
+        }
+
         location / {
-            try_files $uri $uri/ /index.html;
+            #  try_files $uri $uri/ /index.html;
+            return 301 /end;
         }
 
 }

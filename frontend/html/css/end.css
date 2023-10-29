@@ -1,0 +1,13 @@
+a.button {
+  color: #FFF !important;
+  text-decoration: none;
+}
+
+.button {
+  background-color: #333333;
+  border: black;
+}
+
+.button:hover {
+  background-color: black
+}
