@@ -66,10 +66,9 @@ function manageCheckboxRequisites(checkboxTarget) {
 
 
 function isAfterDeadline() {
-  const parisTime = DateTime.now().setZone('Europe/Paris');
-  const formattedParisTime = parisTime.toISO().split('.')[0];
-  const targetDateTime = '2023-10-27T12:00:00';
-  return formattedParisTime > targetDateTime;
+  const currentDate = new Date();
+  const targetDateTime = new Date('2023-10-27T12:00:00Z');
+  return currentDate > targetDateTime;
 }
 
 function notificationError(text = '', title = 'Une erreur est survenue') {
