@@ -5,9 +5,10 @@ Features:
 - ~~Disable event enter (sentry errors) input on search player~~
 - Notifier les members lorsqu'un player n'est plus en liste d'attente 
 - Afficher le rang dans la liste d'attente au moment de l'inscription (>En fait quand un tableau est plein et que tu veux tu inscrire, ce serait bien que tu saches directement combien tu seras et ne pas le découvrir au dernier moment. Voire même ce serait bien avant de mettre ton adresse mail, de savoir quels tableaux sont remplis comment)
- Informations a communiquer FAQ:
+ 
+Informations à communiquer FAQ :
 - Communiquer sur la partie buvette / menus avec prix 
-- Pour la FAQ : Que si c'est bon pour la liste d'attente on ne sait pas, que sur certains tableaux on a pris des gens qui étaient N°30 sur la liste d'attente et d'autres ou en n'a pas pris un seul 
+- Pour la FAQ : Que si c'est bon pour la liste d'attente, on ne sait pas, que sur certains tableaux on a pris des gens qui étaient N°30 sur la liste d'attente et d'autres ou en n'a pas pris un seul 
 - Rappeler le système des tickets pour la buvette, qu'on rembourse s'il leur reste des tickets donc ne pas hésiter à prévoir plus d'argent ça sera jamais perdu 
 - Préciser que le paiement se fait au jour le jour même si on fait samedi et dimanche, cheque ou espece
 - Bien dire pas de CB, que le DAB le plus proche est à la gare RER de Lognes
