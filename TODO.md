@@ -15,6 +15,7 @@ Informations à communiquer FAQ :
 - De prévenir si jamais on ne vient pas
 - Qu'à l'heure pile de fin de pointage (heure du gymnase qui fait foi), on scratche les joueurs qui ne se sont pas présentés et qui n'ont pas prévenu
 - En rappelant l'adresse de contact \<censored\> 
+- Il est toujours utile de prévenir des désistements même après la fin des inscriptions, même le jour même
 
 To fix:
 - bug player wong nathalie detected as M in api endpoint search player
