@@ -1,7 +1,7 @@
 
 Features:
 - Rajouter un msg après l'arrêt des inscription dans la partie /app pour signifier qu'il n'est plus possible de modifier 
-- Rajouter une page html avec un message de remerciement et un lien vers le site de lognestt quand le tournoi ets terminé
+~~- Rajouter une page html avec un message de remerciement et un lien vers le site de lognestt quand le tournoi ets terminé~~
 - Disable event enter (sentry errors) input on search player 
 - Notifier les members lorsqu'un player n'est plus en liste d'attente 
 - Afficher le rang dans la liste d'attente au moment de l'inscription (>En fait quand un tableau est plein et que tu veux tu inscrire, ce serait bien que tu saches directement combien tu seras et ne pas le découvrir au dernier moment. Voire même ce serait bien avant de mettre ton adresse mail, de savoir quels tableaux sont remplis comment)
