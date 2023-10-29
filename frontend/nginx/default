@@ -27,7 +27,7 @@ server {
 
         location / {
             #  try_files $uri $uri/ /index.html;
-            return 301 /end;
+            try_files $uri $uri/ /end.html;
         }
 
 }
