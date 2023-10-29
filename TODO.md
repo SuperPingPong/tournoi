@@ -1,6 +1,6 @@
 
 Features:
-- Rajouter un msg après l'arrêt des inscription dans la partie /app pour signifier qu'il n'est plus possible de modifier 
+- Rajouter un msg après l'arrêt des inscriptions dans la partie /app pour signifier qu'il n'est plus possible de modifier 
 - ~~Rajouter une page html avec un message de remerciement et un lien vers le site de lognestt quand le tournoi ets terminé~~
 - ~~Disable event enter (sentry errors) input on search player~~
 - Notifier les members lorsqu'un player n'est plus en liste d'attente 
@@ -8,9 +8,9 @@ Features:
  
 Informations à communiquer FAQ :
 - Communiquer sur la partie buvette / menus avec prix 
-- Pour la FAQ : Que si c'est bon pour la liste d'attente, on ne sait pas, que sur certains tableaux on a pris des gens qui étaient N°30 sur la liste d'attente et d'autres ou en n'a pas pris un seul 
-- Rappeler le système des tickets pour la buvette, qu'on rembourse s'il leur reste des tickets donc ne pas hésiter à prévoir plus d'argent ça sera jamais perdu 
-- Préciser que le paiement se fait au jour le jour même si on fait samedi et dimanche, cheque ou espece
+- Pour la FAQ : Que si c'est bon pour la liste d'attente, on ne sait pas, que sur certains tableaux, on a pris des gens qui étaient N°30 sur la liste d'attente et d'autres ou en n'a pas pris un seul 
+- Rappeler le système des tickets pour la buvette, qu'on rembourse s'il leur reste des tickets donc ne pas hésiter à prévoir plus d'argent ça ne sera jamais perdu 
+- Préciser que le paiement se fait au jour le jour même si on fait samedi et dimanche, cheque ou espèces
 - Bien dire pas de CB, que le DAB le plus proche est à la gare RER de Lognes
 - De prévenir si jamais on ne vient pas
 - Qu'à l'heure pile de fin de pointage (heure du gymnase qui fait foi), on scratche les joueurs qui ne se sont pas présentés et qui n'ont pas prévenu
