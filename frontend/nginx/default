@@ -21,12 +21,12 @@ server {
             try_files $uri $uri/ /app.html;
         }
 
-        location /before {
-            try_files $uri $uri/ /before.html;
+        location /announcement {
+            try_files $uri $uri/ /announcement.html;
         }
 
-        location /end {
-            try_files $uri $uri/ /end.html;
+        location /farewell {
+            try_files $uri $uri/ /farewell.html;
         }
 
         location / {
