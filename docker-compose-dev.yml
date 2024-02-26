@@ -21,7 +21,7 @@ services:
     environment:
       - SENTRY_DSN=https://f0f3980ec56e4c79986e4e4bdef50bea@o4505519663939584.ingest.sentry.io/4505519664791552
       - EXTERNAL_URL=http://127.0.0.1:41080/app
-      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_EMAIL=$ADMIN_EMAIL
       - JWT_SECRET_KEY=secret
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -38,7 +38,7 @@ services:
     environment:
       - DEBUG=True
       - PYTHONUNBUFFERED=1
-      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_EMAIL=$ADMIN_EMAIL
       - JWT_SECRET_KEY=secret
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
