@@ -240,7 +240,7 @@ function editMemberBands(memberString) {
   const bandIDs = member.Entries === null ? [] : member.Entries.map(obj => obj.BandID);
   var checkboxStrings = ['', '']
   let checkboxStringTitles = [
-    '<p>Samedi 28 Octobre 2023</p>', '<p>Dimanche 29 Octobre 2023</p>'
+    '<p>Samedi 8 Juin 2024</p>', '<p>Dimanche 8 Juin 2024</p>'
   ]
   $.ajax({
     url: `/api/members/${member.ID}/band-availabilities`,
@@ -270,7 +270,7 @@ function editMemberBands(memberString) {
         title: 'Mise a jour des tableaux',
         html:
            getMemberHeaderHtml(member) +
-           '<div class="rules-container"><h2>⚠️ Règlement ⚠️</h2><ul><li>Les tableaux de couleurs identiques ne pourront pas être cumulés dans la même journée.</li><li>Les féminines ont une participation dans le tableau « E » (Féminin ≤ 1199pts) obligatoire (pour le samedi uniquement, si les conditions sont remplies).</li><li>3 tableaux maximum par jour.</li><li>Les inscriptions pourront se faire jusqu’au vendredi 27 octobre 2023 – 12H00.</li><li>Les places disponibles sont bloquées pendant 10 minutes, au-delà votre session sera expirée.</li></ul></div><br><br>' +
+           '<div class="rules-container"><h2>⚠️ Règlement ⚠️</h2><ul><li>Les tableaux de couleurs identiques ne pourront pas être cumulés dans la même journée.</li><li>Les féminines ont une participation dans le tableau « G » (Féminin ≤ 1199pts) obligatoire (pour le samedi uniquement, si les conditions sont remplies).</li><li>2 tableaux maximum par jour.</li><li>Les inscriptions pourront se faire jusqu’au vendredi 7 juin 2024 – 12H00.</li><li>Les places disponibles sont bloquées pendant 10 minutes, au-delà votre session sera expirée.</li></ul></div><br><br>' +
           checkboxStringTitles[0] + checkboxStrings[0] +
           checkboxStringTitles[1] + checkboxStrings[1],
         // input: 'text',

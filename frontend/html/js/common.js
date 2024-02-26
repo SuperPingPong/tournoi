@@ -4,16 +4,30 @@ function manageCheckboxRequisitesEvent(event) {
 }
 
 function manageCheckboxRequisites(checkboxTarget) {
-  const checkboxE = document.querySelector('input#tableau-E');
-  if (checkboxE) {
-    if (checkboxE.getAttribute('data-member-sex') === checkboxE.getAttribute('data-sex') &&
-      parseInt(checkboxE.getAttribute('data-member-points')) <= parseInt(checkboxE.getAttribute('data-maxpoints'))
+
+  const checkboxG = document.querySelector('input#tableau-G');
+  const checkboxH = document.querySelector('input#tableau-H');
+  console.log(checkboxG);
+  if (checkboxG) {
+    if (checkboxG.getAttribute('data-member-sex') === checkboxG.getAttribute('data-sex') &&
+      parseInt(checkboxG.getAttribute('data-member-points')) <= parseInt(checkboxG.getAttribute('data-maxpoints'))
     ) {
-      console.log(checkboxE);
-      const checkboxesWithSameDay = document.querySelectorAll(`input[data-day="${checkboxE.getAttribute('data-day')}"]:checked`);
+      console.log(checkboxG);
+      const checkboxesWithSameDay = document.querySelectorAll(`input[data-day="${checkboxG.getAttribute('data-day')}"]:checked`);
       console.log(checkboxesWithSameDay);
       if (checkboxesWithSameDay.length > 0) {
-        checkboxE.checked = true;
+        console.log([
+          checkboxG.checked,
+          checkboxG.disabled,
+          checkboxH.checked,
+          checkboxH.disabled
+        ]);
+        if (checkboxH.checked === true) {
+          checkboxG.disabled = false;
+          checkboxH.disabled = true;
+          checkboxH.checked = false;
+        }
+        checkboxG.checked = true;
       }
     }
   }
@@ -26,13 +40,13 @@ function manageCheckboxRequisites(checkboxTarget) {
   });
   const checkedCheckboxesWithSameDay = checkboxesWithSameDay.filter(':checked');
 
-  if (checkedCheckboxesWithSameDay.length >= 3) {
+  if (checkedCheckboxesWithSameDay.length >= 2) {
     checkboxesWithSameDay.each(function () {
       const checkbox = $(this);
       if (!checkbox.is(':checked')) {
         checkbox.prop('disabled', true);
         const label = $('label[for="' + checkbox.attr('id') + '"]');
-        label.attr('data-title', 'Vous ne pouvez pas sélectionner plus de 3 tableaux pour cette journée');
+        label.attr('data-title', 'Vous ne pouvez pas sélectionner plus de 2 tableaux pour cette journée');
       }
     });
   } else {
@@ -67,7 +81,7 @@ function manageCheckboxRequisites(checkboxTarget) {
 
 function isAfterDeadline() {
   const currentDate = new Date();
-  const targetDateTime = new Date('2023-10-27T12:00:00Z');
+  const targetDateTime = new Date('2024-06-07T12:00:00Z');
   return currentDate > targetDateTime;
 }
 

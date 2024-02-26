@@ -80,12 +80,21 @@ function Survey(survey) {
   }
 
   function checkEmail(input) {
-    if (input.value.trim() === "") {
+    const email = input.value.trim();
+    if (email === "") {
       showError(input, `Le champ email est obligatoire`);
     } else {
-      const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      if (pattern.test(input.value.trim())) {
-        noErrors(input);
+      const emailPattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      if (emailPattern.test(email)) {
+        const providerPattern = /^(?!.*@(laposte\.net|orange\.fr|wanadoo\.fr)$)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const providerMatch = email.match(providerPattern);
+        if (providerMatch) {
+          noErrors(input);
+        } else {
+          const invalidProviderMatch = email.match(/@(laposte\.net|orange\.fr|wanadoo\.fr)$/);
+          const invalidProvider = invalidProviderMatch ? invalidProviderMatch[1] : "inconnu";
+          showError(input, `Le fournisseur de messagerie "${invalidProvider}" n'est pas autorisé.`);
+        }
       } else {
         showError(input, "Le format de l'email n'est pas valide.");
       }
@@ -533,7 +542,7 @@ function Survey(survey) {
       contentType: 'application/json',
       success: function(response) {
         let checkboxStringTitles = [
-          '<p>Samedi 28 Octobre 2023</p>', '<p>Dimanche 29 Octobre 2023</p>'
+          '<p>Samedi 8 Juin 2024</p>', '<p>Dimanche 9 Juin 2024</p>'
         ]
         const bands = response.bands.filter(band => bandIDs.includes(band.ID));
         let confirmText = '';
