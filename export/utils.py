@@ -10,9 +10,9 @@ def get_cells_to_update(worksheet):
     club = worksheet.range(f'F{START_LINE}:F')
     rank = worksheet.range(f'G{START_LINE}:G')
     category = worksheet.range(f'H{START_LINE}:H')
-    tournament_tables_day_1 = worksheet.range(f'K{START_LINE}:Q')
-    tournament_tables_day_2 = worksheet.range(f'S{START_LINE}:Y')
-    emails = worksheet.range(f'AC{START_LINE}:AC')
+    tournament_tables_day_1 = worksheet.range(f'K{START_LINE}:R')
+    tournament_tables_day_2 = worksheet.range(f'T{START_LINE}:Z')
+    emails = worksheet.range(f'AD{START_LINE}:AD')
     return (
         player_ids,
         license_numbers,
