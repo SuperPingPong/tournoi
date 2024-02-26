@@ -21,6 +21,10 @@ server {
             try_files $uri $uri/ /app.html;
         }
 
+        location /before {
+            try_files $uri $uri/ /before.html;
+        }
+
         location /end {
             try_files $uri $uri/ /end.html;
         }
