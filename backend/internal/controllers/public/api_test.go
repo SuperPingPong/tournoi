@@ -40,7 +40,7 @@ func getTestEnv(t *testing.T) testEnv {
 	ctx, r := gin.CreateTestContext(recorder)
 
 	mockHTTPClient := NewMockHTTPClient(t)
-	api := NewAPI(tx, r, mockHTTPClient)
+	api := NewAPI(tx, r, mockHTTPClient, "")
 
 	// Create OTP
 	otp := models.OTP{

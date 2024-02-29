@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 const (
@@ -24,10 +25,12 @@ type Band struct {
 	Name       string    `gorm:"not null;unique"`
 	Day        int       `gorm:"not null"`
 	Color      string    `gorm:"not null"`
-	Sex        string    `gorm:"not null"`
 	MaxPoints  float64   `gorm:"not null"`
 	MaxEntries int       `gorm:"not null"`
 	Price      int       `gorm:"not null"`
+
+	SexAllowed     string         `gorm:"not null"`
+	OnlyCategories pq.StringArray `gorm:"type:text[]"`
 
 	CreatedAt time.Time `gorm:"<-:create;not null"`
 }

@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestListAvailableBands(t *testing.T) {
+func TestListBandAvailabilities(t *testing.T) {
 	type listBandAvailabilitiesResponse struct {
 		Bands []BandAvailability
 	}
@@ -25,30 +25,38 @@ func TestListAvailableBands(t *testing.T) {
 			{
 				Name:       "S",
 				Day:        1,
-				Sex:        models.BandSex_ALL,
+				SexAllowed: models.BandSex_ALL,
 				MaxEntries: 3,
 				MaxPoints:  99,
 			},
 			{
 				Name:       "T",
 				Day:        1,
-				Sex:        models.BandSex_M,
+				SexAllowed: models.BandSex_M,
 				MaxEntries: 1,
 				MaxPoints:  199,
 			},
 			{
 				Name:       "U",
 				Day:        2,
-				Sex:        models.BandSex_F,
+				SexAllowed: models.BandSex_F,
 				MaxEntries: 2,
 				MaxPoints:  199,
 			},
 			{
 				Name:       "V",
 				Day:        2,
-				Sex:        models.BandSex_ALL,
+				SexAllowed: models.BandSex_ALL,
 				MaxEntries: 1,
 				MaxPoints:  299,
+			},
+			{
+				Name:           "W",
+				Day:            1,
+				SexAllowed:     models.BandSex_ALL,
+				MaxEntries:     3,
+				MaxPoints:      399,
+				OnlyCategories: []string{"B1"},
 			},
 		}
 		require.NoError(t, env.db.Create(&bands).Error)
@@ -136,7 +144,7 @@ func TestListAvailableBands(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, res.Code)
 		require.NoError(t, json.NewDecoder(res.Body).Decode(&got))
-		require.Len(t, got.Bands, 2)
+		require.Len(t, got.Bands, 3)
 		require.Equal(t, BandAvailability{
 			Band:      bands[2],
 			Available: bands[2].MaxEntries,
@@ -147,6 +155,11 @@ func TestListAvailableBands(t *testing.T) {
 			Available: bands[3].MaxEntries - 1, // John locked an entry
 			Waiting:   0,
 		}, got.Bands[1])
+		require.Equal(t, BandAvailability{
+			Band:      bands[4],
+			Available: bands[4].MaxEntries, // John did not lock this entry
+			Waiting:   0,
+		}, got.Bands[2])
 
 		// Joe lists availabilities
 		res = performRequest("GET", fmt.Sprintf(url, members[2].ID), nil, map[string]string{
@@ -155,12 +168,17 @@ func TestListAvailableBands(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, res.Code)
 		require.NoError(t, json.NewDecoder(res.Body).Decode(&got))
-		require.Len(t, got.Bands, 1)
+		require.Len(t, got.Bands, 2)
 		require.Equal(t, BandAvailability{
 			Band:      bands[3],
 			Available: 0, // John still has the lock
 			Waiting:   1, // Jane is waiting
 		}, got.Bands[0])
+		require.Equal(t, BandAvailability{
+			Band:      bands[4],
+			Available: bands[4].MaxEntries - 1, // Jane locked an entry
+			Waiting:   0,
+		}, got.Bands[1])
 
 		// John lists his availabilities again
 		res = performRequest("GET", fmt.Sprintf(url, members[0].ID), nil, map[string]string{
@@ -195,21 +213,21 @@ func TestListAvailableBands(t *testing.T) {
 			{
 				Name:       "S",
 				Day:        1,
-				Sex:        models.BandSex_ALL,
+				SexAllowed: models.BandSex_ALL,
 				MaxEntries: 3,
 				MaxPoints:  99,
 			},
 			{
 				Name:       "T",
 				Day:        1,
-				Sex:        models.BandSex_M,
+				SexAllowed: models.BandSex_M,
 				MaxEntries: 1,
 				MaxPoints:  199,
 			},
 			{
 				Name:       "V",
 				Day:        2,
-				Sex:        models.BandSex_ALL,
+				SexAllowed: models.BandSex_ALL,
 				MaxEntries: 1,
 				MaxPoints:  299,
 			},
@@ -336,32 +354,32 @@ func TestSetMemberEntries(t *testing.T) {
 
 		bands := []models.Band{
 			{
-				Name:      "S",
-				Sex:       models.BandSex_M,
-				MaxPoints: 799,
-				Color:     models.BandColor_GREEN,
-				Day:       1,
+				Name:       "S",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  799,
+				Color:      models.BandColor_GREEN,
+				Day:        1,
 			},
 			{
-				Name:      "T",
-				Sex:       models.BandSex_M,
-				MaxPoints: 999,
-				Color:     models.BandColor_BLUE,
-				Day:       2,
+				Name:       "T",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  999,
+				Color:      models.BandColor_BLUE,
+				Day:        2,
 			},
 			{
-				Name:      "U",
-				Sex:       models.BandSex_ALL,
-				MaxPoints: 999,
-				Color:     models.BandColor_GREEN,
-				Day:       2,
+				Name:       "U",
+				SexAllowed: models.BandSex_ALL,
+				MaxPoints:  999,
+				Color:      models.BandColor_GREEN,
+				Day:        2,
 			},
 			{
-				Name:      "V",
-				Sex:       models.BandSex_F,
-				MaxPoints: 1199,
-				Color:     models.BandColor_PINK,
-				Day:       2,
+				Name:       "V",
+				SexAllowed: models.BandSex_F,
+				MaxPoints:  1199,
+				Color:      models.BandColor_PINK,
+				Day:        2,
 			},
 		}
 		require.NoError(t, env.db.Create(&bands).Error)
@@ -474,18 +492,18 @@ func TestSetMemberEntries(t *testing.T) {
 
 		bands := []models.Band{
 			{
-				Name:      "S",
-				Sex:       models.BandSex_M,
-				MaxPoints: 799,
-				Color:     models.BandColor_GREEN,
-				Day:       1,
+				Name:       "S",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  799,
+				Color:      models.BandColor_GREEN,
+				Day:        1,
 			},
 			{
-				Name:      "T",
-				Sex:       models.BandSex_M,
-				MaxPoints: 999,
-				Color:     models.BandColor_BLUE,
-				Day:       2,
+				Name:       "T",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  999,
+				Color:      models.BandColor_BLUE,
+				Day:        2,
 			},
 		}
 		require.NoError(t, env.db.Create(&bands).Error)
@@ -561,28 +579,26 @@ func TestSetMemberEntries(t *testing.T) {
 		require.True(t, deletedEntries[0].DeletedAt.Valid)
 		require.True(t, deletedEntries[0].DeletedBy.Valid)
 		require.Equal(t, env.user.ID, deletedEntries[0].DeletedBy.UUID)
-		
+
 		// Delete all entries
-		url := fmt.Sprintf("/api/members/%s/set-entries", member.ID)
-		data := map[string]interface{}{
-			"BandIDs": []string{},
+		url = fmt.Sprintf("/api/members/%s/set-entries", member.ID)
+		data = map[string]interface{}{
+			"BandIDs":   []string{},
 			"SessionID": sessionID,
 		}
-		body, err := json.Marshal(data)
+		body, err = json.Marshal(data)
 		require.NoError(t, err)
 
-		res := performRequest("POST", url, bytes.NewBuffer(body), map[string]string{
+		res = performRequest("POST", url, bytes.NewBuffer(body), map[string]string{
 			"Authorization": "Bearer " + env.jwt,
 		}, env.api.router)
 
 		require.Equal(t, http.StatusOK, res.Code)
 
-		var updatedEntries []models.Entry
 		require.NoError(t, env.db.Where(&models.Entry{MemberID: member.ID, Confirmed: true}).Order("created_at ASC").Find(&updatedEntries).Error)
 		// The second entry has been deleted as well
 		require.Len(t, updatedEntries, 0)
 
-		var deletedEntries []models.Entry
 		require.NoError(t, env.db.Unscoped().Where("deleted_at IS NOT NULL AND member_id = ?", member.ID).Order("created_at ASC").Find(&deletedEntries).Error)
 		require.Len(t, deletedEntries, 2)
 	})
@@ -592,39 +608,39 @@ func TestSetMemberEntries(t *testing.T) {
 
 		bands := []models.Band{
 			{
-				Name:      "S",
-				Sex:       models.BandSex_M,
-				MaxPoints: 799,
-				Color:     models.BandColor_PINK,
-				Day:       1,
+				Name:       "S",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  799,
+				Color:      models.BandColor_PINK,
+				Day:        1,
 			},
 			{
-				Name:      "T",
-				Sex:       models.BandSex_ALL,
-				MaxPoints: 999,
-				Color:     models.BandColor_PINK,
-				Day:       2,
+				Name:       "T",
+				SexAllowed: models.BandSex_ALL,
+				MaxPoints:  999,
+				Color:      models.BandColor_PINK,
+				Day:        2,
 			},
 			{
-				Name:      "U",
-				Sex:       models.BandSex_M,
-				MaxPoints: 999,
-				Color:     models.BandColor_GREEN,
-				Day:       2,
+				Name:       "U",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  999,
+				Color:      models.BandColor_GREEN,
+				Day:        2,
 			},
 			{
-				Name:      "V",
-				Sex:       models.BandSex_M,
-				MaxPoints: 999,
-				Color:     models.BandColor_BLUE,
-				Day:       2,
+				Name:       "V",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  999,
+				Color:      models.BandColor_BLUE,
+				Day:        2,
 			},
 			{
-				Name:      "W",
-				Sex:       models.BandSex_ALL,
-				MaxPoints: 999,
-				Color:     models.BandColor_BROWN,
-				Day:       2,
+				Name:       "W",
+				SexAllowed: models.BandSex_ALL,
+				MaxPoints:  999,
+				Color:      models.BandColor_BROWN,
+				Day:        2,
 			},
 		}
 		require.NoError(t, env.db.Create(&bands).Error)
@@ -713,18 +729,18 @@ func TestSetMemberEntries(t *testing.T) {
 
 		bands := []models.Band{
 			{
-				Name:      "S",
-				Sex:       models.BandSex_M,
-				MaxPoints: 799,
-				Color:     models.BandColor_PINK,
-				Day:       1,
+				Name:       "S",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  799,
+				Color:      models.BandColor_PINK,
+				Day:        1,
 			},
 			{
-				Name:      "T",
-				Sex:       models.BandSex_ALL,
-				MaxPoints: 999,
-				Color:     models.BandColor_PINK,
-				Day:       1,
+				Name:       "T",
+				SexAllowed: models.BandSex_ALL,
+				MaxPoints:  999,
+				Color:      models.BandColor_PINK,
+				Day:        1,
 			},
 		}
 		require.NoError(t, env.db.Create(&bands).Error)
@@ -789,14 +805,14 @@ func TestSetMemberEntries(t *testing.T) {
 
 		bands := []models.Band{
 			{
-				Name:      "S",
-				Sex:       models.BandSex_M,
-				MaxPoints: 799,
+				Name:       "S",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  799,
 			},
 			{
-				Name:      "T",
-				Sex:       models.BandSex_M,
-				MaxPoints: 999,
+				Name:       "T",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  999,
 			},
 		}
 		require.NoError(t, env.db.Create(&bands).Error)
@@ -858,14 +874,14 @@ func TestSetMemberEntries(t *testing.T) {
 
 		bands := []models.Band{
 			{
-				Name:      "S",
-				Sex:       models.BandSex_M,
-				MaxPoints: 799,
+				Name:       "S",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  799,
 			},
 			{
-				Name:      "T",
-				Sex:       models.BandSex_M,
-				MaxPoints: 999,
+				Name:       "T",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  999,
 			},
 		}
 		require.NoError(t, env.db.Create(&bands).Error)
@@ -927,14 +943,14 @@ func TestSetMemberEntries(t *testing.T) {
 
 		bands := []models.Band{
 			{
-				Name:      "S",
-				Sex:       models.BandSex_M,
-				MaxPoints: 799,
+				Name:       "S",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  799,
 			},
 			{
-				Name:      "T",
-				Sex:       models.BandSex_M,
-				MaxPoints: 999,
+				Name:       "T",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  999,
 			},
 		}
 		require.NoError(t, env.db.Create(&bands).Error)
@@ -997,18 +1013,18 @@ func TestSetMemberEntries(t *testing.T) {
 
 		bands := []models.Band{
 			{
-				Name:      "S",
-				Sex:       models.BandSex_M,
-				MaxPoints: 799,
-				Color:     models.BandColor_GREEN,
-				Day:       1,
+				Name:       "S",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  799,
+				Color:      models.BandColor_GREEN,
+				Day:        1,
 			},
 			{
-				Name:      "T",
-				Sex:       models.BandSex_M,
-				MaxPoints: 999,
-				Color:     models.BandColor_PINK,
-				Day:       1,
+				Name:       "T",
+				SexAllowed: models.BandSex_M,
+				MaxPoints:  999,
+				Color:      models.BandColor_PINK,
+				Day:        1,
 			},
 		}
 		require.NoError(t, env.db.Create(&bands).Error)
@@ -1091,9 +1107,9 @@ func TestSetMemberEntries(t *testing.T) {
 		require.NoError(t, env.db.Create(&member).Error)
 
 		band := models.Band{
-			Name:      "S",
-			Sex:       models.BandSex_M,
-			MaxPoints: 799,
+			Name:       "S",
+			SexAllowed: models.BandSex_M,
+			MaxPoints:  799,
 		}
 		require.NoError(t, env.db.Create(&band).Error)
 

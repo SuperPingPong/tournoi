@@ -198,7 +198,7 @@ func (api *API) GetMemberEntriesHistory(ctx *gin.Context) {
 
 func possibleBandsScope(member models.Member) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("(sex = ? OR sex = 'ALL') AND max_points >= ?", member.Sex, member.Points)
+		return db.Where("(sex_allowed = ? OR sex_allowed = 'ALL') AND max_points >= ? AND (CASE WHEN only_categories IS NOT NULL THEN ? = ANY(only_categories::text[]) ELSE TRUE END)", member.Sex, member.Points, member.Category)
 	}
 }
 
@@ -279,7 +279,7 @@ func (api *API) SetMemberEntries(ctx *gin.Context) {
 		inputBandIDs := input.BandIDs
 		// We add uuid.Nil to input.BandIDs when it is empty since "band_id NOT IN (NULL)" doesn't match any entry
 		if len(input.BandIDs) == 0 {
-		    inputBandIDs = []uuid.UUID{uuid.Nil}
+			inputBandIDs = []uuid.UUID{uuid.Nil}
 		}
 		if err = tx.
 			Where("member_id = ? AND band_id NOT IN ?", member.ID, inputBandIDs).

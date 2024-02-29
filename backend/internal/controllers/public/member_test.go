@@ -44,6 +44,7 @@ func TestListMembers(t *testing.T) {
 				ClubName:   "Jane Club",
 				PermitType: "T",
 				UserID:     env.user.ID,
+				CreatedAt:  time.Now().Add(1 * time.Minute),
 			},
 			{
 				FirstName:  "Jane",
@@ -55,6 +56,7 @@ func TestListMembers(t *testing.T) {
 				ClubName:   "Jane Club",
 				PermitType: "P",
 				UserID:     env.user.ID,
+				CreatedAt:  time.Now(),
 			},
 		}
 		env.db.Create(&members)
@@ -570,171 +572,5 @@ func TestCreateMember(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, http.StatusBadRequest, res.Code)
 		require.Equal(t, "invalid input: EOF", actual["error"])
-	})
-}
-
-func TestUpdateMember(t *testing.T) {
-	t.Run("Success", func(t *testing.T) {
-		env := getTestEnv(t)
-		defer env.teardown()
-
-		created := &models.Member{
-			FirstName: "John",
-			LastName:  "Doe",
-			Sex:       "M",
-			PermitID:  "000001",
-			UserID:    env.user.ID,
-		}
-		env.db.Create(created)
-
-		firstName := "Jean"
-		lastName := "Pierre"
-		permitID := "123456"
-		sex := "M"
-		point := 801.0
-		category := "S"
-		clubName := "Caillouville"
-		permitType := "T"
-
-		expectedFFTTReq, err := http.NewRequest(http.MethodGet, "https://fftt.dafunker.com/v1/joueur/"+permitID, nil)
-		mockFFTTRes := fmt.Sprintf(`{"nom":"%s","prenom":"%s","licence":"%s","sexe":"%s","point":%f,"cat":"%s","nomclub":"%s","type":"%s"}`, lastName, firstName, permitID, sex, point, category, clubName, permitType)
-		r := io.NopCloser(bytes.NewReader([]byte(mockFFTTRes)))
-		env.api.httpClient.(*MockHTTPClient).EXPECT().Do(expectedFFTTReq).Return(&http.Response{
-			StatusCode: http.StatusOK,
-			Body:       r,
-		}, nil)
-
-		url := fmt.Sprintf("/api/members/%s", created.ID)
-		data := map[string]string{
-			"PermitID": permitID,
-		}
-		body, err := json.Marshal(data)
-		require.NoError(t, err)
-
-		res := performRequest("PATCH", url, bytes.NewBuffer(body), map[string]string{
-			"Authorization": "Bearer " + env.jwt,
-		}, env.api.router)
-
-		var updated models.Member
-		err = json.NewDecoder(res.Body).Decode(&updated)
-		require.NoError(t, err)
-		require.Equal(t, http.StatusOK, res.Code)
-		require.Equal(t, created.ID, updated.ID)
-		require.Equal(t, created.CreatedAt, updated.CreatedAt)
-		require.True(t, created.UpdatedAt.Before(updated.UpdatedAt))
-		require.Equal(t, firstName, updated.FirstName)
-		require.Equal(t, lastName, updated.LastName)
-		require.Equal(t, permitID, updated.PermitID)
-		require.Equal(t, sex, updated.Sex)
-		require.Equal(t, category, updated.Category)
-		require.Equal(t, clubName, updated.ClubName)
-		require.Equal(t, permitType, updated.PermitType)
-		require.Equal(t, env.user.ID, updated.UserID)
-	})
-	t.Run("EmptyInput", func(t *testing.T) {
-		env := getTestEnv(t)
-		defer env.teardown()
-
-		url := "/api/members/000001"
-		data := map[string]string{}
-		body, err := json.Marshal(data)
-		require.NoError(t, err)
-		res := performRequest("PATCH", url, bytes.NewBuffer(body), map[string]string{
-			"Authorization": "Bearer " + env.jwt,
-		}, env.api.router)
-
-		var updated models.Member
-		err = json.NewDecoder(res.Body).Decode(&updated)
-		require.NoError(t, err)
-		require.Equal(t, http.StatusBadRequest, res.Code)
-	})
-	t.Run("MissingInput", func(t *testing.T) {
-		env := getTestEnv(t)
-		defer env.teardown()
-
-		created := &models.Member{
-			FirstName: "John",
-			LastName:  "Doe",
-			Sex:       "M",
-			PermitID:  "123456",
-		}
-		env.db.Create(created)
-
-		url := fmt.Sprintf("/api/members/%s", created.ID)
-		res := performRequest("PATCH", url, nil, map[string]string{
-			"Authorization": "Bearer " + env.jwt,
-		}, env.api.router)
-
-		var actual map[string]string
-		require.Equal(t, http.StatusBadRequest, res.Code)
-		err := json.NewDecoder(res.Body).Decode(&actual)
-		require.NoError(t, err)
-		require.Equal(t, "invalid input: EOF", actual["error"])
-	})
-	t.Run("InvalidMemberID", func(t *testing.T) {
-		env := getTestEnv(t)
-		defer env.teardown()
-
-		url := "/api/members/foo"
-		res := performRequest("PATCH", url, nil, map[string]string{
-			"Authorization": "Bearer " + env.jwt,
-		}, env.api.router)
-
-		var actual map[string]string
-		err := json.NewDecoder(res.Body).Decode(&actual)
-		require.NoError(t, err)
-		require.Equal(t, http.StatusBadRequest, res.Code)
-		require.Equal(t, "invalid member id: foo", actual["error"])
-	})
-	t.Run("WrongUserID", func(t *testing.T) {
-		env := getTestEnv(t)
-		defer env.teardown()
-
-		user := models.User{
-			Email: "hdupont@example.com",
-			Members: []models.Member{
-				{
-					FirstName: "Hervé",
-					LastName:  "Dupont",
-					Sex:       "M",
-					PermitID:  "000003",
-				},
-			},
-		}
-		env.db.Create(&user)
-
-		url := "/api/members/" + user.Members[0].ID.String()
-		data := map[string]string{"PermitID": "000000"}
-		body, err := json.Marshal(data)
-		require.NoError(t, err)
-		res := performRequest("PATCH", url, bytes.NewBuffer(body), map[string]string{
-			"Authorization": "Bearer " + env.jwt,
-		}, env.api.router)
-
-		var actual map[string]string
-		err = json.NewDecoder(res.Body).Decode(&actual)
-		require.NoError(t, err)
-		require.Equal(t, http.StatusNotFound, res.Code)
-		require.Equal(t, fmt.Sprintf("member %s not found", user.Members[0].ID.String()), actual["error"])
-	})
-	t.Run("NotFound", func(t *testing.T) {
-		env := getTestEnv(t)
-		defer env.teardown()
-
-		memberID := uuid.NewString()
-		url := "/api/members/" + memberID
-		data := map[string]string{"PermitID": "000000"}
-		body, err := json.Marshal(data)
-		require.NoError(t, err)
-
-		res := performRequest("PATCH", url, bytes.NewBuffer(body), map[string]string{
-			"Authorization": "Bearer " + env.jwt,
-		}, env.api.router)
-
-		var actual map[string]string
-		err = json.NewDecoder(res.Body).Decode(&actual)
-		require.NoError(t, err)
-		require.Equal(t, http.StatusNotFound, res.Code)
-		require.Equal(t, fmt.Sprintf("member %s not found", memberID), actual["error"])
 	})
 }
