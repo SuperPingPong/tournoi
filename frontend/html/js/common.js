@@ -35,7 +35,7 @@ function manageCheckboxRequisites(checkboxTarget) {
       }
     });
   } else {
-    checkboxes.each(function () {
+    checkboxesWithSameDay.each(function () {
       const checkbox = $(this);
       const label = $('label[for="' + checkbox.attr('id') + '"]');
       checkbox.prop('disabled', false);

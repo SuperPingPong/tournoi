@@ -284,7 +284,6 @@ function editMemberBands(memberString) {
         // input: 'text',
         customClass: 'custom-swal-html-container',
         didRender: () => {
-          // setTimeout(() => {}, 100)
           const checkboxes = document.querySelectorAll('input[type="checkbox"]');
           checkboxes.forEach(checkbox => {
             checkbox.addEventListener('click', manageCheckboxRequisitesEvent);
