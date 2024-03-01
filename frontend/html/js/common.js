@@ -6,27 +6,13 @@ function manageCheckboxRequisitesEvent(event) {
 function manageCheckboxRequisites(checkboxTarget) {
 
   const checkboxG = document.querySelector('input#tableau-G');
-  const checkboxH = document.querySelector('input#tableau-H');
-  console.log(checkboxG);
-  if (checkboxG) {
+  if (checkboxG && checkboxG.checked !== true) {
     if (checkboxG.getAttribute('data-member-sex') === checkboxG.getAttribute('data-sex') &&
       parseInt(checkboxG.getAttribute('data-member-points')) <= parseInt(checkboxG.getAttribute('data-maxpoints'))
     ) {
-      console.log(checkboxG);
       const checkboxesWithSameDay = document.querySelectorAll(`input[data-day="${checkboxG.getAttribute('data-day')}"]:checked`);
-      console.log(checkboxesWithSameDay);
       if (checkboxesWithSameDay.length > 0) {
-        console.log([
-          checkboxG.checked,
-          checkboxG.disabled,
-          checkboxH.checked,
-          checkboxH.disabled
-        ]);
-        if (checkboxH.checked === true) {
-          checkboxG.disabled = false;
-          checkboxH.disabled = true;
-          checkboxH.checked = false;
-        }
+        console.log(123)
         checkboxG.checked = true;
       }
     }
@@ -39,7 +25,6 @@ function manageCheckboxRequisites(checkboxTarget) {
     return checkbox.attr('data-day') === checkboxTarget.getAttribute('data-day');
   });
   const checkedCheckboxesWithSameDay = checkboxesWithSameDay.filter(':checked');
-
   if (checkedCheckboxesWithSameDay.length >= 2) {
     checkboxesWithSameDay.each(function () {
       const checkbox = $(this);

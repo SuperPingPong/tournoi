@@ -249,14 +249,22 @@ function editMemberBands(memberString) {
     success: function(response) {
       const sessionId = response.session_id;
       [1, 2].forEach(day => {
-        let bandsDay = response.bands.filter(band => band.Day === day);
+        // TODO: manage edge case do not show checkbox H if checkbox G is available
+        // Filter out bands with Name "H" only if there is a band with Name "G"
+        let filteredBands = response.bands.filter(band => {
+          const hasGBand = response.bands.some(gBand => gBand.Name === "G");
+          return !(band.Name === "H" && hasGBand);
+        });
+        // Filter bands based on the day
+        let bandsDay = filteredBands.filter(band => band.Day === day);
+        // let bandsDay = response.bands.filter(band => band.Day === day);
         bandsDay.forEach(band => {
           checkboxStrings[day-1] += `<div class="form-group" style="text-align: left">` +
             `<input type="checkbox" ${bandIDs.includes(band.ID) ? "checked" : ""} ` +
             `class="checkbox" id="tableau-${band.Name}" ` +
             `data-color="${band.Color}" data-day="${band.Day}"` +
             `data-member-points="${member.Points}" data-member-sex="${member.Sex}"` +
-            `data-maxpoints="${band.MaxPoints}" data-sex="${band.Sex}"` +
+            `data-maxpoints="${band.MaxPoints}" data-sex="${band.SexAllowed}"` +
             `data-member="${member.ID}" name="editMemberBands" value="${band.ID}">` +
             `<label for="tableau-${band.Name}">` +
              `Tableau ${band.Name} (${band.MaxPoints >= 9000 ? 'TC' : '≤ ' + band.MaxPoints + ' pts'}) - ` +
@@ -276,6 +284,7 @@ function editMemberBands(memberString) {
         // input: 'text',
         customClass: 'custom-swal-html-container',
         didRender: () => {
+          // setTimeout(() => {}, 100)
           const checkboxes = document.querySelectorAll('input[type="checkbox"]');
           checkboxes.forEach(checkbox => {
             checkbox.addEventListener('click', manageCheckboxRequisitesEvent);

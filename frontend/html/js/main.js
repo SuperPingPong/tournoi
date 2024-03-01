@@ -210,7 +210,15 @@ function Survey(survey) {
         success: function(response) {
           const sessionId = response.session_id;
           [1, 2].forEach(day => {
-            let bandsDay = response.bands.filter(band => band.Day === day);
+            // TODO: manage edge case do not show checkbox H if checkbox G is available
+            // Filter out bands with Name "H" only if there is a band with Name "G"
+            let filteredBands = response.bands.filter(band => {
+              const hasGBand = response.bands.some(gBand => gBand.Name === "G");
+              return !(band.Name === "H" && hasGBand);
+            });
+            // Filter bands based on the day
+            let bandsDay = filteredBands.filter(band => band.Day === day);
+            // let bandsDay = response.bands.filter(band => band.Day === day);
             let bandDayContainer = document.getElementById(`form-group-day-${day}`);
             bandDayContainer.innerHTML = '';
             bandsDay.forEach(band => {
@@ -225,7 +233,7 @@ function Survey(survey) {
               input.setAttribute('data-color', band.Color);
               input.setAttribute('data-day', band.Day);
               input.setAttribute('data-maxpoints', band.MaxPoints);
-              input.setAttribute('data-sex', band.Sex);
+              input.setAttribute('data-sex', band.SexAllowed);
               input.setAttribute('data-member-points', memberPoints);
               input.setAttribute('data-member-sex', memberSex);
               const label = document.createElement('label');
@@ -485,6 +493,8 @@ function Survey(survey) {
                   if (memberBands === null || memberBands.length === 0) {
                     let memberId = selectedMember.ID
                     localStorage.setItem('memberId', memberId);
+                    localStorage.setItem('memberPoints', selectedMember.Points);
+                    localStorage.setItem('memberSex', selectedMember.Sex);
                     noErrors();
                     displayNextPanel();
                   } else {
