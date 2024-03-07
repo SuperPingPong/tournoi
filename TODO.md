@@ -10,6 +10,7 @@
 - - 'checkedCheckboxesWithSameDay.length >= 3'
 - - 'checkboxG' (tableau féminin)
 - - TODO
+- - 'Aucun tableau disponible pour les joueurs supérieurs à 1899 points'
 
 ### Features:
 - Rajouter un msg après l'arrêt des inscriptions dans la partie /app pour signifier qu'il n'est plus possible de modifier

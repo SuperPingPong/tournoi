@@ -1,5 +1,14 @@
 function manageCheckboxRequisitesEvent(event) {
   const checkboxTarget = event.target;
+  if (event.type === 'click') {
+    // Remove error "Au moins un tableau doit être sélectionné"
+    // Copied from ShowError function in main.js
+    const input = document.querySelector('.survey__panel__hearabout');
+    const formControl = input.parentElement;
+    const errorElement = formControl.querySelector(".error-message");
+    errorElement.innerText = '';
+    errorElement.setAttribute("role", "alert");
+  }
   manageCheckboxRequisites(checkboxTarget)
 }
 
