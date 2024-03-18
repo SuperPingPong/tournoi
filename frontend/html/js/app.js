@@ -170,10 +170,10 @@ function formatEventDetails(event) {
 
   switch (event.EventType.toLowerCase()) {
     case 'created':
-      emoji += '✅ Ajout du tableau ' + event.BandName;
+      emoji += '✅ Ajout du tableau ' + event.BandName + ` (${band.MaxPoints >= 9000 ? 'TC' : '≤ ' + band.MaxPoints + ' pts'})`;
       break;
     case 'deleted':
-      emoji += '❌ Suppression du tableau ' + event.BandName;
+      emoji += '❌ Suppression du tableau ' + event.BandName + ` (${band.MaxPoints >= 9000 ? 'TC' : '≤ ' + band.MaxPoints + ' pts'})`;
       break;
   }
 
@@ -330,11 +330,11 @@ function editMemberBands(memberString) {
             let bandsDayUpdated = [];
             let bandsDayCreated = result.value.created.filter(band => band.Day === day);
             bandsDayCreated.forEach(band => {
-              bandsDayUpdated.push(`<p style="text-align: left; margin: 0">✅ Ajout du tableau ${band.Name}</p>`)
+              bandsDayUpdated.push(`<p style="text-align: left; margin: 0">✅ Ajout du tableau ${band.Name} (${band.MaxPoints >= 9000 ? 'TC' : '≤ ' + band.MaxPoints + ' pts'})</p>`)
             })
             let bandsDayDeleted = result.value.deleted.filter(band => band.Day === day);
             bandsDayDeleted.forEach(band => {
-              bandsDayUpdated.push(`<p style="text-align: left; margin: 0">❌ Suppression du tableau ${band.Name}</p>`)
+              bandsDayUpdated.push(`<p style="text-align: left; margin: 0">❌ Suppression du tableau ${band.Name} (${band.MaxPoints >= 9000 ? 'TC' : '≤ ' + band.MaxPoints + ' pts'})</p>`)
             })
             if (bandsDayUpdated.length > 0) {
               confirmText += checkboxStringTitles[day-1] + bandsDayUpdated.join('')

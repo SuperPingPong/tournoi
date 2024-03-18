@@ -506,7 +506,7 @@ function Survey(survey) {
                     Swal.fire({
                       icon: 'error',
                       title: 'Licencié déjà inscrit au tournoi',
-                      html: 'Le joueur est déjà inscrit. Vous pouvez modifier votre inscription ou consulter votre rang dans les listes d\'attentes: ' +
+                      html: 'Le joueur est déjà inscrit. Vous pouvez modifier votre inscription ou consulter votre rang dans les listes d\'attente: ' +
                       '<a href="/app">Cliquez ici</a>',
                     });
                   }
@@ -565,7 +565,7 @@ function Survey(survey) {
           let bandsDayCreatedItems = [];
           let bandsDayCreated = bands.filter(band => band.Day === day);
           bandsDayCreated.forEach(band => {
-            bandsDayCreatedItems.push(`<p style="text-align: left; margin: 0">✅ Ajout du tableau ${band.Name}</p>`)
+            bandsDayCreatedItems.push(`<p style="text-align: left; margin: 0">✅ Ajout du tableau ${band.Name} (${band.MaxPoints >= 9000 ? 'TC' : '≤ ' + band.MaxPoints + ' pts'})</p>`)
           })
           if (bandsDayCreatedItems.length > 0) {
             confirmText += checkboxStringTitles[day-1] + bandsDayCreatedItems.join('')
