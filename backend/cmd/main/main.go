@@ -68,7 +68,7 @@ func main() {
 			MaxPoints:      599,
 			MaxEntries:     48,
 			Price:          9,
-			OnlyCategories: []string{"B1", "B2", "M1", "M2"},
+			OnlyCategories: []string{"P1", "P2", "B1", "B2", "M1", "M2"},
 		},
 		{
 			Name:       "B",
