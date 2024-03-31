@@ -4,10 +4,12 @@ function manageCheckboxRequisitesEvent(event) {
     // Remove error "Au moins un tableau doit être sélectionné"
     // Copied from ShowError function in main.js
     const input = document.querySelector('.survey__panel__hearabout');
-    const formControl = input.parentElement;
-    const errorElement = formControl.querySelector(".error-message");
-    errorElement.innerText = '';
-    errorElement.setAttribute("role", "alert");
+    if (input) {
+      const formControl = input.parentElement;
+      const errorElement = formControl.querySelector(".error-message");
+      errorElement.innerText = '';
+      errorElement.setAttribute("role", "alert");
+    }
   }
   manageCheckboxRequisites(checkboxTarget)
 }
@@ -21,7 +23,6 @@ function manageCheckboxRequisites(checkboxTarget) {
     ) {
       const checkboxesWithSameDay = document.querySelectorAll(`input[data-day="${checkboxG.getAttribute('data-day')}"]:checked`);
       if (checkboxesWithSameDay.length > 0) {
-        console.log(123)
         checkboxG.checked = true;
       }
     }

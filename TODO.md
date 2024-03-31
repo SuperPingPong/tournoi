@@ -19,6 +19,7 @@
 - Notifier les members lorsqu'un player n'est plus en liste d'attente
 --> container séparé
 - Afficher le rang dans la liste d'attente au moment de l'inscription (>En fait quand un tableau est plein et que tu veux tu inscrire, ce serait bien que tu saches directement combien tu seras et ne pas le découvrir au dernier moment. Voire même ce serait bien avant de mettre ton adresse mail, de savoir quels tableaux sont remplis comment)
+- ~~Reparer la logique de disable checkbox sur la partie update~~
 
 ### Informations à communiquer FAQ:
 - Communiquer sur la partie buvette / menus avec prix
@@ -32,7 +33,7 @@
 - Il est toujours utile de prévenir des désistements même après la fin des inscriptions, même le jour même
 
 ### To fix:
-- bug player wong nathalie detected as M in api endpoint search player
---> pas réussi a reproduire le bug
+~~- bug player wong nathalie detected as M in api endpoint search player~~
+~~--> pas réussi a reproduire le bug~~
 - ~~Penser à faire la formule pour le nombre de présents (c'est écrit "72", pas (=somme...)~~
 - ~~fix mail providers in error (orange.fr, laposte.net, wanadoo.fr)~~

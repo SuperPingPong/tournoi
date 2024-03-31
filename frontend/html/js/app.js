@@ -235,6 +235,19 @@ function mailMemberBands(memberString) {
   });
 }
 
+function waitForCheckboxes() {
+    return new Promise((resolve) => {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        if (checkboxes.length > 0) {
+            resolve(checkboxes);
+        } else {
+            setTimeout(() => {
+                resolve(waitForCheckboxes());
+            }, 100);
+        }
+    });
+}
+
 function editMemberBands(memberString) {
   const member = JSON.parse(memberString);
   const bandIDs = member.Entries === null ? [] : member.Entries.map(obj => obj.BandID);
@@ -251,10 +264,15 @@ function editMemberBands(memberString) {
       [1, 2].forEach(day => {
         // TODO: manage edge case do not show checkbox H if checkbox G is available
         // Filter out bands with Name "H" only if there is a band with Name "G"
-        let filteredBands = response.bands.filter(band => {
-          const hasGBand = response.bands.some(gBand => gBand.Name === "G");
-          return !(band.Name === "H" && hasGBand);
-        });
+        let filteredBands;
+        if (response.bands) {
+            filteredBands = response.bands.filter(band => {
+                const hasGBand = response.bands.some(gBand => gBand.Name === "G");
+                return !(band.Name === "H" && hasGBand);
+            });
+        } else {
+            filteredBands = [];
+        }
         // Filter bands based on the day
         let bandsDay = filteredBands.filter(band => band.Day === day);
         // let bandsDay = response.bands.filter(band => band.Day === day);
@@ -284,12 +302,13 @@ function editMemberBands(memberString) {
         // input: 'text',
         customClass: 'custom-swal-html-container',
         didRender: () => {
-          const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-          checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('click', manageCheckboxRequisitesEvent);
-            if (checkbox.checked) {
-              manageCheckboxRequisites(checkbox);
-            }
+          waitForCheckboxes().then((checkboxes) => {
+            checkboxes.forEach(checkbox => {
+              checkbox.addEventListener('click', manageCheckboxRequisitesEvent);
+              if (checkbox.checked) {
+                manageCheckboxRequisites(checkbox);
+              }
+            });
           });
         },
         inputAttributes: {
