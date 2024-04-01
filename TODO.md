@@ -11,6 +11,7 @@
 - - 'checkboxG' (tableau féminin)
 - - TODO
 - - 'Aucun tableau disponible pour les joueurs supérieurs à 1899 points'
+Pensez à changer le secret jwt sur une nouvelle version de l'appli avant lancement pour forcer l'invalidation des precedents jwt
 
 ### Features:
 - Rajouter un msg après l'arrêt des inscriptions dans la partie /app pour signifier qu'il n'est plus possible de modifier
