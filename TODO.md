@@ -12,6 +12,7 @@
 - - TODO
 - - 'Aucun tableau disponible pour les joueurs supérieurs à 1899 points'
 Pensez à changer le secret jwt sur une nouvelle version de l'appli avant lancement pour forcer l'invalidation des precedents jwt
+Avant le lancement du tournoi le redirect vers /announcement doit être géré au niveau nginx et pas dans le front sinon probleme de non refresh lié au cache des navigateurs au lancement
 
 ### Features:
 - Rajouter un msg après l'arrêt des inscriptions dans la partie /app pour signifier qu'il n'est plus possible de modifier
