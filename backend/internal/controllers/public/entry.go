@@ -122,6 +122,7 @@ type EntriesHistory struct {
 	ID             uuid.UUID
 	BandId         string
 	BandName       string
+	BandMaxPoints  float64
 	EventTime      time.Time
 	EventType      string
 	EventBy        string
@@ -155,6 +156,7 @@ func (api *API) GetMemberEntriesHistory(ctx *gin.Context) {
             'created' AS event_type,
             users.email AS event_by,
             bands.name AS band_name,
+            bands.max_points AS band_max_points,
             users.is_admin AS event_by_is_admin
         FROM
             entries
@@ -173,6 +175,7 @@ func (api *API) GetMemberEntriesHistory(ctx *gin.Context) {
             'deleted' AS event_type,
             users.email AS event_by,
             bands.name AS band_name,
+            bands.max_points AS band_max_points,
             users.is_admin AS event_by_is_admin
         FROM
             entries

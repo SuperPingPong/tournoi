@@ -170,10 +170,10 @@ function formatEventDetails(event) {
 
   switch (event.EventType.toLowerCase()) {
     case 'created':
-      emoji += '✅ Ajout du tableau ' + event.BandName + ` (${band.MaxPoints >= 9000 ? 'TC' : '≤ ' + band.MaxPoints + ' pts'})`;
+      emoji += '✅ Ajout du tableau ' + event.BandName + ` (${event.BandMaxPoints >= 9000 ? 'TC' : '≤ ' + event.BandMaxPoints + ' pts'})`;
       break;
     case 'deleted':
-      emoji += '❌ Suppression du tableau ' + event.BandName + ` (${band.MaxPoints >= 9000 ? 'TC' : '≤ ' + band.MaxPoints + ' pts'})`;
+      emoji += '❌ Suppression du tableau ' + event.BandName + ` (${event.BandMaxPoints >= 9000 ? 'TC' : '≤ ' + event.BandMaxPoints + ' pts'})`;
       break;
   }
 
