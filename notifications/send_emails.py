@@ -83,7 +83,7 @@ def send_email(service_gmail: Resource, to):
     message = MIMEMultipart()
 
     # Add the subject
-    message['subject'] = f'Dernier rappel: Tournoi de Lognes 28-29/10/2023'
+    message['subject'] = f'Dernier rappel: Tournoi de Lognes 08-09/06/2024'
 
     # Add the recipient(s)
     message['from'] = f'eplognes <tournoiseplognes@gmail.com>'
