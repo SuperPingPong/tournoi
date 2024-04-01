@@ -22,6 +22,7 @@ Avant le lancement du tournoi le redirect vers /announcement doit être géré a
 --> container séparé: WIP
 - Afficher le rang dans la liste d'attente au moment de l'inscription (>En fait quand un tableau est plein et que tu veux tu inscrire, ce serait bien que tu saches directement combien tu seras et ne pas le découvrir au dernier moment. Voire même ce serait bien avant de mettre ton adresse mail, de savoir quels tableaux sont remplis comment)
 - ~~Reparer la logique de disable checkbox sur la partie update~~
+- Authentification par OTP à changer, avec qqch de full front user/password or otp (magic)
 
 ### Informations à communiquer FAQ:
 - Communiquer sur la partie buvette / menus avec prix
