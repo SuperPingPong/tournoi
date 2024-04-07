@@ -43,7 +43,8 @@ docker exec -it $container_name psql -U postgres -a -f /tmp/dump.sql
 #  exit 0
 
 rm to.txt 2>/dev/null || true
-docker exec -it $container_name psql -U postgres -P pager=off -tA -c "select distinct u.email from members m join entries e on m.id=e.member_id join users u on u.id=m.user_id where e.confirmed='t' and e.deleted_at is null;">./to.txt
+#  docker exec -it $container_name psql -U postgres -P pager=off -tA -c "select distinct u.email from members m join entries e on m.id=e.member_id join users u on u.id=m.user_id where e.confirmed='t' and e.deleted_at is null;">./to.txt
+docker exec -it $container_name psql -U postgres -P pager=off -tA -c "select distinct u.email from users as u">./to.txt
 wc -l to.txt
 
 docker rm -f $container_name 2>/dev/null

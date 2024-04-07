@@ -83,14 +83,13 @@ def send_email(service_gmail: Resource, to):
     message = MIMEMultipart()
 
     # Add the subject
-    message['subject'] = f'Dernier rappel: Tournoi de Lognes 08-09/06/2024'
+    message['subject'] = f'Ouverture des inscriptions: Tournoi de Lognes 08-09/06/2024'
 
     # Add the recipient(s)
     message['from'] = f'eplognes <tournoiseplognes@gmail.com>'
-    #  message['from'] = f'Jean-Christophe KOURAJIAN <{OVH_EMAIL}>'
     message['to'] = to
 
-    with open('email_template.html', 'r') as f:
+    with open('templates/tournament_open/email_template.html', 'r') as f:
         message_html = f.read()
 
     # Create a MIMEText object for the HTML message
@@ -112,18 +111,28 @@ def send_email(service_gmail: Resource, to):
 
 
 service_gmail = get_service_gmail()
-"""
-"""
-send_email(service_gmail, 'aurelienduboc96@gmail.com')
-exit(0)
 
-with open('to.txt', 'r') as f:
-    EMAILS = [
+"""
+c=0; for i in backup/*; do c=$((c+1)); ./fetch_emails.sh $i; mv to.txt emails/$c.txt; done
+cat all_emails.txt | tr '\r\n' ' '; echo
+#  sort -u
+"""
+with open('all_emails.txt', 'r') as f:
+    PREVIOUSLY_REGISTERED_EMAILS = [
         item.strip()
         for item in f.read().split('\n')
         if item
     ]
 
+with open('to.txt', 'r') as f:
+    ALREADY_REGISTERED_EMAILS = [
+        item.strip()
+        for item in f.read().split('\n')
+        if item
+    ]
+EMAILS = [e for e in PREVIOUSLY_REGISTERED_EMAILS if e not in ALREADY_REGISTERED_EMAILS]
+#  print(len(EMAILS))
+#  send_email(service_gmail, 'aurelienduboc96@gmail.com')
 print('----')
 for key, email in enumerate(EMAILS):
     print(1+key, email)

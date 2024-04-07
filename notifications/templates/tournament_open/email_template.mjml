@@ -1,0 +1,59 @@
+<mjml owa="desktop">
+    <mj-body background-color="#ffffff">
+
+        <!-- Description -->
+        <mj-section background-color="#ffffff" padding="70px 0px 0px 0px">
+            <mj-group>
+                <mj-column padding="1px 0px 0px 0px">
+                    <mj-text color="#4A67DD" font-size="20px" align="center" font-family="Roboto, sans-serif" padding="40px">
+                       �� Tournoi de Lognes
+                    </mj-text>
+
+                </mj-column>
+            </mj-group>
+        </mj-section>
+
+
+        <mj-section background-color="#ffffff" padding="0px 0px 10px 0px">
+            <mj-group>
+                <mj-column padding="0px 0px 0px 0px">
+
+            <mj-text color="#364468" font-size="16px" align="justify" font-family="Roboto" line-height="140%">
+             Bonjour à tous,<br></br>
+
+             <b>Les inscriptions au tournoi de Lognes ont déjà commencé</b>
+              <br></br>
+
+             Voici un rappel d'information pour le tournoi du 8 juin et 9 juin 2024:
+
+              <ul>
+                <li>
+                  Fin des inscriptions vendredi 7 juin à 12 h, il ne sera plus possible d'effectuer des modifications après cette date.
+                </li>
+                <li>
+                  Vous pouvez consulter vos inscriptions en réutilisant le mail utilisé lors de l'inscription, vous pouvez consulter votre position dans la liste d'attente en temps réel.
+
+                </li>
+                <li>
+                  Le règlement se fait uniquement le jour du tournoi par chèque ou espèce, il n'est pas possible de payer le samedi pour le dimanche.
+                </li>
+
+              </ul>
+
+           </mj-text>
+             <mj-button href="https://tournoi.app.lognestt.fr" background-color="#5f6caf" color="#ffffff">
+              👉 Inscrivez-vous ici 👈
+            </mj-button>
+                      <mj-text color="#364468" font-size="16px" align="justify" font-family="Roboto" line-height="140%">
+                        À très vite&nbsp;!
+                  </mj-text>
+                  <mj-image src="https://i.imgur.com/DaqHIhx.gif" alt="welcome-gif" width="120px" align="center" padding="0px 0px 20px 0px">
+                  </mj-image>
+
+                </mj-column>
+            </mj-group>
+        </mj-section>
+
+
+    </mj-body>
+</mjml>
