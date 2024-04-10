@@ -57,7 +57,7 @@ func (api *API) ListBandAvailabilities(ctx *gin.Context) {
 
 	// List possible bands for the current member
 	var possibleBands []models.Band
-	if err = api.db.Scopes(possibleBandsScope(member)).Find(&possibleBands).Error; err != nil {
+	if err = api.db.Scopes(possibleBandsScope(member)).Order("created_at ASC").Find(&possibleBands).Error; err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to list available bands: %w", err))
 		return
 	}
