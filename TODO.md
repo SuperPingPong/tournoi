@@ -15,6 +15,10 @@ Pensez à changer le secret jwt sur une nouvelle version de l'appli avant lancem
 Avant le lancement du tournoi le redirect vers /announcement doit être géré au niveau nginx et pas dans le front sinon probleme de non refresh lié au cache des navigateurs au lancement
 
 ### Features:
+- Gérer la modification de date de création de certaines entries pour gérer les inscriptions faites par mail si bug/probleme pour acceder à l'application en prenant en compte la date de réception du mail 
+
+- Rajouter une ligne d'explication dans le front pour dire que les rangs dans la liste d'attente peut evoluer dans les deux sens si desinscription ou inscription faite a posteriori pour ceux ayant envoyé un mail et ayant un probleme technique en tenant compte de la date de leur demande par email
+
 - Rajouter un msg après l'arrêt des inscriptions dans la partie /app pour signifier qu'il n'est plus possible de modifier
 - ~~Rajouter une page html avec un message de remerciement et un lien vers le site de lognestt quand le tournoi ets terminé~~
 - ~~Disable event enter (sentry errors) input on search player~~
