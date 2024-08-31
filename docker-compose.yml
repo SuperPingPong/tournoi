@@ -55,4 +55,4 @@ networks:
   tournoi:
     ipam:
       config:
-        - subnet: 172.28.42.0/24
+        - subnet: 172.28.43.0/24
