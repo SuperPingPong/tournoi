@@ -79,7 +79,7 @@ function initDataTable() {
       {
         data: null,
         render: function(data, type, row) {
-  
+
 	  // Convert the escaped row object to base64 encoded JSON string
 	  const rowData = btoa(JSON.stringify(row));
 
@@ -88,10 +88,11 @@ function initDataTable() {
 
           const editButtonStyle = isAfterDeadline() ? 'display: none' : '';
           const editButton = `<button style="${editButtonStyle}" type="submit" data-action="edit" data-info='${rowData}'><i class="fa-solid fa-pencil"></i></button>`;
-          const deleteButtonStyle = isAfterDeadline() ? 'display: none' : 'color: red;';
-          const deleteButton = `<button style="${deleteButtonStyle}" type="submit" data-action="delete" data-info='${rowData}'><i class="fa-solid fa-rectangle-xmark" style="color: red;"></i></button>`;
+          // const deleteButtonStyle = isAfterDeadline() ? 'display: none' : 'color: red;';
+          // const deleteButton = `<button style="${deleteButtonStyle}" type="submit" data-action="delete" data-info='${rowData}'><i class="fa-solid fa-rectangle-xmark" style="color: red;"></i></button>`;
 
-          const buttonsContainer = '<div class="field">' + historyButton + mailButton + editButton + deleteButton + '</div>';
+          // const buttonsContainer = '<div class="field">' + historyButton + mailButton + editButton + deleteButton + '</div>';
+          const buttonsContainer = '<div class="field">' + historyButton + mailButton + editButton + '</div>';
           return buttonsContainer;
         }
       }
