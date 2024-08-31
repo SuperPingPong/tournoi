@@ -18,14 +18,14 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 3,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "datasource": {
         "type": "postgres",
-        "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+        "uid": "adwi3cbmy756ob"
       },
       "gridPos": {
         "h": 6,
@@ -40,16 +40,16 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "<div data-testid=\"TextPanel-converted-content\" class=\"markdown-html css-fb3dw2\" style=\"display: flex; justify-content: center; align-items: center; height: 100%;\">\n  <h3 style=\"text-align: center\">Statistiques<br><br>🏓 TOURNOI NATIONAL B DE L’E.P. LOGNES 🏓 - 28 octobre et 29 octobre 2023</h3>\n</div>\n",
+        "content": "<div data-testid=\"TextPanel-converted-content\" class=\"markdown-html css-fb3dw2\" style=\"display: flex; justify-content: center; align-items: center; height: 100%;\">\n  <h3 style=\"text-align: center\">Statistiques<br><br>🏓 TOURNOI NATIONAL B DE L’E.P. LOGNES 🏓 - 26 octobre et 27 octobre 2024</h3>\n</div>\n",
         "mode": "html"
       },
-      "pluginVersion": "10.1.1",
+      "pluginVersion": "11.2.0",
       "type": "text"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+        "uid": "adwi3cbmy756ob"
       },
       "description": "liste d'attente comprise",
       "fieldConfig": {
@@ -82,6 +82,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -89,14 +90,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.1",
+      "pluginVersion": "11.2.0",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+            "uid": "adwi3cbmy756ob"
           },
           "editorMode": "code",
           "format": "table",
@@ -128,7 +131,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+        "uid": "adwi3cbmy756ob"
       },
       "description": "",
       "fieldConfig": {
@@ -202,12 +205,12 @@
         "showHeader": false,
         "sortBy": []
       },
-      "pluginVersion": "10.1.1",
+      "pluginVersion": "11.2.0",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+            "uid": "adwi3cbmy756ob"
           },
           "editorMode": "code",
           "format": "table",
@@ -239,7 +242,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+        "uid": "adwi3cbmy756ob"
       },
       "gridPos": {
         "h": 6,
@@ -254,16 +257,16 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "<div data-testid=\"TextPanel-converted-content\" class=\"markdown-html css-fb3dw2\" style=\"display: flex; justify-content: center; align-items: center; height: 100%;\">\n  <img src=\"https://tournoi.app.lognestt.fr/img/band-day-1.png\">\n</div>\n",
+        "content": "<div data-testid=\"TextPanel-converted-content\" class=\"markdown-html css-fb3dw2\" style=\"display: flex; justify-content: center; align-items: center; height: 100%;\">\n  <img src=\"https://tournoi.app.lognestt.fr/img/2024-10-band-day-1.png\">\n</div>\n",
         "mode": "html"
       },
-      "pluginVersion": "10.1.1",
+      "pluginVersion": "11.2.0",
       "type": "text"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+        "uid": "adwi3cbmy756ob"
       },
       "fieldConfig": {
         "defaults": {
@@ -271,6 +274,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -335,7 +339,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+            "uid": "adwi3cbmy756ob"
           },
           "editorMode": "code",
           "format": "table",
@@ -367,7 +371,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+        "uid": "adwi3cbmy756ob"
       },
       "gridPos": {
         "h": 6,
@@ -382,16 +386,16 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "<div data-testid=\"TextPanel-converted-content\" class=\"markdown-html css-fb3dw2\" style=\"display: flex; justify-content: center; align-items: center; height: 100%;\">\n  <img src=\"https://tournoi.app.lognestt.fr/img/band-day-2.png\">\n</div>\n",
+        "content": "<div data-testid=\"TextPanel-converted-content\" class=\"markdown-html css-fb3dw2\" style=\"display: flex; justify-content: center; align-items: center; height: 100%;\">\n  <img src=\"https://tournoi.app.lognestt.fr/img/2024-10-band-day-2.png\">\n</div>\n",
         "mode": "html"
       },
-      "pluginVersion": "10.1.1",
+      "pluginVersion": "11.2.0",
       "type": "text"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+        "uid": "adwi3cbmy756ob"
       },
       "fieldConfig": {
         "defaults": {
@@ -399,6 +403,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -463,7 +468,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+            "uid": "adwi3cbmy756ob"
           },
           "editorMode": "code",
           "format": "table",
@@ -495,7 +500,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+        "uid": "adwi3cbmy756ob"
       },
       "description": "",
       "fieldConfig": {
@@ -557,12 +562,12 @@
         "showHeader": false,
         "sortBy": []
       },
-      "pluginVersion": "10.1.1",
+      "pluginVersion": "11.2.0",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+            "uid": "adwi3cbmy756ob"
           },
           "editorMode": "code",
           "format": "table",
@@ -594,7 +599,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+        "uid": "adwi3cbmy756ob"
       },
       "fieldConfig": {
         "defaults": {
@@ -640,12 +645,12 @@
         },
         "showHeader": false
       },
-      "pluginVersion": "10.1.1",
+      "pluginVersion": "11.2.0",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+            "uid": "adwi3cbmy756ob"
           },
           "editorMode": "code",
           "format": "table",
@@ -677,7 +682,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+        "uid": "adwi3cbmy756ob"
       },
       "fieldConfig": {
         "defaults": {
@@ -685,6 +690,7 @@
             "mode": "thresholds"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -709,7 +715,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-blue"
+                "color": "light-blue",
+                "value": null
               }
             ]
           }
@@ -749,7 +756,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "a1c6889f-5268-4123-adf3-d57e7170ae0e"
+            "uid": "adwi3cbmy756ob"
           },
           "editorMode": "code",
           "format": "table",
@@ -780,8 +787,7 @@
     }
   ],
   "refresh": "",
-  "schemaVersion": 38,
-  "style": "dark",
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
@@ -794,6 +800,6 @@
   "timezone": "",
   "title": "STATS",
   "uid": "a57109e5-a08c-4fd8-9e7c-7810fea8bb17",
-  "version": 43,
+  "version": 3,
   "weekStart": ""
 }
