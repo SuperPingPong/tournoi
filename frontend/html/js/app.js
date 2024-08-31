@@ -270,13 +270,13 @@ function editMemberBands(memberString) {
     success: function(response) {
       const sessionId = response.session_id;
       [1, 2].forEach(day => {
-        // TODO: manage edge case do not show checkbox H if checkbox G is available
-        // Filter out bands with Name "H" only if there is a band with Name "G"
+        // TODO: manage edge case do not show checkbox F if checkbox E is available
+        // Filter out bands with Name "F" only if there is a band with Name "E"
         let filteredBands;
         if (response.bands) {
             filteredBands = response.bands.filter(band => {
-                const hasGBand = response.bands.some(gBand => gBand.Name === "G");
-                return !(band.Name === "H" && hasGBand);
+                const hasGBand = response.bands.some(gBand => gBand.Name === "E");
+                return !(band.Name === "F" && hasGBand);
             });
         } else {
             filteredBands = [];
