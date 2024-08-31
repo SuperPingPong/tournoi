@@ -145,23 +145,25 @@ function initDataTable() {
         if (deleteHandler) {
           $('#dataTable').off('click', 'button[data-action="delete"]', deleteHandler.handler);
         }
-        */
         $('#dataTable').on('click', 'button[data-action="delete"]', function(event) {
           event.preventDefault();
           const memberString = $(this).attr('data-info');
           deleteMember(memberString);
         });
+        */
       } else {
         $('#dataTable').on('click', 'button[data-action="edit"]', function(event) {
           event.preventDefault();
           const memberString = $(this).attr('data-info');
           editMemberBands(memberString);
         });
+        /*
         $('#dataTable').on('click', 'button[data-action="delete"]', function(event) {
           event.preventDefault();
           const memberString = $(this).attr('data-info');
           deleteMember(memberString);
         });
+        */
       }
     }
   });
