@@ -429,8 +429,8 @@ function Survey(survey) {
         success: function(response) {
           // console.log(response);
           // Manage if there won't be any band available
-          if (response.point > 1899) {
-            notificationError('Aucun tableau disponible pour les joueurs supérieurs à 1899 points.', 'Aucun tableau disponible');
+          if (response.point > 1999) {
+            notificationError('Aucun tableau disponible pour les joueurs supérieurs à 1999 points.', 'Aucun tableau disponible');
             return
           }
           // Generate HTML content based on the AJAX response
