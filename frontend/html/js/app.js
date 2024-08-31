@@ -103,7 +103,7 @@ function initDataTable() {
       const isAdmin = settings.json.IsAdmin
       if (isAdmin === true) {
         $('button[data-action="edit"]').show();
-        $('button[data-action="delete"]').show();
+        // $('button[data-action="delete"]').show();
         $('button[data-action="history"]').show();
         $('#dataTable').off('click', 'button[data-action="history"]').on('click', 'button[data-action="history"]', function(event) {
           event.preventDefault();
@@ -138,12 +138,14 @@ function initDataTable() {
           const memberString = $(this).attr('data-info');
           editMemberBands(memberString);
         });
+        /*
         const deleteHandler = clickHandlers.find(handler => {
           return handler.selector === 'button[data-action="delete"]';
         });
         if (deleteHandler) {
           $('#dataTable').off('click', 'button[data-action="delete"]', deleteHandler.handler);
         }
+        */
         $('#dataTable').on('click', 'button[data-action="delete"]', function(event) {
           event.preventDefault();
           const memberString = $(this).attr('data-info');
