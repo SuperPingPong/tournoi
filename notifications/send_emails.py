@@ -6,6 +6,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 
 import os.path
 import time
@@ -78,23 +80,49 @@ def fetch_emails(service_gmail: Resource, query: Optional[str] = ''):
     return response
 
 
-def send_email(service_gmail: Resource, to):
+def send_email(service_gmail: Resource, to, attachment_path: Optional[str] = None):
     # Create a MIME Multipart message
     message = MIMEMultipart()
 
     # Add the subject
-    message['subject'] = f'Ouverture des inscriptions: Tournoi de Lognes 08-09/06/2024'
+    #  message['subject'] = f'Ouverture des inscriptions: Tournoi de Lognes 08-09/06/2024'
+    message['subject'] = f'Information importante: Tournoi de Lognes 08-09/06/2024'
 
     # Add the recipient(s)
     message['from'] = f'eplognes <tournoiseplognes@gmail.com>'
     message['to'] = to
 
-    with open('templates/tournament_open/email_template.html', 'r') as f:
+    #  with open('templates/tournament_open/email_template.html', 'r') as f:
+    with open('templates/reminder/email_template.html', 'r') as f:
         message_html = f.read()
 
     # Create a MIMEText object for the HTML message
     html_message = MIMEText(message_html, 'html')
     message.attach(html_message)
+
+    if 'EXTERNAL_URL' in html_message:
+        raise Exception('Please replace EXTERNAL_URL from template')
+
+    # Attach the file if provided
+    if attachment_path:
+        # Open the file in binary mode
+        with open(attachment_path, 'rb') as attachment:
+            # Create a MIMEBase object
+            #  mime_base = MIMEBase('application', 'octet-stream')
+            mime_base = MIMEBase('application', 'vnd.openxmlformats-officedocument.presentationml.presentation')
+            mime_base.set_payload(attachment.read())
+
+        # Encode the payload using base64
+        encoders.encode_base64(mime_base)
+
+        # Add header to the MIMEBase object
+        mime_base.add_header(
+            'Content-Disposition',
+            f'attachment; filename={os.path.basename(attachment_path)}'
+        )
+
+        # Attach the MIMEBase object to the MIMEMultipart message
+        message.attach(mime_base)
 
     # Base64 encode the message
     raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
@@ -117,6 +145,7 @@ c=0; for i in backup/*; do c=$((c+1)); ./fetch_emails.sh $i; mv to.txt emails/$c
 cat all_emails.txt | tr '\r\n' ' '; echo
 #  sort -u
 """
+"""
 with open('all_emails.txt', 'r') as f:
     PREVIOUSLY_REGISTERED_EMAILS = [
         item.strip()
@@ -131,11 +160,22 @@ with open('to.txt', 'r') as f:
         if item
     ]
 EMAILS = [e for e in PREVIOUSLY_REGISTERED_EMAILS if e not in ALREADY_REGISTERED_EMAILS]
+"""
 #  print(len(EMAILS))
 #  send_email(service_gmail, 'aurelienduboc96@gmail.com')
+with open('to.txt', 'r') as f:
+    EMAILS = [
+        item.strip()
+        for item in f.read().split('\n')
+        if item
+    ]
+print(len(EMAILS))
 print('----')
+#  EMAILS = ['aurelienduboc96@gmail.com']
+ATTACHMENT_PATH='./attachments/Info-joueurs-tarif-juin.pptx'
+
 for key, email in enumerate(EMAILS):
     print(1+key, email)
-    send_email(service_gmail, email)
+    send_email(service_gmail, email, attachment_path=ATTACHMENT_PATH)
     print('----')
     time.sleep(1)
