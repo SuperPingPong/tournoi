@@ -14,6 +14,18 @@
 - - 'Aucun tableau disponible pour les joueurs supérieurs à 1999 points'
 Pensez à changer le secret jwt sur une nouvelle version de l'appli avant lancement pour forcer l'invalidation des precedents jwt
 Avant le lancement du tournoi le redirect vers /announcement doit être géré au niveau nginx et pas dans le front sinon probleme de non refresh lié au cache des navigateurs au lancement
+```
+location = / {
+    try_files /farewell.html =404;
+}
+```
+Si jamais un window.location a été mis dans un script, on doit forcer la revalidation du coté client:
+```
+location = / {
+    add_header Cache-Control "no-cache, no-store, must-revalidate";
+    try_files /index.html =404;
+}
+```
 
 ### Features:
 - Gérer la modification de date de création de certaines entries pour gérer les inscriptions faites par mail si bug/probleme pour acceder à l'application en prenant en compte la date de réception du mail
