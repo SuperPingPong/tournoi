@@ -16,14 +16,14 @@ function manageCheckboxRequisitesEvent(event) {
 
 function manageCheckboxRequisites(checkboxTarget) {
 
-  const checkboxG = document.querySelector('input#tableau-G');
-  if (checkboxG && checkboxG.checked !== true) {
-    if (checkboxG.getAttribute('data-member-sex') === checkboxG.getAttribute('data-sex') &&
-      parseInt(checkboxG.getAttribute('data-member-points')) <= parseInt(checkboxG.getAttribute('data-maxpoints'))
+  const checkboxE = document.querySelector('input#tableau-E');
+  if (checkboxE && checkboxE.checked !== true) {
+    if (checkboxE.getAttribute('data-member-sex') === checkboxE.getAttribute('data-sex') &&
+      parseInt(checkboxE.getAttribute('data-member-points')) <= parseInt(checkboxE.getAttribute('data-maxpoints'))
     ) {
-      const checkboxesWithSameDay = document.querySelectorAll(`input[data-day="${checkboxG.getAttribute('data-day')}"]:checked`);
+      const checkboxesWithSameDay = document.querySelectorAll(`input[data-day="${checkboxE.getAttribute('data-day')}"]:checked`);
       if (checkboxesWithSameDay.length > 0) {
-        checkboxG.checked = true;
+        checkboxE.checked = true;
       }
     }
   }
@@ -76,7 +76,7 @@ function manageCheckboxRequisites(checkboxTarget) {
 
 function isAfterDeadline() {
   const currentDate = new Date();
-  const targetDateTime = new Date('2024-06-07T12:00:00Z');
+  const targetDateTime = new Date('2024-10-25T12:00:00Z');
   return currentDate > targetDateTime;
 }
 

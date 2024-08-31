@@ -557,7 +557,7 @@ function Survey(survey) {
       contentType: 'application/json',
       success: function(response) {
         let checkboxStringTitles = [
-          '<p>Samedi 8 Juin 2024</p>', '<p>Dimanche 9 Juin 2024</p>'
+          '<p>Samedi 26 Octobre 2024</p>', '<p>Dimanche 27 Octobre 2024</p>'
         ]
         const bands = response.bands.filter(band => bandIDs.includes(band.ID));
         let confirmText = '';

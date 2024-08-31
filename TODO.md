@@ -2,13 +2,14 @@
 
 ### Changement de tournoi
 - Pensez à rechercher les mots clefs suivant pour remplacement  des informations des tableaux (grep -Ri):
-- - 2024
+- - 2024 + 2024-10 + octobre
+- - 'Les inscriptions seront accessibles ici'
 - - féminin
-- - band-day
+- - band-day png + reglement pdf
 - - 'tableaux maximum par jour'
 - - '2 tableaux'
-- - 'checkedCheckboxesWithSameDay.length >= 3'
-- - 'checkboxG' (tableau féminin)
+- - 'checkedCheckboxesWithSameDay.length >= 2'
+- - 'checkboxE' (tableau féminin) / tableau-E / 'tableau E'
 - - TODO
 - - 'Aucun tableau disponible pour les joueurs supérieurs à 1999 points'
 Pensez à changer le secret jwt sur une nouvelle version de l'appli avant lancement pour forcer l'invalidation des precedents jwt
