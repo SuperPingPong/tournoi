@@ -10,6 +10,7 @@ from email.mime.base import MIMEBase
 from email import encoders
 
 import os.path
+from pathlib import Path
 import time
 import base64
 from typing import Optional
@@ -80,21 +81,23 @@ def fetch_emails(service_gmail: Resource, query: Optional[str] = ''):
     return response
 
 
-def send_email(service_gmail: Resource, to, attachment_path: Optional[str] = None):
+def send_email(service_gmail: Resource, to, template: str, attachment_path: Optional[str] = None):
     # Create a MIME Multipart message
     message = MIMEMultipart()
 
     # Add the subject
     #  message['subject'] = f'Ouverture des inscriptions: Tournoi de Lognes 08-09/06/2024'
-    message['subject'] = f'Information importante: Tournoi de Lognes 08-09/06/2024'
+    message['subject'] = f'Information importante: Tournoi de Lognes 26-27/10/2024'
 
     # Add the recipient(s)
     message['from'] = f'eplognes <tournoiseplognes@gmail.com>'
     message['to'] = to
 
-    #  with open('templates/tournament_open/email_template.html', 'r') as f:
-    with open('templates/reminder/email_template.html', 'r') as f:
-        message_html = f.read()
+    email_template_path = Path(f'templates/{template}/email_template.html')
+    if email_template_path.exists():
+        message_html = email_template_path.read_text()
+    else:
+        raise Exception(f"File does not exist: {email_template_path}")
 
     # Create a MIMEText object for the HTML message
     html_message = MIMEText(message_html, 'html')
@@ -133,7 +136,7 @@ def send_email(service_gmail: Resource, to, attachment_path: Optional[str] = Non
             userId="me",
             body={'raw': raw_message}
         ).execute()
-        print(f"Message sent. Message ID: {message['id']}")
+        print(f"Message sent. Message ID: {message['id']} - {to}")
     except HttpError as error:
         print(f"An error occurred: {error}")
 
@@ -142,9 +145,11 @@ service_gmail = get_service_gmail()
 
 """
 c=0; for i in backup/*; do c=$((c+1)); ./fetch_emails.sh $i; mv to.txt emails/$c.txt; done
-cat all_emails.txt | tr '\r\n' ' '; echo
-#  sort -u
-"""
+rm all_emails.txt 2>/dev/null
+for f in emails/*; do cat $f>>all_emails.txt; done
+sort -u all_emails.txt>temp
+mv temp all_emails.txt
+wc -l all_emails.txt
 """
 with open('all_emails.txt', 'r') as f:
     PREVIOUSLY_REGISTERED_EMAILS = [
@@ -160,9 +165,11 @@ with open('to.txt', 'r') as f:
         if item
     ]
 EMAILS = [e for e in PREVIOUSLY_REGISTERED_EMAILS if e not in ALREADY_REGISTERED_EMAILS]
-"""
+TEMPLATE='tournament_open'
+send_email(service_gmail, 'aurelienduboc96@gmail.com', template=TEMPLATE)
+
+exit(0)
 #  print(len(EMAILS))
-#  send_email(service_gmail, 'aurelienduboc96@gmail.com')
 with open('to.txt', 'r') as f:
     EMAILS = [
         item.strip()
@@ -176,6 +183,6 @@ ATTACHMENT_PATH='./attachments/Info-joueurs-tarif-juin.pptx'
 
 for key, email in enumerate(EMAILS):
     print(1+key, email)
-    send_email(service_gmail, email, attachment_path=ATTACHMENT_PATH)
+    send_email(service_gmail, email, template=TEMPLATE, attachment_path=ATTACHMENT_PATH)
     print('----')
     time.sleep(1)
