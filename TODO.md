@@ -27,6 +27,22 @@ location = / {
 }
 ```
 
+Pour forcer le rechargement des scripts js, ajouter un get param, exemple:
+```
+<script src="js/common.js?v=202410?v=202410"></script>
+```
+
+A tester également avec nginx:
+```
+location ~* \.(js)$ {
+    add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
+    add_header Pragma "no-cache";
+    expires off;
+}
+```
+
+Une autre idée c'est de changer le nom de domaine à chaque fois avec la date dans le nom de domaine
+
 ### Features:
 - Gérer la modification de date de création de certaines entries pour gérer les inscriptions faites par mail si bug/probleme pour acceder à l'application en prenant en compte la date de réception du mail
 
