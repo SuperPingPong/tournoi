@@ -4,9 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/gmail/v1"
 	"html"
 	"io/ioutil"
 	"log"
@@ -14,6 +11,10 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/gmail/v1"
 
 	"github.com/SuperPingPong/tournoi/internal/auth"
 	"github.com/SuperPingPong/tournoi/internal/models"
@@ -127,6 +128,7 @@ func GetGmailService() (*gmail.Service, error) {
 	return service, err
 }
 
+/*
 func sendEmailOTP(to string, code string) error {
 	service, err := GetGmailService()
 
@@ -134,6 +136,37 @@ func sendEmailOTP(to string, code string) error {
 	message := &gmail.Message{
 		Raw: base64.RawURLEncoding.EncodeToString([]byte(
 			fmt.Sprintf("To: %s\r\nSubject: OTP %s Tournoi de Lognes\r\n\r\nVoici votre code de vérification OTP: %s", to, code, code)),
+		),
+	}
+
+	_, err = service.Users.Messages.Send("me", message).Do()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+*/
+
+func sendEmailHTMLOTP(to string, code string) error {
+	service, err := GetGmailService()
+	if err != nil {
+		return fmt.Errorf("failed to get Gmail service: %v", err)
+	}
+
+	// Read the HTML content from the file
+	htmlContent, err := ioutil.ReadFile("email_templates/otp_code.html")
+	if err != nil {
+		return fmt.Errorf("failed to read email HTML file: %v", err)
+	}
+
+	// Replace the placeholder with the otp code
+	replacedContent := strings.Replace(string(htmlContent), "OTP_CODE", code, -1)
+
+	// Set up the email message
+	message := &gmail.Message{
+		Raw: base64.URLEncoding.EncodeToString([]byte(
+			fmt.Sprintf("To: %s\r\nSubject: OTP %s\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=\"utf-8\"\r\n\r\n%s", to, code, replacedContent)),
 		),
 	}
 
@@ -152,7 +185,7 @@ func sendEmailHTML(to string, lastName string, firstName string) error {
 	}
 
 	// Read the HTML content from the file
-	htmlContent, err := ioutil.ReadFile("email_template.html")
+	htmlContent, err := ioutil.ReadFile("email_templates/register_confirm.html")
 	if err != nil {
 		return fmt.Errorf("failed to read email HTML file: %v", err)
 	}

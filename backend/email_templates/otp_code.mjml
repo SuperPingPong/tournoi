@@ -1,0 +1,39 @@
+<mjml owa="desktop">
+    <mj-body background-color="#ffffff">
+
+        <!-- Description -->
+        <mj-section background-color="#ffffff" padding="70px 0px 0px 0px">
+            <mj-group>
+                <mj-column padding="1px 0px 0px 0px">
+                    <mj-text color="#4A67DD" font-size="20px" align="center" font-family="Roboto, sans-serif" padding="40px">
+                       �� Tournoi de Lognes
+                    </mj-text>
+
+                </mj-column>
+            </mj-group>
+        </mj-section>
+
+
+        <mj-section background-color="#ffffff" padding="0px 0px 10px 0px">
+            <mj-group>
+                <mj-column padding="0px 0px 0px 0px">
+
+            <mj-text color="#364468" font-size="16px" align="center" font-family="Roboto" line-height="140%">
+             Voici votre code OTP: <b>OTP_CODE</b>
+             
+
+           </mj-text>
+
+                  <mj-text color="#364468" font-size="16px" align="justify" font-family="Roboto" line-height="140%">
+                  </mj-text>
+                  <mj-image src="https://i.imgur.com/DaqHIhx.gif" alt="welcome-gif" width="120px" align="center" padding="0px 0px 20px 0px">
+                  </mj-image>
+
+                </mj-column>
+            </mj-group>
+        </mj-section>
+
+
+    </mj-body>
+</mjml>
+

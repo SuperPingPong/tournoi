@@ -67,7 +67,7 @@ func (api *API) SendOTP(ctx *gin.Context) {
 		return
 	}
 
-	err = sendEmailOTP(input.Email, password)
+	err = sendEmailHTMLOTP(input.Email, password)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to send email: %w", err))
 		return
