@@ -9,6 +9,7 @@ import psycopg2
 import psycopg2.extras
 
 import gspread
+from gspread.utils import ExportFormat
 from oauth2client.service_account import ServiceAccountCredentials
 import utils
 
@@ -108,7 +109,7 @@ def export():
     worksheet = workbook.worksheet("Base inscrits")
 
     query = """
-            SELECT users.email, 
+            SELECT users.email,
             members.last_name,
             members.first_name,
             members.permit_id,
@@ -137,7 +138,7 @@ def export():
     utils.fill_worksheet(worksheet, BANDS, entries)
 
     # Download the workbook as XLSX
-    workbook_as_xlsx = workbook.export(format='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    workbook_as_xlsx = workbook.export(format=ExportFormat.OPEN_OFFICE_SHEET)
 
     # Save the exported workbook to a file
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
