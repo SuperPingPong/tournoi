@@ -3,6 +3,7 @@
 ### Changement de tournoi
 - Pensez à rechercher les mots clefs suivant pour remplacement  des informations des tableaux (grep -Ri):
 - - 2024 + 2024-12 + décembre
+- - 'const targetDateTime'
 - - 'Les inscriptions seront accessibles ici'
 - - féminin
 - - band-day png + reglement pdf
@@ -29,7 +30,7 @@ location = / {
 
 Pour forcer le rechargement des scripts js, ajouter un get param, exemple:
 ```
-<script src="js/common.js?v=202410?v=202410"></script>
+<script src="js/common.js?v=202410"></script>
 ```
 
 A tester également avec nginx:
