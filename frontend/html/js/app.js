@@ -79,9 +79,6 @@ function initDataTable() {
       {
         data: null,
         render: function(data, type, row) {
-
-          console.log(data);
-
           // Convert the escaped row object to base64 encoded JSON string
           const rowData = btoa(JSON.stringify(row));
 
@@ -90,7 +87,8 @@ function initDataTable() {
 
           const editButtonStyle = isAfterDeadline() ? 'display: none' : '';
           const editButton = `<button style="${editButtonStyle}" type="submit" data-action="edit" data-info='${rowData}'><i class="fa-solid fa-pencil"></i></button>`;
-          const deleteButtonStyle = isAfterDeadline() ? 'display: none' : 'color: red;';
+          // const deleteButtonStyle = isAfterDeadline() ? 'display: none' : 'color: red;';
+          deleteButtonStyle = 'display: none'
           const deleteButton = `<button style="${deleteButtonStyle}" type="submit" data-action="delete" data-info='${rowData}'><i class="fa-solid fa-rectangle-xmark" style="color: red;"></i></button>`;
 
           // const buttonsContainer = '<div class="field">' + historyButton + mailButton + editButton + '</div>';
@@ -106,6 +104,11 @@ function initDataTable() {
       if (isAdmin === true) {
         $('button[data-action="edit"]').show();
         $('button[data-action="delete"]').show();
+        $('#dataTable').off('click', 'button[data-action="delete"]').on('click', 'button[data-action="delete"]', function(event) {
+          event.preventDefault();
+          const memberString = $(this).attr('data-info');
+          deleteMember(memberString);
+        });
         $('button[data-action="history"]').show();
         $('#dataTable').off('click', 'button[data-action="history"]').on('click', 'button[data-action="history"]', function(event) {
           event.preventDefault();
