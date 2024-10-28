@@ -1,0 +1,45 @@
+<mjml owa="desktop">
+    <mj-body background-color="#ffffff">
+
+        <!-- Description -->
+        <mj-section background-color="#ffffff" padding="70px 0px 0px 0px">
+            <mj-group>
+                <mj-column padding="1px 0px 0px 0px">
+                    <mj-text color="#4A67DD" font-size="20px" align="center" font-family="Roboto, sans-serif" padding="40px">
+                       🏓 Tournoi de Lognes
+                    </mj-text>
+
+                </mj-column>
+            </mj-group>
+        </mj-section>
+
+
+        <mj-section background-color="#ffffff" padding="0px 0px 10px 0px">
+            <mj-group>
+                <mj-column padding="0px 0px 0px 0px">
+
+            <mj-text color="#364468" font-size="16px" align="justify" font-family="Roboto" line-height="140%">
+             Bonjour à tous,<br></br>
+              <b>
+              En raison d'un imprévu indépendant de notre volonté et de questions de sécurité, nous sommes au regret de reporter le tournoi initialement prévu les 26 et 27 octobre 2024.
+              </b>
+              <br></br>
+              Si vous avez effectué l'inscription pour un autre joueur, merci de le prévenir.
+              <br></br>
+              Le tournoi est reporté au 21-22 décembre, il faudra se réinscrire pour le tournoi de décembre lorsque les inscriptions seront ouvertes courant novembre.
+              <br></br>
+              À la prochaine,
+              <br></br>
+              L'équipe de Lognes
+           </mj-text>
+
+                  <mj-image src="https://i.imgur.com/DaqHIhx.gif" alt="welcome-gif" width="120px" align="center" padding="0px 0px 20px 0px">
+                  </mj-image>
+
+                </mj-column>
+            </mj-group>
+        </mj-section>
+
+
+    </mj-body>
+</mjml>

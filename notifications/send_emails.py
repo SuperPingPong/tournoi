@@ -81,13 +81,15 @@ def fetch_emails(service_gmail: Resource, query: Optional[str] = ''):
     return response
 
 
-def send_email(service_gmail: Resource, to, template: str, attachment_path: Optional[str] = None):
+def send_email(service_gmail: Resource, to, template: str, attachment_path: Optional[str] = None, subject: Optional[str] = None):
     # Create a MIME Multipart message
     message = MIMEMultipart()
 
     # Add the subject
-    #  message['subject'] = f'Ouverture des inscriptions: Tournoi de Lognes 08-09/06/2024'
-    message['subject'] = f'Information importante: Tournoi de Lognes 26-27/10/2024'
+    if subject is None:
+        message['subject'] = f'Information importante: Tournoi de Lognes'
+    else:
+        message['subject'] = subject
 
     # Add the recipient(s)
     message['from'] = f'eplognes <tournoiseplognes@gmail.com>'
@@ -151,6 +153,8 @@ sort -u all_emails.txt>temp
 mv temp all_emails.txt
 wc -l all_emails.txt
 """
+
+"""
 with open('all_emails.txt', 'r') as f:
     PREVIOUSLY_REGISTERED_EMAILS = [
         item.strip()
@@ -167,8 +171,8 @@ with open('to.txt', 'r') as f:
 EMAILS = [e for e in PREVIOUSLY_REGISTERED_EMAILS if e not in ALREADY_REGISTERED_EMAILS]
 TEMPLATE='tournament_open'
 send_email(service_gmail, 'aurelienduboc96@gmail.com', template=TEMPLATE)
+"""
 
-exit(0)
 #  print(len(EMAILS))
 with open('to.txt', 'r') as f:
     EMAILS = [
@@ -178,11 +182,13 @@ with open('to.txt', 'r') as f:
     ]
 print(len(EMAILS))
 print('----')
+TEMPLATE='tournament_cancel'
 #  EMAILS = ['aurelienduboc96@gmail.com']
-ATTACHMENT_PATH='./attachments/Info-joueurs-tarif-juin.pptx'
+#  ATTACHMENT_PATH='./attachments/Info-joueurs-tarif-juin.pptx'
 
 for key, email in enumerate(EMAILS):
     print(1+key, email)
-    send_email(service_gmail, email, template=TEMPLATE, attachment_path=ATTACHMENT_PATH)
+    #  send_email(service_gmail, email, template=TEMPLATE, attachment_path=ATTACHMENT_PATH)
+    send_email(service_gmail, email, template=TEMPLATE, subject='Tournoi annulé')
     print('----')
     time.sleep(1)
