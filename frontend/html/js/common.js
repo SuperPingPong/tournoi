@@ -76,7 +76,7 @@ function manageCheckboxRequisites(checkboxTarget) {
 
 function isAfterDeadline() {
   const currentDate = new Date();
-  const targetDateTime = new Date('2024-10-25T12:00:00Z');
+  const targetDateTime = new Date('2024-12-25T12:00:00Z');
   return currentDate > targetDateTime;
 }
 

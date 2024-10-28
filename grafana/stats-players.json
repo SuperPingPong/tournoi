@@ -153,7 +153,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "<div data-testid=\"TextPanel-converted-content\" class=\"markdown-html css-fb3dw2\" style=\"display: flex; justify-content: center; align-items: center; height: 100%;\">\n  <img src=\"https://tournoi.app.lognestt.fr/img/2024-10-band-day-1.png\">\n</div>\n",
+        "content": "<div data-testid=\"TextPanel-converted-content\" class=\"markdown-html css-fb3dw2\" style=\"display: flex; justify-content: center; align-items: center; height: 100%;\">\n  <img src=\"https://tournoi.app.lognestt.fr/img/2024-12-band-day-1.png\">\n</div>\n",
         "mode": "html"
       },
       "pluginVersion": "11.2.0",
@@ -177,7 +177,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "<div data-testid=\"TextPanel-converted-content\" class=\"markdown-html css-fb3dw2\" style=\"display: flex; justify-content: center; align-items: center; height: 100%;\">\n  <img src=\"https://tournoi.app.lognestt.fr/img/2024-10-band-day-2.png\">\n</div>\n",
+        "content": "<div data-testid=\"TextPanel-converted-content\" class=\"markdown-html css-fb3dw2\" style=\"display: flex; justify-content: center; align-items: center; height: 100%;\">\n  <img src=\"https://tournoi.app.lognestt.fr/img/2024-12-band-day-2.png\">\n</div>\n",
         "mode": "html"
       },
       "pluginVersion": "11.2.0",

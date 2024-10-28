@@ -80,19 +80,21 @@ function initDataTable() {
         data: null,
         render: function(data, type, row) {
 
-	  // Convert the escaped row object to base64 encoded JSON string
-	  const rowData = btoa(JSON.stringify(row));
+          console.log(data);
+
+          // Convert the escaped row object to base64 encoded JSON string
+          const rowData = btoa(JSON.stringify(row));
 
           const historyButton = `<button style="display:none" type="submit" data-action="history" data-info='${rowData}'><i class="fa-solid fa-history"></i></button>`;
           const mailButton = `<button style="display: none" type="submit" data-action="mail" data-info='${rowData}'><i class="fa-solid fa-envelope"></i></button>`;
 
           const editButtonStyle = isAfterDeadline() ? 'display: none' : '';
           const editButton = `<button style="${editButtonStyle}" type="submit" data-action="edit" data-info='${rowData}'><i class="fa-solid fa-pencil"></i></button>`;
-          // const deleteButtonStyle = isAfterDeadline() ? 'display: none' : 'color: red;';
-          // const deleteButton = `<button style="${deleteButtonStyle}" type="submit" data-action="delete" data-info='${rowData}'><i class="fa-solid fa-rectangle-xmark" style="color: red;"></i></button>`;
+          const deleteButtonStyle = isAfterDeadline() ? 'display: none' : 'color: red;';
+          const deleteButton = `<button style="${deleteButtonStyle}" type="submit" data-action="delete" data-info='${rowData}'><i class="fa-solid fa-rectangle-xmark" style="color: red;"></i></button>`;
 
-          // const buttonsContainer = '<div class="field">' + historyButton + mailButton + editButton + deleteButton + '</div>';
-          const buttonsContainer = '<div class="field">' + historyButton + mailButton + editButton + '</div>';
+          // const buttonsContainer = '<div class="field">' + historyButton + mailButton + editButton + '</div>';
+          const buttonsContainer = '<div class="field">' + historyButton + mailButton + editButton + deleteButton + '</div>';
           return buttonsContainer;
         }
       }
@@ -103,7 +105,7 @@ function initDataTable() {
       const isAdmin = settings.json.IsAdmin
       if (isAdmin === true) {
         $('button[data-action="edit"]').show();
-        // $('button[data-action="delete"]').show();
+        $('button[data-action="delete"]').show();
         $('button[data-action="history"]').show();
         $('#dataTable').off('click', 'button[data-action="history"]').on('click', 'button[data-action="history"]', function(event) {
           event.preventDefault();
@@ -138,7 +140,6 @@ function initDataTable() {
           const memberString = $(this).attr('data-info');
           editMemberBands(memberString);
         });
-        /*
         const deleteHandler = clickHandlers.find(handler => {
           return handler.selector === 'button[data-action="delete"]';
         });
@@ -150,7 +151,6 @@ function initDataTable() {
           const memberString = $(this).attr('data-info');
           deleteMember(memberString);
         });
-        */
       } else {
         $('#dataTable').on('click', 'button[data-action="edit"]', function(event) {
           event.preventDefault();
@@ -261,7 +261,7 @@ function editMemberBands(memberString) {
   const bandIDs = member.Entries === null ? [] : member.Entries.map(obj => obj.BandID);
   var checkboxStrings = ['', '']
   let checkboxStringTitles = [
-    '<p>Samedi 26 Octobre 2024</p>', '<p>Dimanche 27 Octobre 2024</p>'
+    '<p>Samedi 21 Décembre 2024</p>', '<p>Dimanche 22 Décembre 2024</p>'
   ]
   $.ajax({
     url: `/api/members/${member.ID}/band-availabilities`,
@@ -304,7 +304,7 @@ function editMemberBands(memberString) {
         title: 'Mise a jour des tableaux',
         html:
            getMemberHeaderHtml(member) +
-           '<div class="rules-container"><h2>⚠️ Règlement ⚠️</h2><ul><li>Les tableaux de couleurs identiques ne pourront pas être cumulés dans la même journée.</li><li>Les féminines de moins de 1199 points qui s\'inscrivent à un tableau le samedi doivent obligatoirement s\'inscrire au tableau E féminin <= 1199 points.</li><li>2 tableaux maximum par jour.</li><li>Les inscriptions pourront se faire jusqu’au vendredi 25 octobre 2024 – 12H00.</li><li>Les places disponibles sont bloquées pendant 10 minutes, au-delà votre session sera expirée.</li></ul></div><br><br>' +
+           '<div class="rules-container"><h2>⚠️ Règlement ⚠️</h2><ul><li>Les tableaux de couleurs identiques ne pourront pas être cumulés dans la même journée.</li><li>Les féminines de moins de 1199 points qui s\'inscrivent à un tableau le samedi doivent obligatoirement s\'inscrire au tableau E féminin <= 1199 points.</li><li>2 tableaux maximum par jour.</li><li>Les inscriptions pourront se faire jusqu’au vendredi 20 décembre 2024 – 12H00.</li><li>Les places disponibles sont bloquées pendant 10 minutes, au-delà votre session sera expirée.</li></ul></div><br><br>' +
           checkboxStringTitles[0] + checkboxStrings[0] +
           checkboxStringTitles[1] + checkboxStrings[1],
         // input: 'text',
@@ -440,7 +440,7 @@ function deleteMember(memberString) {
     title: "Suppression l'inscription",
     html:
       getMemberHeaderHtml(member) +
-      "Êtes-vous certain de vouloir supprimer l'inscription de ce joueur ?",
+      "Êtes-vous certain de vouloir supprimer l'inscription de ce joueur ? <br><br>⚠️ <b>Attention: Utilisez cette fonctionnalité uniquement en cas de conflit d'inscription, ceci ne doit pas servir à annuler les tableaux d'un joueur</b> ⚠️",
     // input: 'text',
     inputAttributes: {
         autocapitalize: 'off'

@@ -445,7 +445,9 @@ function Survey(survey) {
                 '🗂 Catégorie: ' + response.cat + '<br>' +
                 '🏓 Club: ' + response.nomclub.replace(' ', ' ') + '<br>' +
                 '⚧ Sexe: ' + response.sexe + '<br>' +
-                '🎯 Officiels: ' + response.point ,
+                '🎯 Officiels: ' + response.point + '<br><br>' +
+                '⚠️ <b>Attention: Merci de ne valider que s\'il s\'agit de vous même ou de quelqu\'un dont vous avez l\'autorisation explicite pour l\'inscrire</b> ⚠️ ' +
+                '<br><br>Il n\'est pas possible de vérifier si un autre joueur est déjà inscrit.',
             showCancelButton: true,
             confirmButtonText: 'Confirmer',
             cancelButtonText: 'Annuler',
@@ -557,7 +559,7 @@ function Survey(survey) {
       contentType: 'application/json',
       success: function(response) {
         let checkboxStringTitles = [
-          '<p>Samedi 26 Octobre 2024</p>', '<p>Dimanche 27 Octobre 2024</p>'
+          '<p>Samedi 21 Décembre 2024</p>', '<p>Dimanche 22 Décembre 2024</p>'
         ]
         const bands = response.bands.filter(band => bandIDs.includes(band.ID));
         let confirmText = '';

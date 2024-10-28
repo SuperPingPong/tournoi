@@ -2,7 +2,7 @@
 
 ### Changement de tournoi
 - Pensez à rechercher les mots clefs suivant pour remplacement  des informations des tableaux (grep -Ri):
-- - 2024 + 2024-10 + octobre
+- - 2024 + 2024-12 + décembre
 - - 'Les inscriptions seront accessibles ici'
 - - féminin
 - - band-day png + reglement pdf
