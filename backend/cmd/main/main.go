@@ -85,7 +85,7 @@ func main() {
 			Color:      "pink",
 			SexAllowed: "ALL",
 			MaxPoints:  799,
-			MaxEntries: 84,
+			MaxEntries: 85,
 			Price:      9,
 		},
 		{
