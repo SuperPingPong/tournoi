@@ -18,19 +18,13 @@ server {
         }
 
         location /app {
+            add_header Cache-Control "no-cache, no-store, must-revalidate";
             try_files $uri $uri/ /app.html;
-        }
-
-        location /announcement {
-            try_files $uri $uri/ /announcement.html;
-        }
-
-        location /farewell {
-            try_files $uri $uri/ /farewell.html;
         }
 
         location = / {
             add_header Cache-Control "no-cache, no-store, must-revalidate";
+            #  try_files $uri $uri/ /farewell.html;
             #  try_files /announcement.html =404;
             #  try_files /cancel.html =404;
             try_files /index.html =404;
