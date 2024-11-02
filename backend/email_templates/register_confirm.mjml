@@ -18,17 +18,20 @@
             <mj-group>
                 <mj-column padding="0px 0px 0px 0px">
 
-            <mj-text color="#364468" font-size="16px" align="justify" font-family="Roboto" line-height="140%">
-             Merci pour votre inscription. Vous pouvez à tout moment consulter ou modifier vos tableaux ici:
-           </mj-text>
-             <mj-button href="EXTERNAL_URL" background-color="#5f6caf" color="#ffffff">
-              👉 Gérer mes inscriptions 👈
-            </mj-button>
-                      <mj-text color="#364468" font-size="16px" align="justify" font-family="Roboto" line-height="140%">
+                    <mj-text color="#364468" font-size="16px" align="justify" font-family="Roboto" line-height="140%">
+                        Merci pour votre inscription. Vous pouvez à tout moment consulter ou modifier vos tableaux ici:
+                    </mj-text>
+                    <mj-button href="EXTERNAL_URL" background-color="#5f6caf" color="#ffffff">
+                        👉 Gérer mes inscriptions 👈
+                    </mj-button>
+                    <mj-text color="#364468" font-size="16px" align="justify" font-family="Roboto" line-height="140%">
+                      Pour rappel: Les paiements sont <b>uniquement</b> sur place par espèce ou chèque (à l'ordre de "E.P. de Lognes").
+                    </mj-text>
+                    <mj-text color="#364468" font-size="16px" align="justify" font-family="Roboto" line-height="140%">
                         À très vite&nbsp;!
-                  </mj-text>
-                  <mj-image src="https://i.imgur.com/DaqHIhx.gif" alt="welcome-gif" width="120px" align="center" padding="0px 0px 20px 0px">
-                  </mj-image>
+                    </mj-text>
+                    <mj-image src="https://i.imgur.com/DaqHIhx.gif" alt="welcome-gif" width="120px" align="center" padding="0px 0px 20px 0px">
+                    </mj-image>
 
                 </mj-column>
             </mj-group>
